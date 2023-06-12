@@ -42,16 +42,16 @@ func (u *UserPayload) set_reset_token() error {
 
 type User struct {
 	ID                            uuid.UUID
-	email                         string
-	password                      string
-	salt                          string
-	created_at                    time.Time
-	updated_at                    time.Time
-	is_verified                   bool
-	verification_token            uuid.UUID
-	verification_token_expires_at time.Time
-	reset_token                   uuid.UUID
-	reset_token_expires_at        time.Time
+	Email                         string
+	Password                      string
+	Salt                          string
+	Created_at                    time.Time
+	Updated_at                    time.Time
+	Is_verified                   bool
+	Verification_token            uuid.UUID
+	Verification_token_expires_at time.Time
+	Reset_token                   uuid.UUID
+	Reset_token_expires_at        time.Time
 }
 
 func (u *User) insert(up UserPayload, d UserPayload) error {
