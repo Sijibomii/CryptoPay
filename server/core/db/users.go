@@ -109,13 +109,20 @@ func delete_expired(conn *gorm.DB, email string) (models.User, error) {
 }
 
 type client struct {
-	username  string
+	conn      *gorm.DB
 	serverPID *actor.PID
 }
 
-func (f *client) Receive(ctx *actor.Context) {
-	switch _l := ctx.Message().(type) {
+type Insert struct {
+	Payload models.User
+}
+
+func (c *client) Receive(ctx *actor.Context) {
+	switch l := ctx.Message().(type) {
 	case actor.Started:
-		fmt.Println("foo has started")
+		fmt.Println("User db actor started")
+
+	case Insert:
+		insert(c.conn, l.Payload)
 	}
 }
