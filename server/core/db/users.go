@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/anthdm/hollywood/actor"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"github.com/sijibomii/cryptopay/core/models"
@@ -105,4 +106,16 @@ func delete_expired(conn *gorm.DB, email string) (models.User, error) {
 		return models.User{}, gorm.ErrRecordNotFound
 	}
 	return user, nil
+}
+
+type client struct {
+	username  string
+	serverPID *actor.PID
+}
+
+func (f *client) Receive(ctx *actor.Context) {
+	switch _l := ctx.Message().(type) {
+	case actor.Started:
+		fmt.Println("foo has started")
+	}
 }
