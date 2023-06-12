@@ -109,12 +109,40 @@ func delete_expired(conn *gorm.DB, email string) (models.User, error) {
 }
 
 type client struct {
-	conn      *gorm.DB
-	serverPID *actor.PID
+	Conn      *gorm.DB
+	ServerPID *actor.PID
 }
 
 type Insert struct {
 	Payload models.User
+}
+
+type Update struct {
+	Payload models.User
+	Id      uuid.UUID
+}
+
+type FindByEmail struct {
+	Email string
+}
+
+type FindById struct {
+	Id uuid.UUID
+}
+
+type FindByResetToken struct {
+	Token uuid.UUID
+}
+
+type Activate struct {
+	Token uuid.UUID
+}
+type Delete struct {
+	Token uuid.UUID
+}
+
+type DeleteExpired struct {
+	Email string
 }
 
 func (c *client) Receive(ctx *actor.Context) {
@@ -123,6 +151,30 @@ func (c *client) Receive(ctx *actor.Context) {
 		fmt.Println("User db actor started")
 
 	case Insert:
-		insert(c.conn, l.Payload)
+		insert(c.Conn, l.Payload)
+
+	case Update:
+		update(c.Conn, l.Id, l.Payload)
+
+	case FindByEmail:
+		find_by_email(c.Conn, l.Email)
+
+	case FindById:
+		find_by_id(c.Conn, l.Id)
+
+	case FindByResetToken:
+		find_by_reset_token(c.Conn, l.Token)
+
+	case Activate:
+		activate(c.Conn, l.Token)
+
+	case Delete:
+		delete(c.Conn, l.Token)
+
+	case DeleteExpired:
+		delete_expired(c.Conn, l.Email)
+
+	default:
+		fmt.Println("UNKNOWN MESSAGE TO USER DB")
 	}
 }
