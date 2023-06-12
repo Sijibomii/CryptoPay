@@ -54,6 +54,30 @@ type User struct {
 	reset_token_expires_at        time.Time
 }
 
-func (u *User) Save() error {
+func (u *User) insert(up UserPayload, d UserPayload) error {
+	return nil
+}
+func (u *User) update(up UserPayload, d UserPayload) error {
+	return nil
+}
+func (u *User) find_by_reset_token(up UserPayload, d UserPayload) error {
+	return nil
+}
+func (u *User) find_by_email(up UserPayload, d UserPayload) error {
+	return nil
+}
+func (u *User) find_by_id(up UserPayload, d UserPayload) error {
+	return nil
+}
+func (u *User) activate(up UserPayload, d UserPayload) error {
+	return nil
+}
+func (u *User) delete(up UserPayload, d UserPayload) error {
+	return nil
+}
+func (u *User) deleteExpired(up UserPayload, d UserPayload) error {
+	return nil
+}
+func (u *User) export(up UserPayload, d UserPayload) error {
 	return nil
 }
