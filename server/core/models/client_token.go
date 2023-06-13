@@ -91,5 +91,73 @@ func InsertClientToken(e *actor.Engine, conn *actor.PID, d ClientTokenPayload) (
 }
 
 func FindClientTokensByStore(e *actor.Engine, conn *actor.PID, store_id uuid.UUID, limit, offset int64) ([]ClientToken, error) {
+	var resp = e.Request(conn, FindClientTokensByStoreMessage{
+		store_id: store_id,
+		limit:    limit,
+		offset:   offset,
+	}, 500)
+	res, err := resp.Result()
+	var cts []ClientToken
+	if err != nil {
+		return cts, errors.New("An error occured!")
+	}
+	myStruct, ok := res.([]ClientToken)
 
+	if !ok {
+		return cts, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
+}
+
+func FindClientTokenById(e *actor.Engine, conn *actor.PID, id uuid.UUID) (ClientToken, error) {
+	var resp = e.Request(conn, FindClientTokenByIdMessage{
+		id: id,
+	}, 500)
+	res, err := resp.Result()
+	if err != nil {
+		return ClientToken{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(ClientToken)
+
+	if !ok {
+		return ClientToken{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
+}
+
+func FindClientTokenByTokenAndDomain(e *actor.Engine, conn *actor.PID, token uuid.UUID, domain string) (ClientToken, error) {
+	var resp = e.Request(conn, FindClientTokenByTokenAndDomainMessage{
+		token:  token,
+		domain: domain,
+	}, 500)
+	res, err := resp.Result()
+	if err != nil {
+		return ClientToken{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(ClientToken)
+
+	if !ok {
+		return ClientToken{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
+}
+
+func DeleteClientToken(e *actor.Engine, conn *actor.PID, id uuid.UUID) (bool, error) {
+	var resp = e.Request(conn, DeleteClientTokenMessage{
+		id: id,
+	}, 500)
+	res, err := resp.Result()
+	if err != nil {
+		return false, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(bool)
+
+	if !ok {
+		return false, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
 }
