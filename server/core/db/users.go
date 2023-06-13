@@ -1,16 +1,15 @@
-package users
+package db
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/anthdm/hollywood/actor"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"github.com/sijibomii/cryptopay/core/models"
 )
 
-func insert(conn *gorm.DB, payload models.User) (models.User, error) {
+func insertUser(conn *gorm.DB, payload models.User) (models.User, error) {
 	result := conn.Create(payload)
 	if err := result.Error; err != nil {
 		return payload, err
@@ -18,7 +17,7 @@ func insert(conn *gorm.DB, payload models.User) (models.User, error) {
 	return payload, nil
 }
 
-func update(conn *gorm.DB, id uuid.UUID, payload models.User) (models.User, error) {
+func updateUser(conn *gorm.DB, id uuid.UUID, payload models.User) (models.User, error) {
 	user := models.User{}
 	if err := conn.First(&user, id).Error; err != nil {
 		return payload, err
@@ -31,7 +30,7 @@ func update(conn *gorm.DB, id uuid.UUID, payload models.User) (models.User, erro
 	return payload, nil
 }
 
-func find_by_email(conn *gorm.DB, email string) (models.User, error) {
+func findUserByEmail(conn *gorm.DB, email string) (models.User, error) {
 	var users []models.User
 	if err := conn.Where("email = ?", email).Find(&users).Error; err != nil {
 		return users[0], err
@@ -40,7 +39,7 @@ func find_by_email(conn *gorm.DB, email string) (models.User, error) {
 	return users[0], nil
 }
 
-func find_by_id(conn *gorm.DB, id uuid.UUID) (models.User, error) {
+func findUserById(conn *gorm.DB, id uuid.UUID) (models.User, error) {
 	user := models.User{}
 	if err := conn.First(&user, id).Error; err != nil {
 		return user, err
@@ -49,7 +48,7 @@ func find_by_id(conn *gorm.DB, id uuid.UUID) (models.User, error) {
 	return user, nil
 }
 
-func find_by_reset_token(conn *gorm.DB, token uuid.UUID) (models.User, error) {
+func findUserByResetToken(conn *gorm.DB, token uuid.UUID) (models.User, error) {
 	var users []models.User
 	if err := conn.Where("reset_token = ?", token).Find(&users).Error; err != nil {
 		return users[0], err
@@ -58,7 +57,7 @@ func find_by_reset_token(conn *gorm.DB, token uuid.UUID) (models.User, error) {
 	return users[0], nil
 }
 
-func activate(conn *gorm.DB, token uuid.UUID) (models.User, error) {
+func activateUser(conn *gorm.DB, token uuid.UUID) (models.User, error) {
 	var user models.User
 	now := time.Now()
 
@@ -79,7 +78,7 @@ func activate(conn *gorm.DB, token uuid.UUID) (models.User, error) {
 	return user, nil
 }
 
-func delete(conn *gorm.DB, id uuid.UUID) (models.User, error) {
+func deleteUser(conn *gorm.DB, id uuid.UUID) (models.User, error) {
 	result := conn.Delete(&models.User{}, id)
 	if result.Error != nil {
 		return models.User{}, result.Error
@@ -90,7 +89,7 @@ func delete(conn *gorm.DB, id uuid.UUID) (models.User, error) {
 	return models.User{}, nil
 }
 
-func delete_expired(conn *gorm.DB, email string) (models.User, error) {
+func deleteExpiredUser(conn *gorm.DB, email string) (models.User, error) {
 	var user models.User
 	now := time.Now()
 
@@ -108,45 +107,7 @@ func delete_expired(conn *gorm.DB, email string) (models.User, error) {
 	return user, nil
 }
 
-type UserClient struct {
-	Conn      *gorm.DB
-	ServerPID *actor.PID
-}
-
-func (c UserClient) Receive(ctx *actor.Context) {
-	switch l := ctx.Message().(type) {
-	case actor.Started:
-		fmt.Println("User db actor started")
-
-	case models.Insert:
-		payload, err := insert(c.Conn, l.Payload)
-		if err != nil {
-			ctx.Respond(nil)
-		}
-		ctx.Respond(payload)
-
-	case models.Update:
-		update(c.Conn, l.Id, l.Payload)
-
-	case models.FindByEmail:
-		find_by_email(c.Conn, l.Email)
-
-	case models.FindById:
-		find_by_id(c.Conn, l.Id)
-
-	case models.FindByResetToken:
-		find_by_reset_token(c.Conn, l.Token)
-
-	case models.Activate:
-		activate(c.Conn, l.Token)
-
-	case models.Delete:
-		delete(c.Conn, l.Token)
-
-	case models.DeleteExpired:
-		delete_expired(c.Conn, l.Email)
-
-	default:
-		fmt.Println("UNKNOWN MESSAGE TO USER DB")
-	}
-}
+// type UserClient struct {
+// 	Conn      *gorm.DB
+// 	ServerPID *actor.PID
+// }

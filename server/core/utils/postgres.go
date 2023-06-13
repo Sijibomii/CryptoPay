@@ -1,17 +1,9 @@
 package utils
 
 import (
-	"github.com/anthdm/hollywood/actor"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
-
-type PgExecutorAddr = actor.PID
-
-type Client struct {
-	Conn      *gorm.DB
-	ServerPID *actor.PID
-}
 
 var (
 	DB *gorm.DB
