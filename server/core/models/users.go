@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -121,27 +122,139 @@ func (u *User) Insert(e *actor.Engine, conn *utils.PgExecutorAddr, d UserPayload
 
 	return myStruct, nil
 }
-func (u *User) Update(conn *utils.PgExecutorAddr, d UserPayload) error {
-	return nil
+func (u *User) Update(e *actor.Engine, conn *utils.PgExecutorAddr, id uuid.UUID, d UserPayload) (User, error) {
+	var resp = e.Request(conn, Update{
+		Payload: d.ToUser(),
+		Id:      id,
+	}, 500)
+
+	res, err := resp.Result()
+	if err != nil {
+		return User{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(User)
+
+	if !ok {
+		return User{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
+
 }
-func (u *User) Find_by_reset_token(conn *utils.PgExecutorAddr, d UserPayload) error {
-	return nil
+func (u *User) Find_by_reset_token(e *actor.Engine, conn *utils.PgExecutorAddr, token uuid.UUID) (User, error) {
+	var resp = e.Request(conn, FindByResetToken{
+		Token: token,
+	}, 500)
+
+	res, err := resp.Result()
+	if err != nil {
+		return User{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(User)
+
+	if !ok {
+		return User{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
 }
-func (u *User) Find_by_email(conn *utils.PgExecutorAddr, d UserPayload) error {
-	return nil
+func (u *User) Find_by_email(e *actor.Engine, conn *utils.PgExecutorAddr, email string) (User, error) {
+	var resp = e.Request(conn, FindByEmail{
+		Email: email,
+	}, 500)
+
+	res, err := resp.Result()
+	if err != nil {
+		return User{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(User)
+
+	if !ok {
+		return User{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
 }
-func (u *User) Find_by_id(conn *utils.PgExecutorAddr, d UserPayload) error {
-	return nil
+func (u *User) Find_by_id(e *actor.Engine, conn *utils.PgExecutorAddr, id uuid.UUID) (User, error) {
+	var resp = e.Request(conn, FindById{
+		Id: id,
+	}, 500)
+
+	res, err := resp.Result()
+	if err != nil {
+		return User{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(User)
+
+	if !ok {
+		return User{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
 }
-func (u *User) Activate(conn *utils.PgExecutorAddr, d UserPayload) error {
-	return nil
+func (u *User) Activate(e *actor.Engine, conn *utils.PgExecutorAddr, token uuid.UUID) (User, error) {
+	var resp = e.Request(conn, Activate{
+		Token: token,
+	}, 500)
+
+	res, err := resp.Result()
+	if err != nil {
+		return User{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(User)
+
+	if !ok {
+		return User{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
 }
-func (u *User) Delete(conn *utils.PgExecutorAddr, d UserPayload) error {
-	return nil
+func (u *User) Delete(e *actor.Engine, conn *utils.PgExecutorAddr, token uuid.UUID) (User, error) {
+	var resp = e.Request(conn, Delete{
+		Token: token,
+	}, 500)
+
+	res, err := resp.Result()
+	if err != nil {
+		return User{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(User)
+
+	if !ok {
+		return User{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
 }
-func (u *User) DeleteExpired(conn *utils.PgExecutorAddr, d UserPayload) error {
-	return nil
+func (u *User) DeleteExpired(e *actor.Engine, conn *utils.PgExecutorAddr, email string) (User, error) {
+	var resp = e.Request(conn, DeleteExpired{
+		Email: email,
+	}, 500)
+
+	res, err := resp.Result()
+	if err != nil {
+		return User{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(User)
+
+	if !ok {
+		return User{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
 }
-func (u *User) Export(conn *utils.PgExecutorAddr, d UserPayload) error {
-	return nil
+func (u *User) Export() ([]byte, error) {
+	data := struct {
+		ID        uuid.UUID `json:"id"`
+		Email     string    `json:"email"`
+		CreatedAt time.Time `json:"created_at"`
+		UpdatedAt time.Time `json:"updated_at"`
+	}{
+		ID:        u.ID,
+		Email:     u.Email,
+		CreatedAt: u.Created_at,
+		UpdatedAt: u.Updated_at,
+	}
+
+	return json.Marshal(data)
 }
