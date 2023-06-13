@@ -106,6 +106,7 @@ type DeleteExpiredUserMessage struct {
 }
 
 func InsertUser(e *actor.Engine, conn *actor.PID, d UserPayload) (User, error) {
+	d.Set_created_at()
 	var resp = e.Request(conn, InsertUserMessage{
 		Payload: d.ToUser(),
 	}, 500)

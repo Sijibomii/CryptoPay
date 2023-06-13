@@ -135,6 +135,7 @@ func (s *Store) Can_accept(crypto currency.Crypto) bool {
 
 // confirm the return type before compl code check users too
 func InsertStore(e *actor.Engine, conn *actor.PID, d StorePayload) (Store, error) {
+	d.Set_created_at()
 	var resp = e.Request(conn, InsertStoreMessage{
 		Payload: d.ToStore(),
 	}, 500)

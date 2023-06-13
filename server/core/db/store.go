@@ -8,6 +8,7 @@ import (
 
 func insertStore(conn *gorm.DB, payload models.Store) models.Store {
 	result := conn.Create(payload)
+	// created_at?
 	if err := result.Error; err != nil {
 		panic(err)
 	}
