@@ -8,6 +8,11 @@ import (
 
 type PgExecutorAddr = actor.PID
 
+type Client struct {
+	Conn      *gorm.DB
+	ServerPID *actor.PID
+}
+
 var (
 	DB *gorm.DB
 )

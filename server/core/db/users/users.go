@@ -1,4 +1,4 @@
-package db
+package users
 
 import (
 	"fmt"
@@ -108,12 +108,12 @@ func delete_expired(conn *gorm.DB, email string) (models.User, error) {
 	return user, nil
 }
 
-type client struct {
+type UserClient struct {
 	Conn      *gorm.DB
 	ServerPID *actor.PID
 }
 
-func (c *client) Receive(ctx *actor.Context) {
+func (c UserClient) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 	case actor.Started:
 		fmt.Println("User db actor started")

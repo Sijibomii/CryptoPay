@@ -2,11 +2,13 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/sijibomii/cryptopay/types"
 	"github.com/sijibomii/cryptopay/types/bitcoin"
+	"github.com/sijibomii/cryptopay/types/currency"
 )
 
 type StorePayload struct {
@@ -62,7 +64,26 @@ type Store struct {
 	Deleted_at                 time.Time
 }
 
-func (s *Store) Can_accept(crypto any) bool {
+type InsertStoreMessage struct {
+	Payload User
+}
+
+type UpdateStoreMessage struct {
+	Payload User
+	Id      uuid.UUID
+}
+
+func (s *Store) Can_accept(crypto currency.Crypto) bool {
+	switch crypto {
+	case currency.Btc:
+		if s.Btc_payout_addresses != nil && s.Btc_confirmations_required != 0 {
+			return true
+		}
+	case currency.Eth:
+		fmt.Println("Ethereum (ETH)")
+	default:
+		return false
+	}
 	return false
 }
 
@@ -107,10 +128,9 @@ func (s *Store) export() ([]byte, error) {
 		Btc_payout_addresses:       s.Btc_payout_addresses,
 		Btc_confirmations_required: s.Btc_confirmations_required,
 		Public_key:                 s.Public_key,
-		// change to crypto type
-		Can_accept_btc: s.Can_accept("btc"),
-		CreatedAt:      s.Created_at,
-		UpdatedAt:      s.Updated_at,
+		Can_accept_btc:             s.Can_accept(currency.Btc),
+		CreatedAt:                  s.Created_at,
+		UpdatedAt:                  s.Updated_at,
 	}
 
 	return json.Marshal(data)
