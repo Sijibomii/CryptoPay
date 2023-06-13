@@ -70,6 +70,8 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 	case models.SoftDeleteStoreByOwnerIDMessage:
 		softDeleteStoreByOwnerID(d.DB, l.OwnerID)
 
+	// client tokens
+
 	default:
 		fmt.Println("UNKNOWN MESSAGE TO USER DB")
 	}

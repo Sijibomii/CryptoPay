@@ -11,7 +11,6 @@ import (
 
 func insertUser(conn *gorm.DB, payload models.User) (models.User, error) {
 	result := conn.Create(payload)
-	// created_at?
 	if err := result.Error; err != nil {
 		return payload, err
 	}

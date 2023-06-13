@@ -54,6 +54,24 @@ type InsertClientTokenMessage struct {
 	Payload ClientToken
 }
 
+type FindClientTokensByStoreMessage struct {
+	store_id uuid.UUID
+	limit    int64
+	offset   int64
+}
+type FindClientTokenByIdMessage struct {
+	id uuid.UUID
+}
+
+type FindClientTokenByTokenAndDomainMessage struct {
+	token  uuid.UUID
+	domain string
+}
+
+type DeleteClientTokenMessage struct {
+	id uuid.UUID
+}
+
 func InsertClientToken(e *actor.Engine, conn *actor.PID, d ClientTokenPayload) (ClientToken, error) {
 	d.Set_created_at()
 	var resp = e.Request(conn, InsertClientTokenMessage{
@@ -70,4 +88,8 @@ func InsertClientToken(e *actor.Engine, conn *actor.PID, d ClientTokenPayload) (
 	}
 
 	return myStruct, nil
+}
+
+func FindClientTokensByStore(e *actor.Engine, conn *actor.PID, store_id uuid.UUID, limit, offset int64) ([]ClientToken, error) {
+
 }
