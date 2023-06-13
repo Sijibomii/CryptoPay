@@ -71,6 +71,20 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 		softDeleteStoreByOwnerID(d.DB, l.OwnerID)
 
 	// client tokens
+	case models.InsertClientTokenMessage:
+		insertClientToken(d.DB, l.Payload)
+
+	case models.FindClientTokensByStoreMessage:
+		findClientTokensByStore(d.DB, l.Store_id, l.Limit, l.Offset)
+
+	case models.FindClientTokenByIdMessage:
+		findClientTokenById(d.DB, l.Id)
+
+	case models.FindClientTokenByTokenAndDomainMessage:
+		findClientTokenByTokenAndDomain(d.DB, l.Token, l.Domain)
+
+	case models.DeleteClientTokenMessage:
+		deleteClientToken(d.DB, l.Id)
 
 	default:
 		fmt.Println("UNKNOWN MESSAGE TO USER DB")

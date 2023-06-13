@@ -55,21 +55,21 @@ type InsertClientTokenMessage struct {
 }
 
 type FindClientTokensByStoreMessage struct {
-	store_id uuid.UUID
-	limit    int64
-	offset   int64
+	Store_id uuid.UUID
+	Limit    int64
+	Offset   int64
 }
 type FindClientTokenByIdMessage struct {
-	id uuid.UUID
+	Id uuid.UUID
 }
 
 type FindClientTokenByTokenAndDomainMessage struct {
-	token  uuid.UUID
-	domain string
+	Token  uuid.UUID
+	Domain string
 }
 
 type DeleteClientTokenMessage struct {
-	id uuid.UUID
+	Id uuid.UUID
 }
 
 func InsertClientToken(e *actor.Engine, conn *actor.PID, d ClientTokenPayload) (ClientToken, error) {
@@ -92,9 +92,9 @@ func InsertClientToken(e *actor.Engine, conn *actor.PID, d ClientTokenPayload) (
 
 func FindClientTokensByStore(e *actor.Engine, conn *actor.PID, store_id uuid.UUID, limit, offset int64) ([]ClientToken, error) {
 	var resp = e.Request(conn, FindClientTokensByStoreMessage{
-		store_id: store_id,
-		limit:    limit,
-		offset:   offset,
+		Store_id: store_id,
+		Limit:    limit,
+		Offset:   offset,
 	}, 500)
 	res, err := resp.Result()
 	var cts []ClientToken
@@ -112,7 +112,7 @@ func FindClientTokensByStore(e *actor.Engine, conn *actor.PID, store_id uuid.UUI
 
 func FindClientTokenById(e *actor.Engine, conn *actor.PID, id uuid.UUID) (ClientToken, error) {
 	var resp = e.Request(conn, FindClientTokenByIdMessage{
-		id: id,
+		Id: id,
 	}, 500)
 	res, err := resp.Result()
 	if err != nil {
@@ -129,8 +129,8 @@ func FindClientTokenById(e *actor.Engine, conn *actor.PID, id uuid.UUID) (Client
 
 func FindClientTokenByTokenAndDomain(e *actor.Engine, conn *actor.PID, token uuid.UUID, domain string) (ClientToken, error) {
 	var resp = e.Request(conn, FindClientTokenByTokenAndDomainMessage{
-		token:  token,
-		domain: domain,
+		Token:  token,
+		Domain: domain,
 	}, 500)
 	res, err := resp.Result()
 	if err != nil {
@@ -147,7 +147,7 @@ func FindClientTokenByTokenAndDomain(e *actor.Engine, conn *actor.PID, token uui
 
 func DeleteClientToken(e *actor.Engine, conn *actor.PID, id uuid.UUID) (bool, error) {
 	var resp = e.Request(conn, DeleteClientTokenMessage{
-		id: id,
+		Id: id,
 	}, 500)
 	res, err := resp.Result()
 	if err != nil {
