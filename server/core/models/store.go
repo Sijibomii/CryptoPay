@@ -73,6 +73,18 @@ type UpdateStoreMessage struct {
 	Id      uuid.UUID
 }
 
+type FindStoreById struct {
+}
+
+type FindStoreByOwner struct {
+}
+
+type FindStoreByIdWithDeleted struct {
+}
+
+type SoftDeleteStore struct {
+}
+
 func (s *Store) Can_accept(crypto currency.Crypto) bool {
 	switch crypto {
 	case currency.Btc:

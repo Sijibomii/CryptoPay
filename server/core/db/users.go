@@ -19,7 +19,7 @@ func insertUser(conn *gorm.DB, payload models.User) (models.User, error) {
 
 func updateUser(conn *gorm.DB, id uuid.UUID, payload models.User) (models.User, error) {
 	user := models.User{}
-	if err := conn.First(&user, id).Error; err != nil {
+	if err := conn.Where("id = ?", id).First(&user).Error; err != nil {
 		return payload, err
 	}
 
@@ -41,7 +41,7 @@ func findUserByEmail(conn *gorm.DB, email string) (models.User, error) {
 
 func findUserById(conn *gorm.DB, id uuid.UUID) (models.User, error) {
 	user := models.User{}
-	if err := conn.First(&user, id).Error; err != nil {
+	if err := conn.Where("id = ?", id).First(&user).Error; err != nil {
 		return user, err
 	}
 
@@ -106,8 +106,3 @@ func deleteExpiredUser(conn *gorm.DB, email string) (models.User, error) {
 	}
 	return user, nil
 }
-
-// type UserClient struct {
-// 	Conn      *gorm.DB
-// 	ServerPID *actor.PID
-// }
