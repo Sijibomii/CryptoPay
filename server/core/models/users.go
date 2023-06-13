@@ -106,7 +106,7 @@ type DeleteExpired struct {
 	Email string
 }
 
-func (u *User) Insert(e *actor.Engine, conn *utils.PgExecutorAddr, d UserPayload) (User, error) {
+func InsertUser(e *actor.Engine, conn *utils.PgExecutorAddr, d UserPayload) (User, error) {
 	var resp = e.Request(conn, Insert{
 		Payload: d.ToUser(),
 	}, 500)
@@ -122,7 +122,7 @@ func (u *User) Insert(e *actor.Engine, conn *utils.PgExecutorAddr, d UserPayload
 
 	return myStruct, nil
 }
-func (u *User) Update(e *actor.Engine, conn *utils.PgExecutorAddr, id uuid.UUID, d UserPayload) (User, error) {
+func UpdateUser(e *actor.Engine, conn *utils.PgExecutorAddr, id uuid.UUID, d UserPayload) (User, error) {
 	var resp = e.Request(conn, Update{
 		Payload: d.ToUser(),
 		Id:      id,
@@ -141,7 +141,7 @@ func (u *User) Update(e *actor.Engine, conn *utils.PgExecutorAddr, id uuid.UUID,
 	return myStruct, nil
 
 }
-func (u *User) Find_by_reset_token(e *actor.Engine, conn *utils.PgExecutorAddr, token uuid.UUID) (User, error) {
+func Find_by_reset_token(e *actor.Engine, conn *utils.PgExecutorAddr, token uuid.UUID) (User, error) {
 	var resp = e.Request(conn, FindByResetToken{
 		Token: token,
 	}, 500)
@@ -158,7 +158,7 @@ func (u *User) Find_by_reset_token(e *actor.Engine, conn *utils.PgExecutorAddr, 
 
 	return myStruct, nil
 }
-func (u *User) Find_by_email(e *actor.Engine, conn *utils.PgExecutorAddr, email string) (User, error) {
+func Find_by_email(e *actor.Engine, conn *utils.PgExecutorAddr, email string) (User, error) {
 	var resp = e.Request(conn, FindByEmail{
 		Email: email,
 	}, 500)
@@ -175,7 +175,7 @@ func (u *User) Find_by_email(e *actor.Engine, conn *utils.PgExecutorAddr, email 
 
 	return myStruct, nil
 }
-func (u *User) Find_by_id(e *actor.Engine, conn *utils.PgExecutorAddr, id uuid.UUID) (User, error) {
+func Find_by_id(e *actor.Engine, conn *utils.PgExecutorAddr, id uuid.UUID) (User, error) {
 	var resp = e.Request(conn, FindById{
 		Id: id,
 	}, 500)
@@ -192,7 +192,7 @@ func (u *User) Find_by_id(e *actor.Engine, conn *utils.PgExecutorAddr, id uuid.U
 
 	return myStruct, nil
 }
-func (u *User) Activate(e *actor.Engine, conn *utils.PgExecutorAddr, token uuid.UUID) (User, error) {
+func ActivateUser(e *actor.Engine, conn *utils.PgExecutorAddr, token uuid.UUID) (User, error) {
 	var resp = e.Request(conn, Activate{
 		Token: token,
 	}, 500)
@@ -209,7 +209,7 @@ func (u *User) Activate(e *actor.Engine, conn *utils.PgExecutorAddr, token uuid.
 
 	return myStruct, nil
 }
-func (u *User) Delete(e *actor.Engine, conn *utils.PgExecutorAddr, token uuid.UUID) (User, error) {
+func DeleteUser(e *actor.Engine, conn *utils.PgExecutorAddr, token uuid.UUID) (User, error) {
 	var resp = e.Request(conn, Delete{
 		Token: token,
 	}, 500)
@@ -226,7 +226,7 @@ func (u *User) Delete(e *actor.Engine, conn *utils.PgExecutorAddr, token uuid.UU
 
 	return myStruct, nil
 }
-func (u *User) DeleteExpired(e *actor.Engine, conn *utils.PgExecutorAddr, email string) (User, error) {
+func DeleteExpiredUser(e *actor.Engine, conn *utils.PgExecutorAddr, email string) (User, error) {
 	var resp = e.Request(conn, DeleteExpired{
 		Email: email,
 	}, 500)
