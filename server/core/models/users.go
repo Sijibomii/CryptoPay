@@ -4,40 +4,57 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/sijibomii/cryptopay/core/utils"
 )
 
 type UserPayload struct {
 	ID                            uuid.UUID
-	email                         string
-	password                      string
-	salt                          string
-	created_at                    time.Time
-	updated_at                    time.Time
-	is_verified                   bool
-	verification_token            uuid.UUID
-	verification_token_expires_at time.Time
-	reset_token                   uuid.UUID
-	reset_token_expires_at        time.Time
+	Email                         string
+	Password                      string
+	Salt                          string
+	Created_at                    time.Time
+	Updated_at                    time.Time
+	Is_verified                   bool
+	Verification_token            uuid.UUID
+	Verification_token_expires_at time.Time
+	Reset_token                   uuid.UUID
+	Reset_token_expires_at        time.Time
 }
 
-func (u *UserPayload) set_created_at() error {
-	u.created_at = time.Now()
+func (u *UserPayload) Set_created_at() error {
+	u.Created_at = time.Now()
 	return nil
 }
-func (u *UserPayload) set_updated_at() error {
-	u.updated_at = time.Now()
+func (u *UserPayload) Set_updated_at() error {
+	u.Updated_at = time.Now()
 	return nil
 }
-func (u *UserPayload) set_verification_token() error {
-	u.is_verified = false
-	u.verification_token = uuid.New()
-	u.verification_token_expires_at = time.Now().Add(time.Hour * 24)
+func (u *UserPayload) Set_verification_token() error {
+	u.Is_verified = false
+	u.Verification_token = uuid.New()
+	u.Verification_token_expires_at = time.Now().Add(time.Hour * 24)
 	return nil
 }
-func (u *UserPayload) set_reset_token() error {
-	u.reset_token = uuid.New()
-	u.reset_token_expires_at = time.Now().Add(time.Hour * 24)
+func (u *UserPayload) Set_reset_token() error {
+	u.Reset_token = uuid.New()
+	u.Reset_token_expires_at = time.Now().Add(time.Hour * 24)
 	return nil
+}
+
+func (u *UserPayload) ToUser() User {
+	return User{
+		ID:                            u.ID,
+		Email:                         u.Email,
+		Password:                      u.Password,
+		Salt:                          u.Salt,
+		Created_at:                    u.Created_at,
+		Updated_at:                    u.Updated_at,
+		Is_verified:                   u.Is_verified,
+		Verification_token:            u.Verification_token,
+		Verification_token_expires_at: u.Verification_token_expires_at,
+		Reset_token:                   u.Reset_token,
+		Reset_token_expires_at:        u.Reset_token_expires_at,
+	}
 }
 
 type User struct {
@@ -54,30 +71,30 @@ type User struct {
 	Reset_token_expires_at        time.Time
 }
 
-func (u *User) insert(up UserPayload, d UserPayload) error {
+func (u *User) Insert(conn *utils.PgExecutorAddr, d UserPayload) error {
 	return nil
 }
-func (u *User) update(up UserPayload, d UserPayload) error {
+func (u *User) Update(conn *utils.PgExecutorAddr, d UserPayload) error {
 	return nil
 }
-func (u *User) find_by_reset_token(up UserPayload, d UserPayload) error {
+func (u *User) Find_by_reset_token(conn *utils.PgExecutorAddr, d UserPayload) error {
 	return nil
 }
-func (u *User) find_by_email(up UserPayload, d UserPayload) error {
+func (u *User) Find_by_email(conn *utils.PgExecutorAddr, d UserPayload) error {
 	return nil
 }
-func (u *User) find_by_id(up UserPayload, d UserPayload) error {
+func (u *User) Find_by_id(conn *utils.PgExecutorAddr, d UserPayload) error {
 	return nil
 }
-func (u *User) activate(up UserPayload, d UserPayload) error {
+func (u *User) Activate(conn *utils.PgExecutorAddr, d UserPayload) error {
 	return nil
 }
-func (u *User) delete(up UserPayload, d UserPayload) error {
+func (u *User) Delete(conn *utils.PgExecutorAddr, d UserPayload) error {
 	return nil
 }
-func (u *User) deleteExpired(up UserPayload, d UserPayload) error {
+func (u *User) DeleteExpired(conn *utils.PgExecutorAddr, d UserPayload) error {
 	return nil
 }
-func (u *User) export(up UserPayload, d UserPayload) error {
+func (u *User) Export(conn *utils.PgExecutorAddr, d UserPayload) error {
 	return nil
 }
