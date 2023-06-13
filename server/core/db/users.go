@@ -113,65 +113,37 @@ type client struct {
 	ServerPID *actor.PID
 }
 
-type Insert struct {
-	Payload models.User
-}
-
-type Update struct {
-	Payload models.User
-	Id      uuid.UUID
-}
-
-type FindByEmail struct {
-	Email string
-}
-
-type FindById struct {
-	Id uuid.UUID
-}
-
-type FindByResetToken struct {
-	Token uuid.UUID
-}
-
-type Activate struct {
-	Token uuid.UUID
-}
-type Delete struct {
-	Token uuid.UUID
-}
-
-type DeleteExpired struct {
-	Email string
-}
-
 func (c *client) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 	case actor.Started:
 		fmt.Println("User db actor started")
 
-	case Insert:
-		insert(c.Conn, l.Payload)
+	case models.Insert:
+		payload, err := insert(c.Conn, l.Payload)
+		if err != nil {
+			ctx.Respond(nil)
+		}
+		ctx.Respond(payload)
 
-	case Update:
+	case models.Update:
 		update(c.Conn, l.Id, l.Payload)
 
-	case FindByEmail:
+	case models.FindByEmail:
 		find_by_email(c.Conn, l.Email)
 
-	case FindById:
+	case models.FindById:
 		find_by_id(c.Conn, l.Id)
 
-	case FindByResetToken:
+	case models.FindByResetToken:
 		find_by_reset_token(c.Conn, l.Token)
 
-	case Activate:
+	case models.Activate:
 		activate(c.Conn, l.Token)
 
-	case Delete:
+	case models.Delete:
 		delete(c.Conn, l.Token)
 
-	case DeleteExpired:
+	case models.DeleteExpired:
 		delete_expired(c.Conn, l.Email)
 
 	default:

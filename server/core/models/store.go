@@ -60,3 +60,7 @@ type Store struct {
 	Hd_path                    string
 	Deleted_at                 time.Time
 }
+
+func (s *Store) Insert(UserPayload, d UserPayload) error {
+	return nil
+}

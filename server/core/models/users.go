@@ -1,8 +1,10 @@
 package models
 
 import (
+	"errors"
 	"time"
 
+	"github.com/anthdm/hollywood/actor"
 	"github.com/google/uuid"
 	"github.com/sijibomii/cryptopay/core/utils"
 )
@@ -71,8 +73,53 @@ type User struct {
 	Reset_token_expires_at        time.Time
 }
 
-func (u *User) Insert(conn *utils.PgExecutorAddr, d UserPayload) error {
-	return nil
+type Insert struct {
+	Payload User
+}
+
+type Update struct {
+	Payload User
+	Id      uuid.UUID
+}
+
+type FindByEmail struct {
+	Email string
+}
+
+type FindById struct {
+	Id uuid.UUID
+}
+
+type FindByResetToken struct {
+	Token uuid.UUID
+}
+
+type Activate struct {
+	Token uuid.UUID
+}
+type Delete struct {
+	Token uuid.UUID
+}
+
+type DeleteExpired struct {
+	Email string
+}
+
+func (u *User) Insert(e *actor.Engine, conn *utils.PgExecutorAddr, d UserPayload) (User, error) {
+	var resp = e.Request(conn, Insert{
+		Payload: d.ToUser(),
+	}, 500)
+	res, err := resp.Result()
+	if err != nil {
+		return User{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(User)
+
+	if !ok {
+		return User{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
 }
 func (u *User) Update(conn *utils.PgExecutorAddr, d UserPayload) error {
 	return nil
