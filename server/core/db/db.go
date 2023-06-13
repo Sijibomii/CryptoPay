@@ -46,6 +46,29 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 		deleteExpiredUser(d.DB, l.Email)
 
 	// add store cases below
+	case models.InsertStoreMessage:
+		insertStore(d.DB, l.Payload)
+
+	case models.UpdateStoreMessage:
+		updateStore(d.DB, l.Id, l.Payload)
+
+	case models.FindStoreByIdMessage:
+		findStoreById(d.DB, l.Id)
+
+	case models.FindStoreByOwnerMessage:
+		findStoreByOwner(d.DB, l.OwnerID, l.Limit, l.Offset)
+
+	case models.FindStoreByIdWithDeletedMessage:
+		findStoreByIdWithDeleted(d.DB, l.Id)
+
+	case models.DeleteStoreMessage:
+		deleteStore(d.DB, l.Id)
+
+	case models.SoftDeleteStoreMessage:
+		softDeleteStore(d.DB, l.Id)
+
+	case models.SoftDeleteStoreByOwnerIDMessage:
+		softDeleteStoreByOwnerID(d.DB, l.OwnerID)
 
 	default:
 		fmt.Println("UNKNOWN MESSAGE TO USER DB")

@@ -6,47 +6,48 @@ import (
 	"github.com/sijibomii/cryptopay/core/models"
 )
 
-func insertStore(conn *gorm.DB, payload models.Store) (models.Store, error) {
+func insertStore(conn *gorm.DB, payload models.Store) models.Store {
 	result := conn.Create(payload)
 	if err := result.Error; err != nil {
-		return payload, err
+		panic(err)
 	}
-	return payload, nil
+	return payload
 }
 
-func updateStore(conn *gorm.DB, id uuid.UUID, payload models.Store) (models.Store, error) {
+func updateStore(conn *gorm.DB, id uuid.UUID, payload models.Store) models.Store {
 	store := models.Store{}
 	if err := conn.Where("id = ? AND deleted_at IS NULL", id).First(&store).Error; err != nil {
-		return payload, err
+		panic(err)
 	}
 
 	if err := conn.Save(&payload).Error; err != nil {
-		return payload, err
+		panic(err)
 	}
 
-	return payload, nil
+	return payload
 }
 
-func findStoreById(conn *gorm.DB, id uuid.UUID) (models.Store, error) {
+func findStoreById(conn *gorm.DB, id uuid.UUID) models.Store {
+
 	store := models.Store{}
 	if err := conn.Where("id = ? AND deleted_at IS NULL", id).First(&store).Error; err != nil {
-		return store, err
+		panic(err)
 	}
 
-	return store, nil
+	return store
 }
 
 // this includes stores that have been soft deleted
-func findStoreByIdWithDeleted(conn *gorm.DB, id uuid.UUID) (models.Store, error) {
+func findStoreByIdWithDeleted(conn *gorm.DB, id uuid.UUID) models.Store {
 	store := models.Store{}
 	if err := conn.Where("id = ?", id).First(&store, id).Error; err != nil {
-		return store, err
+		panic(err)
 	}
 
-	return store, nil
+	return store
 }
 
-func findByOwner(conn *gorm.DB, ownerID uuid.UUID, limit, offset int64) ([]models.Store, error) {
+func findStoreByOwner(conn *gorm.DB, ownerID uuid.UUID, limit, offset int64) []models.Store {
 	var stores []models.Store
 
 	result := conn.
@@ -57,25 +58,25 @@ func findByOwner(conn *gorm.DB, ownerID uuid.UUID, limit, offset int64) ([]model
 		Find(&stores)
 
 	if result.Error != nil {
-		return nil, result.Error
+		panic(result.Error)
 	}
 
-	return stores, nil
+	return stores
 }
 
-func delete(conn *gorm.DB, id uuid.UUID) (int64, error) {
+func deleteStore(conn *gorm.DB, id uuid.UUID) int64 {
 	result := conn.
 		Where("id = ?", id).
 		Where("deleted_at IS NULL").
 		Delete(&models.Store{})
 
 	if result.Error != nil {
-		return 0, result.Error
+		panic(result.Error)
 	}
-	return result.RowsAffected, nil
+	return result.RowsAffected
 }
 
-func SoftDelete(conn *gorm.DB, id uuid.UUID) error {
+func softDeleteStore(conn *gorm.DB, id uuid.UUID) bool {
 	payload := models.StorePayload{}
 	payload.Set_deleted_at()
 
@@ -86,15 +87,15 @@ func SoftDelete(conn *gorm.DB, id uuid.UUID) error {
 		Updates(payload)
 
 	if result.Error != nil {
-		return result.Error
+		panic(result.Error)
 	}
 
 	// delete client tokens by sotr id
 
-	return nil
+	return true
 }
 
-func SoftDeleteByOwnerID(conn *gorm.DB, ownerID uuid.UUID) error {
+func softDeleteStoreByOwnerID(conn *gorm.DB, ownerID uuid.UUID) bool {
 	payload := models.StorePayload{}
 	payload.Set_deleted_at()
 
@@ -105,19 +106,19 @@ func SoftDeleteByOwnerID(conn *gorm.DB, ownerID uuid.UUID) error {
 		Updates(payload)
 
 	if result.Error != nil {
-		return result.Error
+		panic(result.Error)
 	}
 
 	var deletedStores []models.Store
 	if err := conn.
 		Where("owner_id = ?", ownerID).
 		Find(&deletedStores).Error; err != nil {
-		return err
+		panic(err)
 	}
 
 	// for _, store := range deletedStores {
 	// 	// delete client tokens of each store
 	// }
 
-	return nil
+	return true
 }
