@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/google/uuid"
@@ -61,6 +62,56 @@ type Store struct {
 	Deleted_at                 time.Time
 }
 
-func (s *Store) Insert(UserPayload, d UserPayload) error {
+func (s *Store) Can_accept(crypto any) bool {
+	return false
+}
+
+func InsertStore(UserPayload, d UserPayload) error {
 	return nil
+}
+
+func UpdateStore(UserPayload, d UserPayload) error {
+	return nil
+}
+
+func Find_By_Owner(UserPayload, d UserPayload) error {
+	return nil
+}
+
+func Find_By_Id(UserPayload, d UserPayload) error {
+	return nil
+}
+
+func Find_By_Id_With_Deleted(UserPayload, d UserPayload) error {
+	return nil
+}
+func Soft_Delete() error {
+	return nil
+}
+
+func (s *Store) export() ([]byte, error) {
+	data := struct {
+		ID                         uuid.UUID         `json:"id"`
+		Description                string            `json:"description"`
+		Name                       string            `json:"name"`
+		Btc_payout_addresses       []bitcoin.Address `json:"btc_payout_addresses"`
+		Btc_confirmations_required int               `json:"btc_confirmations_required"`
+		Public_key                 types.PublicKey   `json:"public_key"`
+		Can_accept_btc             bool              `json:"can_accept_btc"`
+		CreatedAt                  time.Time         `json:"created_at"`
+		UpdatedAt                  time.Time         `json:"updated_at"`
+	}{
+		ID:                         s.ID,
+		Description:                s.Description,
+		Name:                       s.Name,
+		Btc_payout_addresses:       s.Btc_payout_addresses,
+		Btc_confirmations_required: s.Btc_confirmations_required,
+		Public_key:                 s.Public_key,
+		// change to crypto type
+		Can_accept_btc: s.Can_accept("btc"),
+		CreatedAt:      s.Created_at,
+		UpdatedAt:      s.Updated_at,
+	}
+
+	return json.Marshal(data)
 }
