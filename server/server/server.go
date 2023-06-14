@@ -18,7 +18,7 @@ import (
 func Run(config config.Config) {
 	r := mux.NewRouter()
 
-	pg := *initPool("", 10)
+	pg := *initPool(config.Postgres, 10)
 
 	// define app state
 
@@ -58,6 +58,7 @@ func initPool(connection string, pool_size int) *utils.PgExecutor {
 	// Initialize the connection pool
 	pool, err := utils.InitPool(connection, pool_size)
 	if err != nil {
+		fmt.Println(connection)
 		panic(err)
 	}
 
