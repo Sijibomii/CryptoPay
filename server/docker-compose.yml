@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  database:
+    container_name: crypto-database
+    image: postgres:13-alpine
+    command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
+    environment:
+      - POSTGRES_USER=crypto
+      - POSTGRES_PASSWORD=crypto
+      - POSTGRES_DB=crypto
+    ports: 
+      - 5432:5432
+    volumes:
+      - database:/var/lib/postgresql/data
+volumes:
+  database:
