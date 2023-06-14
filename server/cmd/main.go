@@ -1,21 +1,40 @@
 package main
 
+import (
+	"log"
+	"os"
+	"strconv"
+
+	"github.com/joho/godotenv"
+	"github.com/sijibomii/cryptopay/config"
+	"github.com/sijibomii/cryptopay/server"
+)
+
 func main() {
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	pg_url := os.Getenv("POSTGRES_URL")
 
-	// setting up the db stuff
-	// import DBClient from db
-	// import func InitPool from utils
+	port := os.Getenv("PORT")
+	num, err := strconv.ParseInt(port, 10, 64)
+	if err != nil {
+		panic("invalid port")
+	}
 
-	// func newDbClient() actor.Receiver {
-	// 	return &DBClient{
-	// 	PgExecutor: {
-	// 	DB: return value of InitPool
-	// }
-	// }
-	// }
+	host := os.Getenv("HOST")
 
-	// e := actor.NewEngine()
-	// pid := e.Spawn(newDbClient, "dbClient")
-	// InsertUser in models package can now be called with e, pid, (whatever payload)
+	sc := config.ServerConfig{
+		Host: host,
+		Port: num,
+	}
+
+	c := config.Config{
+		Postgres: pg_url,
+		Server:   sc,
+	}
+
+	server.Run(c)
 
 }

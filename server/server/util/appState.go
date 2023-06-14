@@ -3,13 +3,15 @@ package util
 import (
 	"net/http"
 
+	"github.com/anthdm/hollywood/actor"
 	"github.com/sijibomii/cryptopay/config"
 	"github.com/sijibomii/cryptopay/core/utils"
 )
 
 type AppState struct {
-	Postgres utils.PgExecutor
-	Config   *config.Config
+	PgExecutor utils.PgExecutor
+	Config     *config.Config
+	Postgres   *actor.PID
 }
 
 type AppHandler struct {

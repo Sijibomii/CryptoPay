@@ -14,6 +14,7 @@ require (
 require (
 	github.com/gorilla/mux v1.8.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/lib/pq v1.1.1 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect

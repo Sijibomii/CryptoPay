@@ -5,26 +5,38 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/anthdm/hollywood/actor"
 	"github.com/gorilla/mux"
 	"github.com/sijibomii/cryptopay/config"
+	"github.com/sijibomii/cryptopay/core/db"
 	"github.com/sijibomii/cryptopay/core/utils"
 	"github.com/sijibomii/cryptopay/server/controllers"
 	"github.com/sijibomii/cryptopay/server/util"
 )
 
-func run(postgres any, config config.Config) {
+// posgress connection string should come in config
+func Run(config config.Config) {
 	r := mux.NewRouter()
 
+	pg := *initPool("", 10)
+
 	// define app state
+
+	// spawn up db client
+	e := actor.NewEngine()
+	pid := e.Spawn(newDbClient(pg), "dbClient")
+
 	appState := &util.AppState{
-		Postgres: *initPool("", 10),
-		Config:   &config,
+		Postgres:   pid,
+		PgExecutor: pg,
+		Config:     &config,
 	}
 
+	// routes register
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		controllers.IndexHandler(w, r, appState)
 	}).Methods("GET")
-	// r.HandleFunc("/", controllers.RootIndexHandler).Methods(http.MethodGet)
+
 	server := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port),
 		Handler: r,
@@ -32,6 +44,14 @@ func run(postgres any, config config.Config) {
 
 	log.Printf("Server listening on %s:%d\n", config.Server.Host, config.Server.Port)
 	log.Fatal(server.ListenAndServe())
+}
+
+func newDbClient(DB utils.PgExecutor) actor.Producer {
+	return func() actor.Receiver {
+		return &db.DBClient{
+			PgExecutor: DB,
+		}
+	}
 }
 
 func initPool(connection string, pool_size int) *utils.PgExecutor {
