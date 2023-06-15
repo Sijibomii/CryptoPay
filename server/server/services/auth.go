@@ -25,7 +25,7 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 	}
 
 	if !util.ComparePassword(user.Password, password) {
-		fmt.Printf("Invalid password for user, userID: ", user.ID)
+		fmt.Printf("Invalid password for user, userID: %s", user.ID)
 		return "", errors.New("invalid username or password")
 	}
 
@@ -36,7 +36,7 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 		Props:  map[string]interface{}{},
 	}
 	// store session in db and things like that
-	err := createSession(&session)
+	err := dao.CreateSession(appState.Engine, appState.Postgres, &session)
 	if err != nil {
 		return "", errors.Wrap(err, "unable to create session")
 	}
