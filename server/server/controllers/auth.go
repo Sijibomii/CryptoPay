@@ -20,6 +20,11 @@ type LoginResponse struct {
 	Token string `json:"token"`
 }
 
+type RegisterParams struct {
+	email    string
+	password string
+}
+
 func LoginHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -47,4 +52,20 @@ func LoginHandler(w http.ResponseWriter, r *http.Request, appState *util.AppStat
 
 	util.JsonBytesResponse(w, http.StatusOK, json)
 	return
+}
+
+func RegisterHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+	requestBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	var registerData RegisterParams
+	err = json.Unmarshal(requestBody, &registerData)
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+	token, err := services.Login(appState, registerData.email, registerData.password)
 }

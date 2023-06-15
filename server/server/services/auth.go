@@ -44,3 +44,26 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 
 	return session.Token, nil
 }
+
+func Register(appState *util.AppState, email string, password string) (string, error) {
+	var user *models.User
+
+	if email != "" {
+		var err error
+		_, err = dao.GetUserByEmail(appState.Engine, appState.Postgres, email)
+		if err == nil || !util.IsErrNotFound(err) {
+			return "", errors.Wrap(err, "email has been taken")
+		}
+
+		// hash password first
+
+		// register user
+		user, err = dao.RegisterUserByEmail(appState.Engine, appState.Postgres, email, password)
+
+		if user == nil {
+			return "", errors.New("Reistration failed")
+		}
+
+		// think about what happens to session here
+	}
+}

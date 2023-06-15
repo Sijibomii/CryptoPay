@@ -27,6 +27,20 @@ func (nf *ErrNotFound) Error() string {
 	return fmt.Sprintf("{%s} not found", nf.entity)
 }
 
+type ErrUserRegisterationFailed struct {
+	entity string
+}
+
+func NewErrUserRegisterationFailed(entity string) *ErrUserRegisterationFailed {
+	return &ErrUserRegisterationFailed{
+		entity: entity,
+	}
+}
+
+func (nf *ErrUserRegisterationFailed) Error() string {
+	return fmt.Sprintf("{%s} registration failed", nf.entity)
+}
+
 type ErrNotSessionCreationFailed struct {
 	entity string
 }

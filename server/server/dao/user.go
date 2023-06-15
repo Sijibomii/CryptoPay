@@ -17,3 +17,16 @@ func GetUserByEmail(e *actor.Engine, conn *actor.PID, email string) (*models.Use
 
 	return &user, nil
 }
+
+func RegisterUserByEmail(e *actor.Engine, conn *actor.PID, email, password string) (*models.User, error) {
+	user, err := models.InsertUser(e, conn, models.UserPayload{
+		Email:    email,
+		Password: password,
+	})
+	if err != nil {
+		// reg failed
+		return nil, util.NewErrUserRegisterationFailed(email)
+	}
+
+	return &user, nil
+}
