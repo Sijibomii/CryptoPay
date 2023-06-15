@@ -73,6 +73,10 @@ type User struct {
 	Reset_token_expires_at        time.Time
 }
 
+func (User) TableName() string {
+	return "users"
+}
+
 type InsertUserMessage struct {
 	Payload User
 }

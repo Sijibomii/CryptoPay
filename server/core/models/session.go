@@ -12,7 +12,7 @@ type Session struct {
 	ID             string                 `json:"id"`
 	Token          string                 `json:"token"`
 	UserID         string                 `json:"user_id"`
-	Props          map[string]interface{} `json:"props"`
+	Props          map[string]interface{} `gorm:"type:jsonb"`
 	CreatedAt      time.Time              `json:"create_at,omitempty"`
 	UpdatedAt      time.Time              `json:"update_at,omitempty"`
 	LastActivityAt time.Time              `json:"last_activity_at"`

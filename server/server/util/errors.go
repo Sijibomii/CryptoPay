@@ -27,6 +27,20 @@ func (nf *ErrNotFound) Error() string {
 	return fmt.Sprintf("{%s} not found", nf.entity)
 }
 
+type ErrNotSessionCreationFailed struct {
+	entity string
+}
+
+func NewErrNotSessionCreationFailed(entity string) *ErrNotSessionCreationFailed {
+	return &ErrNotSessionCreationFailed{
+		entity: entity,
+	}
+}
+
+func (nf *ErrNotSessionCreationFailed) Error() string {
+	return fmt.Sprintf("{%s} could not be created", nf.entity)
+}
+
 // ErrNotAllFound is an error type that can be returned by APIs
 // when a query that should fetch a certain amount of records
 // unexpectedly fetches less.

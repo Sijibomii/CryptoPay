@@ -59,7 +59,7 @@ type Store struct {
 	Owner_id                   uuid.UUID
 	Private_key                types.PrivateKey
 	Public_key                 types.PublicKey
-	Btc_payout_addresses       []bitcoin.Address
+	Btc_payout_addresses       []bitcoin.Address `gorm:"type:text[]"`
 	Btc_confirmations_required int
 	Mnemonic                   string
 	Hd_path                    string

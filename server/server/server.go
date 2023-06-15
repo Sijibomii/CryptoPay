@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/sijibomii/cryptopay/config"
 	"github.com/sijibomii/cryptopay/core/db"
+	"github.com/sijibomii/cryptopay/core/models"
 	"github.com/sijibomii/cryptopay/core/utils"
 	"github.com/sijibomii/cryptopay/server/controllers"
 	"github.com/sijibomii/cryptopay/server/util"
@@ -19,6 +20,8 @@ func Run(config config.Config) {
 	r := mux.NewRouter()
 
 	pg := *initPool(config.Postgres, 10)
+
+	pg.DB.AutoMigrate(&models.User{}, &models.Store{}, &models.ClientToken{}, &models.Session{})
 
 	// define app state
 

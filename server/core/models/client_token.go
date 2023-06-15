@@ -35,7 +35,7 @@ type ClientToken struct {
 	Store_id   uuid.UUID
 	Domain     string
 	Created_at time.Time
-	Client     types.Client
+	Client     types.Client `gorm:"type:jsonb"`
 }
 
 func (cp *ClientTokenPayload) ToClientToken() ClientToken {
