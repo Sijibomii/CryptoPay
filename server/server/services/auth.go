@@ -35,6 +35,7 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 		UserID: user.ID.String(),
 		Props:  map[string]interface{}{},
 	}
+
 	// store session in db and things like that
 	err := dao.CreateSession(appState.Engine, appState.Postgres, &session)
 	if err != nil {

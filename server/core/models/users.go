@@ -9,14 +9,6 @@ import (
 	"github.com/google/uuid"
 )
 
-type Session struct {
-	ID        string                 `json:"id"`
-	Token     string                 `json:"token"`
-	UserID    string                 `json:"user_id"`
-	Props     map[string]interface{} `json:"props"`
-	CreatedAt int64                  `json:"create_at,omitempty"`
-	UpdatedAt int64                  `json:"update_at,omitempty"`
-}
 type UserPayload struct {
 	ID                            uuid.UUID
 	Email                         string
