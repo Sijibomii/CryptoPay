@@ -1,6 +1,10 @@
 package models
 
 import (
+	"errors"
+	"time"
+
+	"github.com/anthdm/hollywood/actor"
 	"github.com/google/uuid"
 )
 
@@ -9,9 +13,23 @@ type Session struct {
 	Token          string                 `json:"token"`
 	UserID         string                 `json:"user_id"`
 	Props          map[string]interface{} `json:"props"`
-	CreatedAt      int64                  `json:"create_at,omitempty"`
-	UpdatedAt      int64                  `json:"update_at,omitempty"`
-	LastActivityAt int64                  `json:"last_activity_at"`
+	CreatedAt      time.Time              `json:"create_at,omitempty"`
+	UpdatedAt      time.Time              `json:"update_at,omitempty"`
+	LastActivityAt time.Time              `json:"last_activity_at"`
+}
+
+func (sp *Session) Set_created_at() error {
+	sp.CreatedAt = time.Now()
+	return nil
+}
+
+func (sp *Session) Set_updated_at() error {
+	sp.UpdatedAt = time.Now()
+	return nil
+}
+func (sp *Session) Set_LastActivity_at() error {
+	sp.LastActivityAt = time.Now()
+	return nil
 }
 
 type InsertSessionMessage struct {
@@ -22,3 +40,41 @@ type UpdateSessionMessage struct {
 	Payload Session
 	Id      uuid.UUID
 }
+
+func InsertSession(e *actor.Engine, conn *actor.PID, d *Session) (Session, error) {
+	d.Set_created_at()
+	var resp = e.Request(conn, InsertSessionMessage{
+		Payload: *d,
+	}, 500)
+	res, err := resp.Result()
+	if err != nil {
+		return Session{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(Session)
+
+	if !ok {
+		return Session{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
+}
+
+// func UpdateSession(e *actor.Engine, conn *actor.PID, id uuid.UUID, d UserPayload) (User, error) {
+// 	var resp = e.Request(conn, UpdateUserMessage{
+// 		Payload: d.ToUser(),
+// 		Id:      id,
+// 	}, 500)
+
+// 	res, err := resp.Result()
+// 	if err != nil {
+// 		return User{}, errors.New("An error occured!")
+// 	}
+// 	myStruct, ok := res.(User)
+
+// 	if !ok {
+// 		return User{}, errors.New("An error occured!")
+// 	}
+
+// 	return myStruct, nil
+
+// }
