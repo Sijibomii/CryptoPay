@@ -230,44 +230,20 @@ func IsErrUnauthorized(err error) bool {
 // }
 
 // IsErrNotFound returns true if `err` is or wraps one of:
-// - model.ErrNotFound
-// - model.ErrNotAllFound
-// - sql.ErrNoRows
-// - mattermost-plugin-api/ErrNotFound.
-// - model.ErrCategoryDeleted.
-// func IsErrNotFound(err error) bool {
-// 	if err == nil {
-// 		return false
-// 	}
+// - ErrNotFound
+func IsErrNotFound(err error) bool {
+	if err == nil {
+		return false
+	}
 
-// 	// check if this is a model.ErrNotFound
-// 	var nf *ErrNotFound
-// 	if errors.As(err, &nf) {
-// 		return true
-// 	}
+	// check if this is a model.ErrNotFound
+	var nf *ErrNotFound
+	if errors.As(err, &nf) {
+		return true
+	}
 
-// 	// check if this is a model.ErrNotAllFound
-// 	var naf *ErrNotAllFound
-// 	if errors.As(err, &naf) {
-// 		return true
-// 	}
-
-// 	// check if this is a sql.ErrNotFound
-// 	if errors.Is(err, sql.ErrNoRows) {
-// 		return true
-// 	}
-
-// 	// check if this is a Mattermost AppError with a Not Found status
-// 	var appErr *mm_model.AppError
-// 	if errors.As(err, &appErr) {
-// 		if appErr.StatusCode == http.StatusNotFound {
-// 			return true
-// 		}
-// 	}
-
-// 	// check if this is a model.ErrCategoryDeleted
-// 	// return errors.Is(err, ErrCategoryDeleted)
-// }
+	return false
+}
 
 // // IsErrRequestEntityTooLarge returns true if `err` is or wraps one of:
 // // - model.ErrRequestEntityTooLarge.

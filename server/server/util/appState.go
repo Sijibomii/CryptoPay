@@ -12,6 +12,7 @@ type AppState struct {
 	PgExecutor utils.PgExecutor
 	Config     *config.Config
 	Postgres   *actor.PID
+	Engine     *actor.Engine
 }
 
 type AppHandler struct {

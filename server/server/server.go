@@ -30,6 +30,7 @@ func Run(config config.Config) {
 		Postgres:   pid,
 		PgExecutor: pg,
 		Config:     &config,
+		Engine:     e,
 	}
 
 	// routes register
