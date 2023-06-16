@@ -27,6 +27,11 @@ func (u *UserPayload) Set_created_at() error {
 	u.Created_at = time.Now()
 	return nil
 }
+func (u *UserPayload) Set_is_verified() error {
+	u.Is_verified = false
+	return nil
+}
+
 func (u *UserPayload) Set_updated_at() error {
 	u.Updated_at = time.Now()
 	return nil
@@ -111,6 +116,9 @@ type DeleteExpiredUserMessage struct {
 
 func InsertUser(e *actor.Engine, conn *actor.PID, d UserPayload) (User, error) {
 	d.Set_created_at()
+	d.Set_updated_at()
+	d.Set_verification_token()
+	d.Set_is_verified()
 	var resp = e.Request(conn, InsertUserMessage{
 		Payload: d.ToUser(),
 	}, 500)

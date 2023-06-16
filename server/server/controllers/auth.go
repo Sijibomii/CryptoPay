@@ -25,6 +25,8 @@ type RegisterParams struct {
 	password string
 }
 
+type RegisterResponse struct{}
+
 func LoginHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -67,5 +69,23 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request, appState *util.AppS
 		util.ErrorResponseFunc(w, r, err)
 		return
 	}
-	token, err := services.Login(appState, registerData.email, registerData.password)
+	registerErr := services.Register(appState, registerData.email, registerData.password)
+
+	if registerErr != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+	json, err := json.Marshal(RegisterResponse{})
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	util.JsonBytesResponse(w, http.StatusOK, json)
+	return
+}
+
+func Activation(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+
 }

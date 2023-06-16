@@ -45,25 +45,38 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 	return session.Token, nil
 }
 
-func Register(appState *util.AppState, email string, password string) (string, error) {
+func Register(appState *util.AppState, email string, password string) error {
 	var user *models.User
 
 	if email != "" {
 		var err error
 		_, err = dao.GetUserByEmail(appState.Engine, appState.Postgres, email)
 		if err == nil || !util.IsErrNotFound(err) {
-			return "", errors.Wrap(err, "email has been taken")
+			return errors.Wrap(err, "email has been taken")
 		}
-
-		// hash password first
+		err = util.IsPasswordValid(password, util.PasswordSettings{
+			MinimumLength: 9,
+			Lowercase:     true,
+			Number:        true,
+			Uppercase:     true,
+			Symbol:        true,
+		})
+		if err != nil {
+			return errors.Wrap(err, "Invalid password")
+		}
 
 		// register user
-		user, err = dao.RegisterUserByEmail(appState.Engine, appState.Postgres, email, password)
+		user, err = dao.RegisterUserByEmail(appState.Engine, appState.Postgres, email, util.HashPassword(password))
 
 		if user == nil {
-			return "", errors.New("Reistration failed")
+			errors.New("Reistration failed")
 		}
 
-		// think about what happens to session here
+		// send mail
+
+		return nil
 	}
+	return errors.New("invalid username or password")
 }
+
+// resend activation email
