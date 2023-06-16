@@ -7,7 +7,15 @@ type ServerConfig struct {
 	// PublicKeyPath  string
 }
 
+type MailerConfig struct {
+	SmtpHost     string
+	SmtpPort     int
+	SmtpUsername string
+	SmtpPassword string
+}
+
 type Config struct {
 	Postgres string
 	Server   ServerConfig
+	Mailer   MailerConfig
 }

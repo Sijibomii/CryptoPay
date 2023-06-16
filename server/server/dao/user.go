@@ -30,3 +30,5 @@ func RegisterUserByEmail(e *actor.Engine, conn *actor.PID, email, password strin
 
 	return &user, nil
 }
+
+// creat

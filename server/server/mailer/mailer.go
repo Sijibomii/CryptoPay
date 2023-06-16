@@ -13,10 +13,10 @@ type SendActivationMailMessage struct {
 }
 
 type Mailer struct {
-	smtpHost     string
-	smtpPort     int
-	smtpUsername string
-	smtpPassword string
+	SmtpHost     string
+	SmtpPort     int
+	SmtpUsername string
+	SmtpPassword string
 }
 
 func sendActivationEmail(m *Mailer, user models.User) {
@@ -36,7 +36,7 @@ func sendActivationEmail(m *Mailer, user models.User) {
 	message.SetBody("text/html", body)
 
 	// Create a new SMTP dialer
-	dialer := gomail.NewDialer(m.smtpHost, m.smtpPort, m.smtpUsername, m.smtpPassword)
+	dialer := gomail.NewDialer(m.SmtpHost, m.SmtpPort, m.SmtpUsername, m.SmtpPassword)
 
 	// Send the email
 	if err := dialer.DialAndSend(message); err != nil {

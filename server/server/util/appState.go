@@ -13,6 +13,7 @@ type AppState struct {
 	Config     *config.Config
 	Postgres   *actor.PID
 	Engine     *actor.Engine
+	Mailer     *actor.PID
 }
 
 type AppHandler struct {

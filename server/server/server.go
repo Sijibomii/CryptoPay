@@ -12,6 +12,7 @@ import (
 	"github.com/sijibomii/cryptopay/core/models"
 	"github.com/sijibomii/cryptopay/core/utils"
 	"github.com/sijibomii/cryptopay/server/controllers"
+	"github.com/sijibomii/cryptopay/server/mailer"
 	"github.com/sijibomii/cryptopay/server/util"
 )
 
@@ -29,11 +30,14 @@ func Run(config config.Config) {
 	e := actor.NewEngine()
 	pid := e.Spawn(newDbClient(pg), "dbClient")
 
+	mailerPid := e.Spawn(newMailerClient(&config.Mailer), "mailer")
+
 	appState := &util.AppState{
 		Postgres:   pid,
 		PgExecutor: pg,
 		Config:     &config,
 		Engine:     e,
+		Mailer:     mailerPid,
 	}
 
 	// routes register
@@ -48,6 +52,17 @@ func Run(config config.Config) {
 
 	log.Printf("Server listening on %s:%d\n", config.Server.Host, config.Server.Port)
 	log.Fatal(server.ListenAndServe())
+}
+
+func newMailerClient(m *config.MailerConfig) actor.Producer {
+	return func() actor.Receiver {
+		return &mailer.Mailer{
+			SmtpHost:     m.SmtpHost,
+			SmtpPort:     m.SmtpPort,
+			SmtpUsername: m.SmtpUsername,
+			SmtpPassword: m.SmtpPassword,
+		}
+	}
 }
 
 func newDbClient(DB utils.PgExecutor) actor.Producer {

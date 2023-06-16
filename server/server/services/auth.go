@@ -6,6 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sijibomii/cryptopay/core/models"
 	"github.com/sijibomii/cryptopay/server/dao"
+	"github.com/sijibomii/cryptopay/server/mailer"
 	"github.com/sijibomii/cryptopay/server/util"
 )
 
@@ -73,6 +74,9 @@ func Register(appState *util.AppState, email string, password string) error {
 		}
 
 		// send mail
+		appState.Engine.Send(appState.Mailer, mailer.SendActivationMailMessage{
+			Payload: *user,
+		})
 
 		return nil
 	}
