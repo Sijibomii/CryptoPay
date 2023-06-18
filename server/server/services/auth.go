@@ -46,14 +46,14 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 	return session.Token, nil
 }
 
-func Register(appState *util.AppState, email string, password string) error {
+func Register(appState *util.AppState, email string, password string) (*models.User, error) {
 	var user *models.User
 
 	if email != "" {
 		var err error
 		_, err = dao.GetUserByEmail(appState.Engine, appState.Postgres, email)
 		if err == nil || !util.IsErrNotFound(err) {
-			return errors.Wrap(err, "email has been taken")
+			return nil, errors.Wrap(err, "email has been taken")
 		}
 		err = util.IsPasswordValid(password, util.PasswordSettings{
 			MinimumLength: 9,
@@ -63,7 +63,7 @@ func Register(appState *util.AppState, email string, password string) error {
 			Symbol:        true,
 		})
 		if err != nil {
-			return errors.Wrap(err, "Invalid password")
+			return nil, errors.Wrap(err, "Invalid password")
 		}
 
 		// register user
@@ -78,9 +78,9 @@ func Register(appState *util.AppState, email string, password string) error {
 		// 	Payload: *user,
 		// })
 
-		return nil
+		return user, nil
 	}
-	return errors.New("invalid username or password")
+	return nil, errors.New("invalid username or password")
 }
 
 func Activate(appState *util.AppState, token string) error {

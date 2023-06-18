@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/google/uuid"
 	"github.com/sijibomii/cryptopay/server/services"
 	"github.com/sijibomii/cryptopay/server/util"
 )
@@ -28,7 +29,11 @@ type RegisterParams struct {
 	Password string `json:"password"`
 }
 
-type RegisterResponse struct{}
+type RegisterResponse struct {
+	ID          uuid.UUID `json:"id"`
+	Email       string    `json:"email"`
+	Is_verified bool      `json:"isVerified"`
+}
 
 type ActivationResponse struct{}
 
@@ -77,13 +82,17 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request, appState *util.AppS
 		return
 	}
 	fmt.Printf("EMAIL IS %s ################ \n", registerData.Email)
-	registerErr := services.Register(appState, registerData.Email, registerData.Password)
+	registeredUser, registerErr := services.Register(appState, registerData.Email, registerData.Password)
 
 	if registerErr != nil {
 		util.ErrorResponseFunc(w, r, err)
 		return
 	}
-	json, err := json.Marshal(RegisterResponse{})
+	json, err := json.Marshal(RegisterResponse{
+		ID:          registeredUser.ID,
+		Email:       registeredUser.Email,
+		Is_verified: registeredUser.Is_verified,
+	})
 
 	if err != nil {
 		util.ErrorResponseFunc(w, r, err)
