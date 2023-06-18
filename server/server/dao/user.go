@@ -3,6 +3,7 @@ package dao
 // interacts with db
 import (
 	"github.com/anthdm/hollywood/actor"
+	"github.com/google/uuid"
 	"github.com/sijibomii/cryptopay/core/models"
 	"github.com/sijibomii/cryptopay/server/util"
 )
@@ -23,6 +24,7 @@ func RegisterUserByEmail(e *actor.Engine, conn *actor.PID, email, password strin
 		Email:    email,
 		Password: password,
 	})
+
 	if err != nil {
 		// reg failed
 		return nil, util.NewErrUserRegisterationFailed(email)
@@ -31,4 +33,10 @@ func RegisterUserByEmail(e *actor.Engine, conn *actor.PID, email, password strin
 	return &user, nil
 }
 
-// creat
+func FindUserByActivationTokenAndActivate(e *actor.Engine, conn *actor.PID, token uuid.UUID) (*models.User, error) {
+	user, err := models.ActivateUser(e, conn, token)
+	if err != nil {
+		return nil, util.NewErrUserRegisterationFailed("")
+	}
+	return &user, nil
+}

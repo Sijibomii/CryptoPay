@@ -45,6 +45,14 @@ func Run(config config.Config) {
 		controllers.IndexHandler(w, r, appState)
 	}).Methods("GET")
 
+	r.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+		controllers.LoginHandler(w, r, appState)
+	}).Methods("POST")
+
+	r.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+		controllers.RegisterHandler(w, r, appState)
+	}).Methods("POST")
+
 	server := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port),
 		Handler: r,

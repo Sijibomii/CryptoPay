@@ -3,10 +3,10 @@ package services
 import (
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sijibomii/cryptopay/core/models"
 	"github.com/sijibomii/cryptopay/server/dao"
-	"github.com/sijibomii/cryptopay/server/mailer"
 	"github.com/sijibomii/cryptopay/server/util"
 )
 
@@ -74,13 +74,27 @@ func Register(appState *util.AppState, email string, password string) error {
 		}
 
 		// send mail
-		appState.Engine.Send(appState.Mailer, mailer.SendActivationMailMessage{
-			Payload: *user,
-		})
+		// appState.Engine.Send(appState.Mailer, mailer.SendActivationMailMessage{
+		// 	Payload: *user,
+		// })
 
 		return nil
 	}
 	return errors.New("invalid username or password")
+}
+
+func Activate(appState *util.AppState, token string) error {
+
+	if token != "" {
+		var err error
+		parsedUUID, err := uuid.Parse(token)
+		_, err = dao.FindUserByActivationTokenAndActivate(appState.Engine, appState.Postgres, parsedUUID)
+		if err != nil {
+			return errors.Wrap(err, "activation failed")
+		}
+		return nil
+	}
+	return nil
 }
 
 // resend activation email

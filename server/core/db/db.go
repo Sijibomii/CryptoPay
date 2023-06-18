@@ -19,6 +19,7 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 	case models.InsertUserMessage:
 		payload, err := insertUser(d.DB, l.Payload)
+		fmt.Printf("insert user call finieshed ####### +%v", payload)
 		if err != nil {
 			ctx.Respond(nil)
 		}

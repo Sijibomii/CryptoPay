@@ -48,6 +48,11 @@ func (u *UserPayload) Set_reset_token() error {
 	return nil
 }
 
+func (u *UserPayload) Set_id_token() error {
+	u.ID = uuid.New()
+	return nil
+}
+
 func (u *UserPayload) ToUser() User {
 	return User{
 		ID:                            u.ID,
@@ -65,7 +70,7 @@ func (u *UserPayload) ToUser() User {
 }
 
 type User struct {
-	ID                            uuid.UUID
+	ID                            uuid.UUID `gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
 	Email                         string
 	Password                      string
 	Salt                          string
@@ -115,10 +120,14 @@ type DeleteExpiredUserMessage struct {
 }
 
 func InsertUser(e *actor.Engine, conn *actor.PID, d UserPayload) (User, error) {
+
 	d.Set_created_at()
 	d.Set_updated_at()
 	d.Set_verification_token()
 	d.Set_is_verified()
+	// postgres should do this automaticalyy... check that
+	d.Set_id_token()
+
 	var resp = e.Request(conn, InsertUserMessage{
 		Payload: d.ToUser(),
 	}, 500)
@@ -171,6 +180,7 @@ func Find_by_reset_token(e *actor.Engine, conn *actor.PID, token uuid.UUID) (Use
 	return myStruct, nil
 }
 func Find_by_email(e *actor.Engine, conn *actor.PID, email string) (User, error) {
+
 	var resp = e.Request(conn, FindUserByEmailMessage{
 		Email: email,
 	}, 500)
