@@ -130,8 +130,10 @@ func InsertUser(e *actor.Engine, conn *actor.PID, d UserPayload) (User, error) {
 
 	var resp = e.Request(conn, InsertUserMessage{
 		Payload: d.ToUser(),
-	}, 500)
+	}, time.Millisecond*100)
+
 	res, err := resp.Result()
+
 	if err != nil {
 		return User{}, errors.New("An error occured!")
 	}
