@@ -149,9 +149,12 @@ func UpdateUser(e *actor.Engine, conn *actor.PID, id uuid.UUID, d UserPayload) (
 	var resp = e.Request(conn, UpdateUserMessage{
 		Payload: d.ToUser(),
 		Id:      id,
-	}, 500)
+	}, time.Millisecond*100)
 
 	res, err := resp.Result()
+
+	// fmt.Printf(" User struct: %+v\n", myStruct)
+
 	if err != nil {
 		return User{}, errors.New("An error occured!")
 	}
@@ -167,7 +170,7 @@ func UpdateUser(e *actor.Engine, conn *actor.PID, id uuid.UUID, d UserPayload) (
 func Find_by_reset_token(e *actor.Engine, conn *actor.PID, token uuid.UUID) (User, error) {
 	var resp = e.Request(conn, FindUserByResetTokenMessage{
 		Token: token,
-	}, 500)
+	}, time.Millisecond*100)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -185,7 +188,7 @@ func Find_by_email(e *actor.Engine, conn *actor.PID, email string) (User, error)
 
 	var resp = e.Request(conn, FindUserByEmailMessage{
 		Email: email,
-	}, 500)
+	}, time.Millisecond*100)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -202,7 +205,7 @@ func Find_by_email(e *actor.Engine, conn *actor.PID, email string) (User, error)
 func Find_by_id(e *actor.Engine, conn *actor.PID, id uuid.UUID) (User, error) {
 	var resp = e.Request(conn, FindUserByIdMessage{
 		Id: id,
-	}, 500)
+	}, time.Millisecond*100)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -219,7 +222,7 @@ func Find_by_id(e *actor.Engine, conn *actor.PID, id uuid.UUID) (User, error) {
 func ActivateUser(e *actor.Engine, conn *actor.PID, token uuid.UUID) (User, error) {
 	var resp = e.Request(conn, ActivateUserMessage{
 		Token: token,
-	}, 500)
+	}, time.Millisecond*100)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -236,7 +239,7 @@ func ActivateUser(e *actor.Engine, conn *actor.PID, token uuid.UUID) (User, erro
 func DeleteUser(e *actor.Engine, conn *actor.PID, token uuid.UUID) (User, error) {
 	var resp = e.Request(conn, DeleteUserMessage{
 		Token: token,
-	}, 500)
+	}, time.Millisecond*100)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -253,7 +256,7 @@ func DeleteUser(e *actor.Engine, conn *actor.PID, token uuid.UUID) (User, error)
 func DeleteExpiredUser(e *actor.Engine, conn *actor.PID, email string) (User, error) {
 	var resp = e.Request(conn, DeleteExpiredUserMessage{
 		Email: email,
-	}, 500)
+	}, time.Millisecond*100)
 
 	res, err := resp.Result()
 	if err != nil {

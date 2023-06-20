@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -14,8 +13,8 @@ import (
 )
 
 type LoginParams struct {
-	Email    string
-	Password string
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type LoginResponse struct {
@@ -44,8 +43,11 @@ func LoginHandler(w http.ResponseWriter, r *http.Request, appState *util.AppStat
 		return
 	}
 
+	defer r.Body.Close()
+
 	var loginData LoginParams
 	err = json.Unmarshal(requestBody, &loginData)
+
 	if err != nil {
 		util.ErrorResponseFunc(w, r, err)
 		return
@@ -81,7 +83,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request, appState *util.AppS
 		util.ErrorResponseFunc(w, r, err)
 		return
 	}
-	fmt.Printf("EMAIL IS %s ################ \n", registerData.Email)
+
 	registeredUser, registerErr := services.Register(appState, registerData.Email, registerData.Password)
 
 	if registerErr != nil {

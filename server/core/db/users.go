@@ -15,7 +15,6 @@ func insertUser(conn *gorm.DB, payload models.User) (models.User, error) {
 	result := conn.Create(&payload)
 
 	if err := result.Error; err != nil {
-		fmt.Printf("omo payload no enter oo %s \n", err.Error())
 		return payload, err
 	}
 	return payload, nil
@@ -34,17 +33,17 @@ func updateUser(conn *gorm.DB, id uuid.UUID, payload models.User) (models.User, 
 	return payload, nil
 }
 
-func findUserByEmail(conn *gorm.DB, email string) (*models.User, error) {
+func findUserByEmail(conn *gorm.DB, email string) (models.User, error) {
 	var users []models.User
 	if err := conn.Where("email = ?", email).Find(&users).Error; err != nil {
-		return nil, err
+		return models.User{}, err
 	}
 
 	if len(users) == 0 {
-		return nil, errors.New("users not found")
+		return models.User{}, errors.New("users not found")
 	}
 
-	return &users[0], nil
+	return users[0], nil
 }
 
 func findUserById(conn *gorm.DB, id uuid.UUID) models.User {

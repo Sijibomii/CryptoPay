@@ -14,8 +14,10 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 	var user *models.User
 
 	if email != "" {
+
 		var err error
 		user, err = dao.GetUserByEmail(appState.Engine, appState.Postgres, email)
+		fmt.Printf("email is %v \n", user)
 		if err != nil && !util.IsErrNotFound(err) {
 			return "", errors.Wrap(err, "invalid username or password")
 		}

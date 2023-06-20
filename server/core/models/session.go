@@ -45,7 +45,7 @@ func InsertSession(e *actor.Engine, conn *actor.PID, d *Session) (Session, error
 	d.Set_created_at()
 	var resp = e.Request(conn, InsertSessionMessage{
 		Payload: *d,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return Session{}, errors.New("An error occured!")

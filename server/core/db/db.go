@@ -19,7 +19,7 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 	case models.InsertUserMessage:
 		payload, err := insertUser(d.DB, l.Payload)
-		fmt.Printf("insert user call finieshed ####### +%v", payload)
+
 		if err != nil {
 			ctx.Respond(nil)
 		}
@@ -29,7 +29,13 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 		updateUser(d.DB, l.Id, l.Payload)
 
 	case models.FindUserByEmailMessage:
-		findUserByEmail(d.DB, l.Email)
+		payload, err := findUserByEmail(d.DB, l.Email)
+		fmt.Printf("OUtput of actor %v \n", payload)
+
+		if err != nil {
+			ctx.Respond(nil)
+		}
+		ctx.Respond(payload)
 
 	case models.FindUserByIdMessage:
 		findUserById(d.DB, l.Id)
@@ -86,6 +92,15 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 	case models.DeleteClientTokenMessage:
 		deleteClientToken(d.DB, l.Id)
+
+	// sesssion
+
+	case models.InsertSessionMessage:
+		// panic if there's error
+		payload := insertSession(d.DB, l.Payload)
+
+		// how to catch a panic?
+		ctx.Respond(payload)
 
 	default:
 		fmt.Println("UNKNOWN MESSAGE TO USER DB")
