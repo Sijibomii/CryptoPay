@@ -8,6 +8,7 @@ import (
 	"net/url"
 
 	"github.com/google/uuid"
+	"github.com/sijibomii/cryptopay/core/models"
 	"github.com/sijibomii/cryptopay/server/services"
 	"github.com/sijibomii/cryptopay/server/util"
 )
@@ -49,6 +50,11 @@ type ChangePasswordParams struct {
 	Token    string `json:"token"`
 }
 
+type ProfileResponse struct {
+	ID    uuid.UUID `json:"id"`
+	Email string    `json:"email"`
+}
+
 func ResetPasswordHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -71,6 +77,21 @@ func ResetPasswordHandler(w http.ResponseWriter, r *http.Request, appState *util
 	}
 
 	json, err := json.Marshal(ResetPasswordResponse{Success: true})
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	util.JsonBytesResponse(w, http.StatusOK, json)
+	return
+}
+
+func ProfileHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+	userContext := r.Context().Value("user").(models.User)
+	json, err := json.Marshal(ProfileResponse{
+		Email: userContext.Email,
+		ID:    userContext.ID,
+	})
 	if err != nil {
 		util.ErrorResponseFunc(w, r, err)
 		return
