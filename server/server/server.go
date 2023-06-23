@@ -68,12 +68,29 @@ func Run(config config.Config) {
 	secureRoutes := r.PathPrefix("/").Subrouter()
 	secureRoutes.Use(middleware.AuthMiddleware(appState))
 
-	// profile
 	secureRoutes.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
-		controllers.ChangePasswordHandler(w, r, appState)
+		controllers.ProfileHandler(w, r, appState)
+	}).Methods("GET")
+
+	secureRoutes.HandleFunc("/client_tokens", func(w http.ResponseWriter, r *http.Request) {
+		controllers.GetAllClientTokensHandler(w, r, appState)
+	}).Methods("GET")
+
+	secureRoutes.HandleFunc("/client_tokens", func(w http.ResponseWriter, r *http.Request) {
+		controllers.CreateClientTokensHandler(w, r, appState)
 	}).Methods("POST")
 
-	// user/id
+	// /client_tokens/{id}
+
+	// /stores
+
+	// /stores/{id}
+
+	// /payments
+
+	// /payments/{id}/status
+
+	// /vouchers
 
 	server := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port),
