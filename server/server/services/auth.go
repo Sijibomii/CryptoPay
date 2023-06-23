@@ -49,7 +49,9 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 
 func ResetPassword(appState *util.AppState, email string) (*models.User, error) {
 	var user *models.User
+
 	var err error
+
 	if email != "" {
 		var err error
 		user, err = dao.GetUserByEmail(appState.Engine, appState.Postgres, email)
@@ -73,6 +75,39 @@ func ResetPassword(appState *util.AppState, email string) (*models.User, error) 
 	// appState.Engine.Send(appState.Mailer, mailer.SendResetPasswordMailMessage{
 	// 	Payload: *user,
 	// })
+
+	return user, nil
+}
+
+func ChangePassword(appState *util.AppState, token uuid.UUID, newPassword string) (*models.User, error) {
+	var user *models.User
+
+	var err error
+
+	user, err = dao.FindUserByRestToken(appState.Engine, appState.Postgres, token)
+
+	if user == nil {
+		errors.New("Operation Failed")
+	}
+
+	// hash password
+	err = util.IsPasswordValid(newPassword, util.PasswordSettings{
+		MinimumLength: 9,
+		Lowercase:     true,
+		Number:        true,
+		Uppercase:     true,
+		Symbol:        true,
+	})
+
+	if err != nil {
+		return nil, errors.Wrap(err, "Invalid password")
+	}
+
+	user, err = dao.SetNewPasswordById(appState.Engine, appState.Postgres, user.ID, util.HashPassword(newPassword))
+
+	if err != nil {
+		return nil, errors.Wrap(err, "Password Change operation failed")
+	}
 
 	return user, nil
 }

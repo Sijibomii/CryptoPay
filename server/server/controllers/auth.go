@@ -44,6 +44,11 @@ type ResetPasswordResponse struct {
 	Success bool `json:"success"`
 }
 
+type ChangePasswordParams struct {
+	Password string `json:"password"`
+	Token    string `json:"token"`
+}
+
 func ResetPasswordHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -73,6 +78,16 @@ func ResetPasswordHandler(w http.ResponseWriter, r *http.Request, appState *util
 
 	util.JsonBytesResponse(w, http.StatusOK, json)
 	return
+}
+
+func ChangePasswordHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+	requestBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	defer r.Body.Close()
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
