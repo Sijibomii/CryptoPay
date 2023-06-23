@@ -16,3 +16,18 @@ func GetClientTokenListByStoreId(e *actor.Engine, conn *actor.PID, id uuid.UUID,
 
 	return tokens, nil
 }
+
+func CreateClientToken(e *actor.Engine, conn *actor.PID, store_id uuid.UUID, name, domain string) (*models.ClientToken, error) {
+	token, err := models.InsertClientToken(e, conn, models.ClientTokenPayload{
+		ID:       uuid.New(),
+		Name:     name,
+		Token:    uuid.New(),
+		Store_id: store_id,
+		Domain:   domain,
+	})
+	if err != nil {
+		return nil, util.NewErrNotFound("creation failed")
+	}
+
+	return &token, nil
+}
