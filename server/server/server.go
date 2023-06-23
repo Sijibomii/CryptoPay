@@ -13,6 +13,7 @@ import (
 	"github.com/sijibomii/cryptopay/core/utils"
 	"github.com/sijibomii/cryptopay/server/controllers"
 	"github.com/sijibomii/cryptopay/server/mailer"
+	"github.com/sijibomii/cryptopay/server/middleware"
 	"github.com/sijibomii/cryptopay/server/util"
 )
 
@@ -63,7 +64,14 @@ func Run(config config.Config) {
 		controllers.ChangePasswordHandler(w, r, appState)
 	}).Methods("POST")
 
+	// protected routes
+	secureRoutes := r.PathPrefix("/").Subrouter()
+	secureRoutes.Use(middleware.AuthMiddleware(appState))
+
 	// profile
+	secureRoutes.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
+		controllers.ChangePasswordHandler(w, r, appState)
+	}).Methods("POST")
 
 	// user/id
 

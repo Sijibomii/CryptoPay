@@ -102,6 +102,12 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 		// how to catch a panic?
 		ctx.Respond(payload)
 
+	case models.GetSessionByTokenMessage:
+		payload := getSessionByToken(d.DB, l.Token)
+
+		// how to catch a panic?
+		ctx.Respond(payload)
+
 	default:
 		fmt.Println("UNKNOWN MESSAGE TO USER DB")
 	}

@@ -19,6 +19,17 @@ func GetUserByEmail(e *actor.Engine, conn *actor.PID, email string) (*models.Use
 	return &user, nil
 }
 
+func GetUserById(e *actor.Engine, conn *actor.PID, id uuid.UUID) (*models.User, error) {
+	user, err := models.Find_User_by_id(e, conn, id)
+
+	if err != nil {
+		// user not found
+		return nil, util.NewErrNotFound("user not found")
+	}
+
+	return &user, nil
+}
+
 func FindUserByRestToken(e *actor.Engine, conn *actor.PID, token uuid.UUID) (*models.User, error) {
 	user, err := models.Find_by_reset_token(e, conn, token)
 

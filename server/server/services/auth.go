@@ -34,7 +34,7 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 	session := models.Session{
 		ID:     util.NewID(util.IDTypeSession),
 		Token:  util.NewID(util.IDTypeToken),
-		UserID: user.ID.String(),
+		UserID: user.ID,
 		Props:  map[string]interface{}{},
 	}
 

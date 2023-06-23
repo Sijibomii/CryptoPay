@@ -11,7 +11,7 @@ import (
 type Session struct {
 	ID             string                 `json:"id"`
 	Token          string                 `json:"token"`
-	UserID         string                 `json:"user_id"`
+	UserID         uuid.UUID              `json:"user_id"`
 	Props          map[string]interface{} `gorm:"type:jsonb"`
 	CreatedAt      time.Time              `json:"create_at,omitempty"`
 	UpdatedAt      time.Time              `json:"update_at,omitempty"`
@@ -41,12 +41,36 @@ type UpdateSessionMessage struct {
 	Id      uuid.UUID
 }
 
+type GetSessionByTokenMessage struct {
+	Token string
+}
+
 func InsertSession(e *actor.Engine, conn *actor.PID, d *Session) (Session, error) {
 	d.Set_created_at()
 	var resp = e.Request(conn, InsertSessionMessage{
 		Payload: *d,
 	}, time.Millisecond*100)
 	res, err := resp.Result()
+	if err != nil {
+		return Session{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(Session)
+
+	if !ok {
+		return Session{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
+}
+
+func GetSessionByToken(e *actor.Engine, conn *actor.PID, token string) (Session, error) {
+
+	var resp = e.Request(conn, GetSessionByTokenMessage{
+		Token: token,
+	}, time.Millisecond*100)
+
+	res, err := resp.Result()
+
 	if err != nil {
 		return Session{}, errors.New("An error occured!")
 	}

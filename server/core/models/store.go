@@ -190,7 +190,7 @@ func Find_By_Owner(e *actor.Engine, conn *actor.PID, id uuid.UUID, limit, offset
 	return myStruct, nil
 }
 
-func Find_By_Id(e *actor.Engine, conn *actor.PID, id uuid.UUID) (Store, error) {
+func Find_Store_By_Id(e *actor.Engine, conn *actor.PID, id uuid.UUID) (Store, error) {
 	var resp = e.Request(conn, FindStoreByIdMessage{
 		Id: id,
 	}, 500)

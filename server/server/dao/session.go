@@ -15,3 +15,13 @@ func CreateSession(e *actor.Engine, conn *actor.PID, session *models.Session) er
 
 	return nil
 }
+
+func GetSessionByToken(e *actor.Engine, conn *actor.PID, token string) (*models.Session, error) {
+	session, err := models.GetSessionByToken(e, conn, token)
+
+	if err != nil {
+		return &session, util.NewErrNotFound("user not found")
+	}
+
+	return &session, nil
+}

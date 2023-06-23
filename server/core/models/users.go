@@ -202,7 +202,7 @@ func Find_by_email(e *actor.Engine, conn *actor.PID, email string) (User, error)
 
 	return myStruct, nil
 }
-func Find_by_id(e *actor.Engine, conn *actor.PID, id uuid.UUID) (User, error) {
+func Find_User_by_id(e *actor.Engine, conn *actor.PID, id uuid.UUID) (User, error) {
 	var resp = e.Request(conn, FindUserByIdMessage{
 		Id: id,
 	}, time.Millisecond*100)
