@@ -14,7 +14,6 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 	var user *models.User
 
 	if email != "" {
-
 		var err error
 		user, err = dao.GetUserByEmail(appState.Engine, appState.Postgres, email)
 		fmt.Printf("email is %v \n", user)
@@ -46,6 +45,36 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 	}
 
 	return session.Token, nil
+}
+
+func ResetPassword(appState *util.AppState, email string) (*models.User, error) {
+	var user *models.User
+	var err error
+	if email != "" {
+		var err error
+		user, err = dao.GetUserByEmail(appState.Engine, appState.Postgres, email)
+		fmt.Printf("email is %v \n", user)
+		if err != nil && !util.IsErrNotFound(err) {
+			return user, errors.Wrap(err, "invalid username or password")
+		}
+	}
+
+	if user == nil {
+		return user, errors.New("invalid username or password")
+	}
+
+	user, err = dao.SetResetPasswordTokenByEmail(appState.Engine, appState.Postgres, user.ID)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "error occurs")
+	}
+
+	// send mail
+	// appState.Engine.Send(appState.Mailer, mailer.SendResetPasswordMailMessage{
+	// 	Payload: *user,
+	// })
+
+	return user, nil
 }
 
 func Register(appState *util.AppState, email string, password string) (*models.User, error) {

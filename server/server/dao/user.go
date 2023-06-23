@@ -33,6 +33,20 @@ func RegisterUserByEmail(e *actor.Engine, conn *actor.PID, email, password strin
 	return &user, nil
 }
 
+func SetResetPasswordTokenByEmail(e *actor.Engine, conn *actor.PID, id uuid.UUID) (*models.User, error) {
+	userPayload := models.UserPayload{}
+
+	userPayload.Set_reset_token()
+
+	user, err := models.UpdateUser(e, conn, id, userPayload)
+
+	if err != nil {
+		return nil, util.NewErrNotFound("user could not be updated")
+	}
+
+	return &user, nil
+}
+
 func FindUserByActivationTokenAndActivate(e *actor.Engine, conn *actor.PID, token uuid.UUID) (*models.User, error) {
 	user, err := models.ActivateUser(e, conn, token)
 	if err != nil {

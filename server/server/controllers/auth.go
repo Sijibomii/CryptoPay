@@ -36,6 +36,45 @@ type RegisterResponse struct {
 
 type ActivationResponse struct{}
 
+type ResetPasswordParams struct {
+	Email string `json:"email"`
+}
+
+type ResetPasswordResponse struct {
+	Success bool `json:"success"`
+}
+
+func ResetPasswordHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+	requestBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	defer r.Body.Close()
+	var resetData ResetPasswordParams
+	err = json.Unmarshal(requestBody, &resetData)
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+	_, err = services.ResetPassword(appState, resetData.Email)
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	json, err := json.Marshal(ResetPasswordResponse{Success: true})
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	util.JsonBytesResponse(w, http.StatusOK, json)
+	return
+}
+
 func LoginHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
