@@ -31,3 +31,12 @@ func CreateClientToken(e *actor.Engine, conn *actor.PID, store_id uuid.UUID, nam
 
 	return &token, nil
 }
+
+func GetClientTokenById(e *actor.Engine, conn *actor.PID, id uuid.UUID) (*models.ClientToken, error) {
+	token, err := models.FindClientTokenById(e, conn, id)
+	if err != nil {
+		return nil, util.NewErrNotFound("get client token by id failed")
+	}
+
+	return &token, nil
+}

@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/sijibomii/cryptopay/core/models"
 	"github.com/sijibomii/cryptopay/server/services"
 	"github.com/sijibomii/cryptopay/server/util"
@@ -26,6 +27,14 @@ type CreateTokenParams struct {
 }
 
 type CreateTokenResponse struct {
+	Name     string `json:"name"`
+	Store_id string `json:"store_id"`
+	Domain   string `json:"domain"`
+	Token    string `json:"token"`
+}
+
+type GetClientTokenById struct {
+	ID       string `json:"id"`
 	Name     string `json:"name"`
 	Store_id string `json:"store_id"`
 	Domain   string `json:"domain"`
@@ -82,6 +91,54 @@ func GetAllClientTokensHandler(w http.ResponseWriter, r *http.Request, appState 
 		Store_id: store.ID,
 		Offset:   offsetNum,
 		Limit:    limitNum,
+	})
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	util.JsonBytesResponse(w, http.StatusOK, json)
+	return
+}
+
+func GetClientTokenByIdHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+	userContext := r.Context().Value("user").(models.User)
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	clientTokenId, tokenErr := uuid.Parse(id)
+
+	if tokenErr != nil {
+		util.ErrorResponseFunc(w, r, tokenErr)
+		return
+	}
+
+	token, err := services.GetClientTokenById(appState, clientTokenId)
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	store, err := services.FindStoreById(appState, token.Store_id)
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, tokenErr)
+		return
+	}
+
+	if store.Owner_id != userContext.ID {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	json, err := json.Marshal(GetClientTokenById{
+		ID:       token.ID.String(),
+		Name:     token.Name,
+		Domain:   token.Domain,
+		Store_id: token.Store_id.String(),
+		Token:    token.Token.String(),
 	})
 	if err != nil {
 		util.ErrorResponseFunc(w, r, err)

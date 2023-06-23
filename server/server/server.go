@@ -81,6 +81,9 @@ func Run(config config.Config) {
 	}).Methods("POST")
 
 	// /client_tokens/{id}
+	secureRoutes.HandleFunc("/client_tokens/:id", func(w http.ResponseWriter, r *http.Request) {
+		controllers.GetClientTokenByIdHandler(w, r, appState)
+	}).Methods("GET")
 
 	// /stores
 

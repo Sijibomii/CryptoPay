@@ -23,6 +23,19 @@ func GetAllClientTokensByStoreId(appState *util.AppState, id uuid.UUID, offset, 
 	return tokens, nil
 }
 
+func GetClientTokenById(appState *util.AppState, id uuid.UUID) (*models.ClientToken, error) {
+	var token *models.ClientToken
+	var err error
+
+	token, err = dao.GetClientTokenById(appState.Engine, appState.Postgres, id)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "error occurs")
+	}
+
+	return token, nil
+}
+
 func CreateClientToken(appState *util.AppState, store_id uuid.UUID, name, domain string) (*models.ClientToken, error) {
 	var token *models.ClientToken
 	var err error
