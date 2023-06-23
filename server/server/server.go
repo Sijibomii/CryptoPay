@@ -53,6 +53,20 @@ func Run(config config.Config) {
 		controllers.RegisterHandler(w, r, appState)
 	}).Methods("POST")
 
+	// activate
+
+	r.HandleFunc("/reset_password", func(w http.ResponseWriter, r *http.Request) {
+		controllers.ResetPasswordHandler(w, r, appState)
+	}).Methods("POST")
+
+	r.HandleFunc("/change_password", func(w http.ResponseWriter, r *http.Request) {
+		controllers.ChangePasswordHandler(w, r, appState)
+	}).Methods("POST")
+
+	// profile
+
+	// user/id
+
 	server := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port),
 		Handler: r,

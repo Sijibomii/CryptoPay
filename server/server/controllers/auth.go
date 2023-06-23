@@ -88,6 +88,24 @@ func ChangePasswordHandler(w http.ResponseWriter, r *http.Request, appState *uti
 	}
 
 	defer r.Body.Close()
+
+	var changeData ChangePasswordParams
+	err = json.Unmarshal(requestBody, &changeData)
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	token, tokenErr := uuid.Parse(changeData.Token)
+
+	if tokenErr != nil {
+		util.ErrorResponseFunc(w, r, tokenErr)
+		return
+	}
+
+	_, err = services.ChangePassword(appState, token, changeData.Password)
+
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
