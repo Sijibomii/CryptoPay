@@ -27,3 +27,18 @@ func FindStoresByOwnerId(e *actor.Engine, conn *actor.PID, ownerId uuid.UUID, of
 
 	return stores, nil
 }
+
+func CreateStore(e *actor.Engine, conn *actor.PID, ownerId uuid.UUID, name, description string) (*models.Store, error) {
+	store, err := models.InsertStore(e, conn, models.StorePayload{
+		Name:        name,
+		Description: description,
+		Owner_id:    ownerId,
+		ID:          uuid.New(),
+	})
+
+	if err != nil {
+		return nil, util.NewErrNotFound("store failed to be created")
+	}
+
+	return &store, nil
+}

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"strconv"
 
@@ -13,6 +14,11 @@ import (
 type GetStoresResponse struct {
 	Stores []models.Store `json:"stores"`
 	Owner  string         `json:"owner_id"`
+}
+
+type CreateStoreParams struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func GetStoresList(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
@@ -55,5 +61,23 @@ func GetStoresList(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 }
 
 func CreateStores(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+	userContext := r.Context().Value("user").(models.User)
 
+	requestBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	defer r.Body.Close()
+
+	var createStoreData CreateStoreParams
+	err = json.Unmarshal(requestBody, &createStoreData)
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	store, err := services.CreateStore(appState, userContext.ID, createStoreData.Name, createStoreData.Description)
 }

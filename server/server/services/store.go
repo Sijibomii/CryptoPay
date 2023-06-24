@@ -33,3 +33,16 @@ func FindStoresByOwnerId(appState *util.AppState, ownerId uuid.UUID, offset, lim
 
 	return stores, nil
 }
+
+func CreateStore(appState *util.AppState, ownerId uuid.UUID, name, description string) (*models.Store, error) {
+	var store *models.Store
+	var err error
+
+	store, err = dao.CreateStore(appState.Engine, appState.Postgres, ownerId, name, description)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "error geting store")
+	}
+
+	return store, nil
+}
