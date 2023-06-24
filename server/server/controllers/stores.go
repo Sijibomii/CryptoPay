@@ -21,6 +21,11 @@ type CreateStoreParams struct {
 	Description string `json:"description"`
 }
 
+type CreateStoreReponse struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
 func GetStoresList(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
 	userContext := r.Context().Value("user").(models.User)
 
@@ -80,4 +85,14 @@ func CreateStores(w http.ResponseWriter, r *http.Request, appState *util.AppStat
 	}
 
 	store, err := services.CreateStore(appState, userContext.ID, createStoreData.Name, createStoreData.Description)
+
+	json, err := store.Export()
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	util.JsonBytesResponse(w, http.StatusOK, json)
+	return
 }

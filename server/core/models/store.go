@@ -270,7 +270,7 @@ func Soft_Delete_Store_By_OwnerID(e *actor.Engine, conn *actor.PID, Owner_id uui
 	return true, nil
 }
 
-func (s *Store) export() ([]byte, error) {
+func (s *Store) Export() ([]byte, error) {
 	data := struct {
 		ID                         uuid.UUID         `json:"id"`
 		Description                string            `json:"description"`
