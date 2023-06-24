@@ -26,11 +26,15 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 		ctx.Respond(payload)
 
 	case models.UpdateUserMessage:
-		updateUser(d.DB, l.Id, l.Payload)
+		payload, err := updateUser(d.DB, l.Id, l.Payload)
+		if err != nil {
+			panic(err)
+		}
+		ctx.Respond(payload)
 
 	case models.FindUserByEmailMessage:
 		payload, err := findUserByEmail(d.DB, l.Email)
-		fmt.Printf("OUtput of actor %v \n", payload)
+		fmt.Printf("Output of actor %v \n", payload)
 
 		if err != nil {
 			ctx.Respond(nil)
@@ -38,60 +42,96 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 		ctx.Respond(payload)
 
 	case models.FindUserByIdMessage:
-		findUserById(d.DB, l.Id)
+		payload := findUserById(d.DB, l.Id)
+
+		ctx.Respond(payload)
 
 	case models.FindUserByResetTokenMessage:
-		findUserByResetToken(d.DB, l.Token)
+		payload := findUserByResetToken(d.DB, l.Token)
+
+		ctx.Respond(payload)
 
 	case models.ActivateUserMessage:
-		activateUser(d.DB, l.Token)
+		payload := activateUser(d.DB, l.Token)
+
+		ctx.Respond(payload)
 
 	case models.DeleteUserMessage:
-		deleteUser(d.DB, l.Token)
+		payload := deleteUser(d.DB, l.Token)
+
+		ctx.Respond(payload)
 
 	case models.DeleteExpiredUserMessage:
-		deleteExpiredUser(d.DB, l.Email)
+		payload := deleteExpiredUser(d.DB, l.Email)
+
+		ctx.Respond(payload)
 
 	// add store cases below
 	case models.InsertStoreMessage:
-		insertStore(d.DB, l.Payload)
+		payload := insertStore(d.DB, l.Payload)
+
+		ctx.Respond(payload)
 
 	case models.UpdateStoreMessage:
-		updateStore(d.DB, l.Id, l.Payload)
+		payload := updateStore(d.DB, l.Id, l.Payload)
+
+		ctx.Respond(payload)
 
 	case models.FindStoreByIdMessage:
-		findStoreById(d.DB, l.Id)
+		payload := findStoreById(d.DB, l.Id)
+
+		ctx.Respond(payload)
 
 	case models.FindStoreByOwnerMessage:
-		findStoreByOwner(d.DB, l.OwnerID, l.Limit, l.Offset)
+		payload := findStoreByOwner(d.DB, l.OwnerID, l.Limit, l.Offset)
+
+		ctx.Respond(payload)
 
 	case models.FindStoreByIdWithDeletedMessage:
-		findStoreByIdWithDeleted(d.DB, l.Id)
+		payload := findStoreByIdWithDeleted(d.DB, l.Id)
+
+		ctx.Respond(payload)
 
 	case models.DeleteStoreMessage:
-		deleteStore(d.DB, l.Id)
+		payload := deleteStore(d.DB, l.Id)
+
+		ctx.Respond(payload)
 
 	case models.SoftDeleteStoreMessage:
-		softDeleteStore(d.DB, l.Id)
+		payload := softDeleteStore(d.DB, l.Id)
+
+		ctx.Respond(payload)
 
 	case models.SoftDeleteStoreByOwnerIDMessage:
-		softDeleteStoreByOwnerID(d.DB, l.OwnerID)
+		payload := softDeleteStoreByOwnerID(d.DB, l.OwnerID)
+
+		ctx.Respond(payload)
 
 	// client tokens
 	case models.InsertClientTokenMessage:
-		insertClientToken(d.DB, l.Payload)
+		payload := insertClientToken(d.DB, l.Payload)
+
+		ctx.Respond(payload)
 
 	case models.FindClientTokensByStoreMessage:
-		findClientTokensByStore(d.DB, l.Store_id, l.Limit, l.Offset)
+		payload := findClientTokensByStore(d.DB, l.Store_id, l.Limit, l.Offset)
+
+		ctx.Respond(payload)
 
 	case models.FindClientTokenByIdMessage:
-		findClientTokenById(d.DB, l.Id)
+		payload := findClientTokenById(d.DB, l.Id)
+
+		ctx.Respond(payload)
 
 	case models.FindClientTokenByTokenAndDomainMessage:
-		findClientTokenByTokenAndDomain(d.DB, l.Token, l.Domain)
+		payload := findClientTokenByTokenAndDomain(d.DB, l.Token, l.Domain)
+
+		ctx.Respond(payload)
 
 	case models.DeleteClientTokenMessage:
-		deleteClientToken(d.DB, l.Id)
+		payload := deleteClientToken(d.DB, l.Id)
+
+		ctx.Respond(payload)
 
 	// sesssion
 
@@ -101,6 +141,13 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 		// how to catch a panic?
 		ctx.Respond(payload)
+
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Printf("Session insertion failed")
+				ctx.Respond(nil)
+			}
+		}()
 
 	case models.GetSessionByTokenMessage:
 		payload := getSessionByToken(d.DB, l.Token)
