@@ -1,11 +1,15 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sijibomii/cryptopay/core/models"
+	"github.com/sijibomii/cryptopay/hdkeyring"
 	"github.com/sijibomii/cryptopay/server/dao"
 	"github.com/sijibomii/cryptopay/server/util"
+	"github.com/sijibomii/cryptopay/types/bitcoin"
 )
 
 func FindStoreById(appState *util.AppState, id uuid.UUID) (*models.Store, error) {
@@ -38,9 +42,15 @@ func CreateStore(appState *util.AppState, ownerId uuid.UUID, name, description s
 	var store *models.Store
 	var err error
 
-	privateKey, publicKey, error := util.GenerateRSA()
+	privateKey, publicKey, err := util.GenerateRSA()
 
-	store, err = dao.CreateStore(appState.Engine, appState.Postgres, ownerId, name, description)
+	if err != nil {
+		fmt.Printf("error genrating rsa")
+	}
+
+	keyring, _ := hdkeyring.NewHdKeyring("m/44'/60'/0'/0", 1, bitcoin.Test)
+
+	store, err = dao.CreateStore(appState.Engine, appState.Postgres, ownerId, name, description, privateKey, publicKey, keyring.Mnemonic.Phrase(), keyring.HdPath.String())
 
 	if err != nil {
 		return nil, errors.Wrap(err, "error geting store")

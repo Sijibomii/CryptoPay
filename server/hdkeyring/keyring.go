@@ -5,8 +5,6 @@ import (
 
 	"github.com/sijibomii/cryptopay/hdkeyring/bip39"
 	"github.com/sijibomii/cryptopay/types/bitcoin"
-	// "github.com/tyler-smith/go-bip32"
-	// "github.com/tyler-smith/go-bip39"
 )
 
 type HdKeyring struct {
