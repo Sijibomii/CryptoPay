@@ -1,6 +1,8 @@
 package hdkeyring
 
 import (
+	"fmt"
+
 	"github.com/sijibomii/cryptopay/hdkeyring/bip39"
 	"github.com/sijibomii/cryptopay/types/bitcoin"
 	// "github.com/tyler-smith/go-bip32"
@@ -21,15 +23,20 @@ func NewHdKeyring(path string, numberOfAccounts uint32, btcNetwork bitcoin.Netwo
 	newPath, err := ParseDerivationPath(path)
 
 	if err != nil {
-		//
+		fmt.Printf("error while parsing derivation path")
 	}
 
 	mnemonic, err := bip39.NewMnemonic(bip39.Words12, bip39.English, "")
 
 	if err != nil {
-		//
+		fmt.Printf("error while creating mnemonic")
 	}
 
+	keyring, _ := initfromMnemonic(mnemonic, newPath, btcNetwork)
+
+	keyring.loadWallets(int(numberOfAccounts))
+
+	return keyring, nil
 }
 
 func initfromMnemonic(Mnemonic bip39.Mnemonic, path DerivationPath, btcNetwork bitcoin.Network) (*HdKeyring, error) {
@@ -44,4 +51,25 @@ func initfromMnemonic(Mnemonic bip39.Mnemonic, path DerivationPath, btcNetwork b
 		BtcNetwork: btcNetwork,
 		Root:       &root,
 	}, nil
+}
+
+func (hd HdKeyring) loadWallets(no_of_accounts int) {
+
+	var wallets []Wallet
+
+	for i := int(0); i < no_of_accounts; i++ {
+
+		keypair, err := hd.Root.Derive(Index{
+			value:      uint32(i),
+			isHardened: false,
+		})
+
+		if err != nil {
+			fmt.Printf("error loading wallets")
+		}
+
+		wallet := NewWallet(keypair.xprv.secretKey, hd.BtcNetwork)
+
+		wallets = append(wallets, *wallet)
+	}
 }
