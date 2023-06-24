@@ -20,3 +20,16 @@ func FindStoreById(appState *util.AppState, id uuid.UUID) (*models.Store, error)
 
 	return store, nil
 }
+
+func FindStoresByOwnerId(appState *util.AppState, ownerId uuid.UUID, offset, limit int) ([]models.Store, error) {
+	var stores []models.Store
+	var err error
+
+	stores, err = dao.FindStoresByOwnerId(appState.Engine, appState.Postgres, ownerId, offset, limit)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "error occurs")
+	}
+
+	return stores, nil
+}

@@ -170,7 +170,7 @@ func UpdateStore(e *actor.Engine, conn *actor.PID, id uuid.UUID, d StorePayload)
 	return myStruct, nil
 }
 
-func Find_By_Owner(e *actor.Engine, conn *actor.PID, id uuid.UUID, limit, offset int64) ([]Store, error) {
+func Find_Store_By_Owner_Id(e *actor.Engine, conn *actor.PID, id uuid.UUID, limit, offset int64) ([]Store, error) {
 	var resp = e.Request(conn, FindStoreByOwnerMessage{
 		OwnerID: id,
 		Limit:   limit,
