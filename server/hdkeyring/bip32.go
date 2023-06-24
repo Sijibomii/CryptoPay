@@ -59,6 +59,7 @@ func NewHardenedIndex(value uint32) Index {
 }
 
 func NewSoftIndex(value uint32) Index {
+
 	return Index{
 		isHardened: false,
 		value:      value,
@@ -92,7 +93,7 @@ func (dp *DerivationPath) String() string {
 	return path
 }
 
-func parseDerivationPath(path string) (DerivationPath, error) {
+func ParseDerivationPath(path string) (DerivationPath, error) {
 	entries := regexp.MustCompile(`/`).Split(path, -1)
 
 	if len(entries) == 0 || !RegexMasterKey.MatchString(entries[0]) {
@@ -551,7 +552,7 @@ func NewXKeyPair(xprv Xprv, xpub Xpub) XKeyPair {
 	return XKeyPair{xprv, xpub}
 }
 
-func (kp XKeyPair) FromSeed(seed bip39.Seed, btcNetwork bitcoin.Network) (XKeyPair, error) {
+func FromSeed(seed bip39.Seed, btcNetwork bitcoin.Network) (XKeyPair, error) {
 	// create a master private key
 	xprv, err := XprvFromMasterSeed(seed, btcNetwork)
 	if err != nil {

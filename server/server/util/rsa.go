@@ -8,7 +8,7 @@ import (
 	"errors"
 )
 
-func generateRSA() ([]byte, []byte, error) {
+func GenerateRSA() ([]byte, []byte, error) {
 	// Generate RSA private key
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {

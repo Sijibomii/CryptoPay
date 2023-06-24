@@ -38,6 +38,8 @@ func CreateStore(appState *util.AppState, ownerId uuid.UUID, name, description s
 	var store *models.Store
 	var err error
 
+	privateKey, publicKey, error := util.GenerateRSA()
+
 	store, err = dao.CreateStore(appState.Engine, appState.Postgres, ownerId, name, description)
 
 	if err != nil {
