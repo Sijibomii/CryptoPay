@@ -93,6 +93,17 @@ func Run(config config.Config) {
 	}).Methods("POST")
 
 	// /stores/{id}
+	secureRoutes.HandleFunc("/stores/:id", func(w http.ResponseWriter, r *http.Request) {
+		controllers.GetStoresById(w, r, appState)
+	}).Methods("GET")
+
+	secureRoutes.HandleFunc("/stores/:id", func(w http.ResponseWriter, r *http.Request) {
+		controllers.GetStoresList(w, r, appState)
+	}).Methods("PATCH")
+
+	secureRoutes.HandleFunc("/stores/:id", func(w http.ResponseWriter, r *http.Request) {
+		controllers.GetStoresList(w, r, appState)
+	}).Methods("DELETE")
 
 	// /payments
 

@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/sijibomii/cryptopay/core/models"
 	"github.com/sijibomii/cryptopay/server/services"
 	"github.com/sijibomii/cryptopay/server/util"
@@ -85,6 +87,37 @@ func CreateStores(w http.ResponseWriter, r *http.Request, appState *util.AppStat
 	}
 
 	store, err := services.CreateStore(appState, userContext.ID, createStoreData.Name, createStoreData.Description)
+
+	json, err := store.Export()
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	util.JsonBytesResponse(w, http.StatusOK, json)
+	return
+}
+
+func GetStoresById(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+	userContext := r.Context().Value("user").(models.User)
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	storeId, tokenErr := uuid.Parse(id)
+
+	if tokenErr != nil {
+		util.ErrorResponseFunc(w, r, tokenErr)
+		return
+	}
+
+	store, err := services.FindStoreById(appState, storeId)
+
+	if store.Owner_id != userContext.ID {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 
 	json, err := store.Export()
 
