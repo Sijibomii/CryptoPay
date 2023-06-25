@@ -7,7 +7,8 @@ import (
 )
 
 func insertStore(conn *gorm.DB, payload models.Store) models.Store {
-	result := conn.Create(payload)
+
+	result := conn.Create(&payload)
 	if err := result.Error; err != nil {
 		panic(err)
 	}

@@ -35,7 +35,6 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 		ID:     util.NewID(util.IDTypeSession),
 		Token:  util.NewID(util.IDTypeToken),
 		UserID: user.ID,
-		Props:  map[string]interface{}{},
 	}
 
 	// store session in db and things like that

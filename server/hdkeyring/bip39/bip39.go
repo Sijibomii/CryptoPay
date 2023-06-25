@@ -224,19 +224,35 @@ func (s Seed) AsBytes() []byte {
 
 func NewMnemonic(typ MnemonicType, lang Language, password string) (Mnemonic, error) {
 	entropyLength := typ.entropyLength() / 8
+
 	entropy := make([]byte, entropyLength)
+
 	_, err := rand.Read(entropy)
+
 	if err != nil {
 		return Mnemonic{}, err
 	}
 
+	err = loadWordlists()
+
+	if err != nil {
+		fmt.Println("########## eorldlist error", err.Error())
+	}
+
 	wordlist := lang.getWordlist()
 
+	fmt.Println("worldlist \n", wordlist)
+
 	checksumLength := typ.checksumLength()
+
+	fmt.Println("checksumLength\n", checksumLength)
+
 	checksum := calculateChecksum(entropy, checksumLength)
+	fmt.Println("checksum \n", checksum)
 
 	withChecksum := append(entropy, checksum.bits...)
 	withChecksumBits := bytesToBits(withChecksum)
+
 	withChecksumBits.Truncate(11 * typ.wordCount())
 
 	var phrase []string
@@ -405,7 +421,9 @@ func (bv *bitVec) Reset() {
 }
 
 func (bv *bitVec) Truncate(length int) {
+
 	byteLength := (length + 7) / 8
+	fmt.Println("The number is:", bv.bits)
 	bv.bits = bv.bits[:byteLength]
 	bv.length = length
 }
@@ -429,6 +447,7 @@ func (bv *bitVec) Reverse() {
 }
 
 func bytesToBits(bytes []byte) *bitVec {
+	fmt.Println("######### bytes =", bytes)
 	bits := newBitVec()
 	for _, b := range bytes {
 		for i := 0; i < 8; i++ {

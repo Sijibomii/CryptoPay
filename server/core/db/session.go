@@ -18,9 +18,12 @@ func insertSession(conn *gorm.DB, payload models.Session) models.Session {
 
 func getSessionByToken(conn *gorm.DB, token string) models.Session {
 	session := models.Session{}
-	if err := conn.Where("token = ?", token).First(&session).Error; err != nil {
-		panic(err)
-	}
 
+	if err := conn.Where("token = ?", token).First(&session).Error; err != nil {
+		fmt.Printf("################# error: %s\n", err.Error())
+		// panic(err)
+	}
+	// fmt.Printf("token: %s", token)
+	// fmt.Printf("############ SESSION: %v", session)
 	return session
 }

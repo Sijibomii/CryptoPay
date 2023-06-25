@@ -19,12 +19,15 @@ type HdKeyring struct {
 func NewHdKeyring(path string, numberOfAccounts uint32, btcNetwork bitcoin.Network) (*HdKeyring, error) {
 
 	newPath, err := ParseDerivationPath(path)
+	fmt.Printf("generated path ############################# \n")
 
 	if err != nil {
 		fmt.Printf("error while parsing derivation path")
 	}
 
 	mnemonic, err := bip39.NewMnemonic(bip39.Words12, bip39.English, "")
+
+	fmt.Printf("generated mnemonic ############################# \n")
 
 	if err != nil {
 		fmt.Printf("error while creating mnemonic")

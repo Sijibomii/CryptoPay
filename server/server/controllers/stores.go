@@ -27,7 +27,7 @@ type CreateStoreReponse struct {
 }
 
 func GetStoresList(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
-	userContext := r.Context().Value("user").(models.User)
+	userContext := r.Context().Value("user").(*models.User)
 
 	queryValues := r.URL.Query()
 
@@ -66,7 +66,7 @@ func GetStoresList(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 }
 
 func CreateStores(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
-	userContext := r.Context().Value("user").(models.User)
+	userContext := r.Context().Value("user").(*models.User)
 
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {

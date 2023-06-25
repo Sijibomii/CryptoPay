@@ -1,15 +1,13 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sijibomii/cryptopay/core/models"
-	"github.com/sijibomii/cryptopay/hdkeyring"
 	"github.com/sijibomii/cryptopay/server/dao"
 	"github.com/sijibomii/cryptopay/server/util"
-	"github.com/sijibomii/cryptopay/types/bitcoin"
+	"github.com/tyler-smith/go-bip32"
+	"github.com/tyler-smith/go-bip39"
 )
 
 func FindStoreById(appState *util.AppState, id uuid.UUID) (*models.Store, error) {
@@ -40,17 +38,21 @@ func FindStoresByOwnerId(appState *util.AppState, ownerId uuid.UUID, offset, lim
 
 func CreateStore(appState *util.AppState, ownerId uuid.UUID, name, description string) (*models.Store, error) {
 	var store *models.Store
-	var err error
+	// var err error
 
-	privateKey, publicKey, err := util.GenerateRSA()
+	entropy, _ := bip39.NewEntropy(256)
+	mnemonic, _ := bip39.NewMnemonic(entropy)
 
-	if err != nil {
-		fmt.Printf("error genrating rsa")
-	}
+	seed := bip39.NewSeed(mnemonic, "")
 
-	keyring, _ := hdkeyring.NewHdKeyring("m/44'/60'/0'/0", 1, bitcoin.Test)
+	masterKey, _ := bip32.NewMasterKey(seed)
 
-	store, err = dao.CreateStore(appState.Engine, appState.Postgres, ownerId, name, description, privateKey, publicKey, keyring.Mnemonic.Phrase(), keyring.HdPath.String())
+	childPath := "m/44'/60'/0'/0" // Replace with your desired path
+	childKey, _ := util.NewChildKeyFromString(masterKey, childPath)
+
+	publicKey := childKey.PublicKey()
+
+	store, err := dao.CreateStore(appState.Engine, appState.Postgres, ownerId, name, description, childKey, publicKey, mnemonic, childPath)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "error geting store")

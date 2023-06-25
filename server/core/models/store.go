@@ -8,9 +8,9 @@ import (
 
 	"github.com/anthdm/hollywood/actor"
 	"github.com/google/uuid"
-	"github.com/sijibomii/cryptopay/types"
 	"github.com/sijibomii/cryptopay/types/bitcoin"
 	"github.com/sijibomii/cryptopay/types/currency"
+	"github.com/tyler-smith/go-bip32"
 )
 
 type StorePayload struct {
@@ -20,8 +20,8 @@ type StorePayload struct {
 	Created_at                 time.Time
 	Updated_at                 time.Time
 	Owner_id                   uuid.UUID
-	Private_key                types.PrivateKey
-	Public_key                 types.PublicKey
+	Private_key                bip32.Key
+	Public_key                 bip32.Key
 	Btc_payout_addresses       []bitcoin.Address
 	Btc_confirmations_required int
 	Mnemonic                   string
@@ -51,15 +51,15 @@ func (sp *StorePayload) Set_deleted_at() error {
 }
 
 type Store struct {
-	ID                         uuid.UUID
-	Name                       string
-	Description                string
-	Created_at                 time.Time
-	Updated_at                 time.Time
-	Owner_id                   uuid.UUID
-	Private_key                types.PrivateKey
-	Public_key                 types.PublicKey
-	Btc_payout_addresses       []bitcoin.Address `gorm:"type:text[]"`
+	ID          uuid.UUID
+	Name        string
+	Description string
+	Created_at  time.Time
+	Updated_at  time.Time
+	Owner_id    uuid.UUID
+	Private_key bip32.Key
+	Public_key  bip32.Key
+	// Btc_payout_addresses       string
 	Btc_confirmations_required int
 	Mnemonic                   string
 	Hd_path                    string
@@ -67,16 +67,22 @@ type Store struct {
 }
 
 func (sp *StorePayload) ToStore() Store {
+	// addressStrings := make([]string, len(sp.Btc_payout_addresses))
+	// for i, address := range sp.Btc_payout_addresses {
+	// 	addressStrings[i] = string(address)
+	// }
+	// joinedAddresses := strings.Join(addressStrings, ",")
+
 	return Store{
-		ID:                         sp.ID,
-		Name:                       sp.Name,
-		Description:                sp.Description,
-		Created_at:                 sp.Created_at,
-		Updated_at:                 sp.Updated_at,
-		Owner_id:                   sp.Owner_id,
-		Private_key:                sp.Private_key,
-		Public_key:                 sp.Public_key,
-		Btc_payout_addresses:       sp.Btc_payout_addresses,
+		ID:          sp.ID,
+		Name:        sp.Name,
+		Description: sp.Description,
+		Created_at:  sp.Created_at,
+		Updated_at:  sp.Updated_at,
+		Owner_id:    sp.Owner_id,
+		Private_key: sp.Private_key,
+		Public_key:  sp.Public_key,
+		// Btc_payout_addresses:       joinedAddresses,
 		Btc_confirmations_required: sp.Btc_confirmations_required,
 		Mnemonic:                   sp.Mnemonic,
 		Hd_path:                    sp.Hd_path,
@@ -122,9 +128,10 @@ type SoftDeleteStoreByOwnerIDMessage struct {
 func (s *Store) Can_accept(crypto currency.Crypto) bool {
 	switch crypto {
 	case currency.Btc:
-		if s.Btc_payout_addresses != nil && s.Btc_confirmations_required != 0 {
-			return true
-		}
+		// if s.Btc_payout_addresses != "" && s.Btc_confirmations_required != 0 {
+		// 	return true
+		// }
+		return false
 	case currency.Eth:
 		fmt.Println("Ethereum (ETH)")
 	default:
@@ -138,7 +145,7 @@ func InsertStore(e *actor.Engine, conn *actor.PID, d StorePayload) (Store, error
 	d.Set_created_at()
 	var resp = e.Request(conn, InsertStoreMessage{
 		Payload: d.ToStore(),
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return Store{}, errors.New("An error occured!")
@@ -156,7 +163,7 @@ func UpdateStore(e *actor.Engine, conn *actor.PID, id uuid.UUID, d StorePayload)
 	var resp = e.Request(conn, UpdateStoreMessage{
 		Payload: d.ToStore(),
 		Id:      id,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return Store{}, errors.New("An error occured!")
@@ -175,7 +182,7 @@ func Find_Store_By_Owner_Id(e *actor.Engine, conn *actor.PID, id uuid.UUID, limi
 		OwnerID: id,
 		Limit:   limit,
 		Offset:  offset,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	var stores []Store
 	if err != nil {
@@ -193,7 +200,7 @@ func Find_Store_By_Owner_Id(e *actor.Engine, conn *actor.PID, id uuid.UUID, limi
 func Find_Store_By_Id(e *actor.Engine, conn *actor.PID, id uuid.UUID) (Store, error) {
 	var resp = e.Request(conn, FindStoreByIdMessage{
 		Id: id,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return Store{}, errors.New("An error occured!")
@@ -209,7 +216,7 @@ func Find_Store_By_Id(e *actor.Engine, conn *actor.PID, id uuid.UUID) (Store, er
 func Find_By_Id_With_Deleted(e *actor.Engine, conn *actor.PID, id uuid.UUID) (Store, error) {
 	var resp = e.Request(conn, FindStoreByIdWithDeletedMessage{
 		Id: id,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return Store{}, errors.New("An error occured!")
@@ -225,7 +232,7 @@ func Find_By_Id_With_Deleted(e *actor.Engine, conn *actor.PID, id uuid.UUID) (St
 func Soft_Delete(e *actor.Engine, conn *actor.PID, id uuid.UUID) (bool, error) {
 	var resp = e.Request(conn, SoftDeleteStoreMessage{
 		Id: id,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return false, errors.New("An error occured!")
@@ -241,7 +248,7 @@ func Soft_Delete(e *actor.Engine, conn *actor.PID, id uuid.UUID) (bool, error) {
 func Delete(e *actor.Engine, conn *actor.PID, id uuid.UUID) (int64, error) {
 	var resp = e.Request(conn, DeleteStoreMessage{
 		Id: id,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return 0, errors.New("An error occured!")
@@ -257,7 +264,7 @@ func Delete(e *actor.Engine, conn *actor.PID, id uuid.UUID) (int64, error) {
 func Soft_Delete_Store_By_OwnerID(e *actor.Engine, conn *actor.PID, Owner_id uuid.UUID) (bool, error) {
 	var resp = e.Request(conn, SoftDeleteStoreByOwnerIDMessage{
 		OwnerID: Owner_id,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return false, errors.New("An error occured!")
@@ -271,26 +278,31 @@ func Soft_Delete_Store_By_OwnerID(e *actor.Engine, conn *actor.PID, Owner_id uui
 }
 
 func (s *Store) Export() ([]byte, error) {
+
+	// ss := strings.Split(s.Btc_payout_addresses, ",")
+	// addressStrings := make([]bitcoin.Address, len(ss))
+	// for i, address := range s.Btc_payout_addresses {
+	// 	addressStrings[i] = bitcoin.Address(address)
+	// }
+
 	data := struct {
 		ID                         uuid.UUID         `json:"id"`
 		Description                string            `json:"description"`
 		Name                       string            `json:"name"`
 		Btc_payout_addresses       []bitcoin.Address `json:"btc_payout_addresses"`
 		Btc_confirmations_required int               `json:"btc_confirmations_required"`
-		Public_key                 types.PublicKey   `json:"public_key"`
+		Public_key                 bip32.Key         `json:"public_key"`
 		Can_accept_btc             bool              `json:"can_accept_btc"`
 		CreatedAt                  time.Time         `json:"created_at"`
 		UpdatedAt                  time.Time         `json:"updated_at"`
 	}{
-		ID:                         s.ID,
-		Description:                s.Description,
-		Name:                       s.Name,
-		Btc_payout_addresses:       s.Btc_payout_addresses,
+		ID:          s.ID,
+		Description: s.Description,
+		Name:        s.Name,
+		// Btc_payout_addresses:       addressStrings,
 		Btc_confirmations_required: s.Btc_confirmations_required,
 		Public_key:                 s.Public_key,
-		Can_accept_btc:             s.Can_accept(currency.Btc),
-		CreatedAt:                  s.Created_at,
-		UpdatedAt:                  s.Updated_at,
+		Can_accept_btc:             false, //s.Can_accept(currency.Btc),
 	}
 
 	return json.Marshal(data)
