@@ -53,7 +53,7 @@ func findStoreByOwner(conn *gorm.DB, ownerID uuid.UUID, limit, offset int64) []m
 
 	result := conn.
 		Where("owner_id = ?", ownerID).
-		Where("deleted_at IS NULL").
+		Where("del = ?", false).
 		Limit(int(limit)).
 		Offset(int(offset)).
 		Find(&stores)

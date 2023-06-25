@@ -27,7 +27,7 @@ type StorePayload struct {
 	Btc_confirmations_required int
 	Mnemonic                   string
 	Hd_path                    string
-	Deleted_at                 time.Time
+	Del                        bool
 }
 
 func New() StorePayload {
@@ -36,6 +36,7 @@ func New() StorePayload {
 
 func (sp *StorePayload) Set_created_at() error {
 	sp.Created_at = time.Now()
+	sp.Del = false
 	return nil
 }
 
@@ -47,7 +48,7 @@ func (sp *StorePayload) Set_updated_at() error {
 func (sp *StorePayload) Set_deleted_at() error {
 	sp.Name = ""
 	sp.Description = ""
-	sp.Deleted_at = time.Now()
+	sp.Del = true
 	return nil
 }
 
@@ -64,7 +65,8 @@ type Store struct {
 	Btc_confirmations_required int
 	Mnemonic                   string
 	Hd_path                    string
-	Deleted_at                 time.Time
+	Del                        bool
+	// Deleted_at                 time.Time
 }
 
 func (sp *StorePayload) ToStore() Store {
@@ -87,7 +89,7 @@ func (sp *StorePayload) ToStore() Store {
 		Btc_confirmations_required: sp.Btc_confirmations_required,
 		Mnemonic:                   sp.Mnemonic,
 		Hd_path:                    sp.Hd_path,
-		Deleted_at:                 sp.Deleted_at,
+		// Deleted_at:                 sp.Deleted_at,
 	}
 }
 
