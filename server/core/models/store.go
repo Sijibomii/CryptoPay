@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/anthdm/hollywood/actor"
@@ -51,15 +52,15 @@ func (sp *StorePayload) Set_deleted_at() error {
 }
 
 type Store struct {
-	ID          uuid.UUID
-	Name        string
-	Description string
-	Created_at  time.Time
-	Updated_at  time.Time
-	Owner_id    uuid.UUID
-	Private_key bip32.Key
-	Public_key  bip32.Key
-	// Btc_payout_addresses       string
+	ID                         uuid.UUID
+	Name                       string
+	Description                string
+	Created_at                 time.Time
+	Updated_at                 time.Time
+	Owner_id                   uuid.UUID
+	Private_key                bip32.Key
+	Public_key                 bip32.Key
+	Btc_payout_user_addresses  string
 	Btc_confirmations_required int
 	Mnemonic                   string
 	Hd_path                    string
@@ -67,22 +68,22 @@ type Store struct {
 }
 
 func (sp *StorePayload) ToStore() Store {
-	// addressStrings := make([]string, len(sp.Btc_payout_addresses))
-	// for i, address := range sp.Btc_payout_addresses {
-	// 	addressStrings[i] = string(address)
-	// }
-	// joinedAddresses := strings.Join(addressStrings, ",")
+	addressStrings := make([]string, len(sp.Btc_payout_addresses))
+	for i, address := range sp.Btc_payout_addresses {
+		addressStrings[i] = string(address)
+	}
+	joinedAddresses := strings.Join(addressStrings, ",")
 
 	return Store{
-		ID:          sp.ID,
-		Name:        sp.Name,
-		Description: sp.Description,
-		Created_at:  sp.Created_at,
-		Updated_at:  sp.Updated_at,
-		Owner_id:    sp.Owner_id,
-		Private_key: sp.Private_key,
-		Public_key:  sp.Public_key,
-		// Btc_payout_addresses:       joinedAddresses,
+		ID:                         sp.ID,
+		Name:                       sp.Name,
+		Description:                sp.Description,
+		Created_at:                 sp.Created_at,
+		Updated_at:                 sp.Updated_at,
+		Owner_id:                   sp.Owner_id,
+		Private_key:                sp.Private_key,
+		Public_key:                 sp.Public_key,
+		Btc_payout_user_addresses:  joinedAddresses,
 		Btc_confirmations_required: sp.Btc_confirmations_required,
 		Mnemonic:                   sp.Mnemonic,
 		Hd_path:                    sp.Hd_path,
@@ -279,11 +280,11 @@ func Soft_Delete_Store_By_OwnerID(e *actor.Engine, conn *actor.PID, Owner_id uui
 
 func (s *Store) Export() ([]byte, error) {
 
-	// ss := strings.Split(s.Btc_payout_addresses, ",")
-	// addressStrings := make([]bitcoin.Address, len(ss))
-	// for i, address := range s.Btc_payout_addresses {
-	// 	addressStrings[i] = bitcoin.Address(address)
-	// }
+	ss := strings.Split(s.Btc_payout_user_addresses, ",")
+	addressStrings := make([]bitcoin.Address, len(ss))
+	for i, address := range s.Btc_payout_user_addresses {
+		addressStrings[i] = bitcoin.Address(address)
+	}
 
 	data := struct {
 		ID                         uuid.UUID         `json:"id"`
@@ -296,10 +297,10 @@ func (s *Store) Export() ([]byte, error) {
 		CreatedAt                  time.Time         `json:"created_at"`
 		UpdatedAt                  time.Time         `json:"updated_at"`
 	}{
-		ID:          s.ID,
-		Description: s.Description,
-		Name:        s.Name,
-		// Btc_payout_addresses:       addressStrings,
+		ID:                         s.ID,
+		Description:                s.Description,
+		Name:                       s.Name,
+		Btc_payout_addresses:       addressStrings,
 		Btc_confirmations_required: s.Btc_confirmations_required,
 		Public_key:                 s.Public_key,
 		Can_accept_btc:             false, //s.Can_accept(currency.Btc),
