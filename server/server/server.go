@@ -102,7 +102,7 @@ func Run(config config.Config) {
 	}).Methods("PATCH")
 
 	secureRoutes.HandleFunc("/stores/:id", func(w http.ResponseWriter, r *http.Request) {
-		controllers.GetStoresList(w, r, appState)
+		controllers.DeleteStoreById(w, r, appState)
 	}).Methods("DELETE")
 
 	// add separate route for addition of address

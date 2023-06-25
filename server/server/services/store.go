@@ -73,3 +73,9 @@ func UpdateStoresById(appState *util.AppState, storeId uuid.UUID, name, descript
 
 	return store, nil
 }
+
+func DeleteStoresById(appState *util.AppState, storeId uuid.UUID) (bool, error) {
+	ans, err := dao.DeleteStoresById(appState.Engine, appState.Postgres, storeId)
+
+	return ans, err
+}

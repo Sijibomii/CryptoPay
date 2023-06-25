@@ -62,3 +62,14 @@ func UpdateStoresById(e *actor.Engine, conn *actor.PID, storeId uuid.UUID, name,
 
 	return &store, nil
 }
+
+func DeleteStoresById(e *actor.Engine, conn *actor.PID, storeId uuid.UUID) (bool, error) {
+	ans, err := models.Soft_Delete_Store(e, conn, storeId)
+
+	if err != nil {
+		return false, err
+	}
+
+	// should be true
+	return ans, nil
+}

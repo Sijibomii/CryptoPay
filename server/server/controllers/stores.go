@@ -33,6 +33,8 @@ type UpdateStoreParams struct {
 	Description string `json:"description"`
 }
 
+type DeleteStoreReponse struct{}
+
 func GetStoresList(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
 	userContext := r.Context().Value("user").(*models.User)
 
@@ -176,6 +178,45 @@ func UpdateStoresById(w http.ResponseWriter, r *http.Request, appState *util.App
 	store, err = services.UpdateStoresById(appState, storeId, updateStoreData.Name, updateStoreData.Description)
 
 	json, err := store.Export()
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	util.JsonBytesResponse(w, http.StatusOK, json)
+	return
+}
+
+func DeleteStoreById(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+	userContext := r.Context().Value("user").(*models.User)
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	storeId, tokenErr := uuid.Parse(id)
+
+	if tokenErr != nil {
+		util.ErrorResponseFunc(w, r, tokenErr)
+		return
+	}
+
+	store, err := services.FindStoreById(appState, storeId)
+
+	if store.Owner_id != userContext.ID {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	// delete store
+	services.DeleteStoresById(appState, storeId)
+
+	json, err := json.Marshal(DeleteStoreReponse{})
 
 	if err != nil {
 		util.ErrorResponseFunc(w, r, err)

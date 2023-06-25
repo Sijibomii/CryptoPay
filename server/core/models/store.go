@@ -232,7 +232,7 @@ func Find_By_Id_With_Deleted(e *actor.Engine, conn *actor.PID, id uuid.UUID) (St
 	return myStruct, nil
 }
 
-func Soft_Delete(e *actor.Engine, conn *actor.PID, id uuid.UUID) (bool, error) {
+func Soft_Delete_Store(e *actor.Engine, conn *actor.PID, id uuid.UUID) (bool, error) {
 	var resp = e.Request(conn, SoftDeleteStoreMessage{
 		Id: id,
 	}, time.Millisecond*100)
