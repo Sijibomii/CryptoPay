@@ -28,6 +28,11 @@ type CreateStoreReponse struct {
 	Description string `json:"description"`
 }
 
+type UpdateStoreParams struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
 func GetStoresList(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
 	userContext := r.Context().Value("user").(*models.User)
 
@@ -118,6 +123,57 @@ func GetStoresById(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
+
+	json, err := store.Export()
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	util.JsonBytesResponse(w, http.StatusOK, json)
+	return
+}
+
+func UpdateStoresById(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+	userContext := r.Context().Value("user").(*models.User)
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	storeId, tokenErr := uuid.Parse(id)
+
+	if tokenErr != nil {
+		util.ErrorResponseFunc(w, r, tokenErr)
+		return
+	}
+
+	requestBody, err := io.ReadAll(r.Body)
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	defer r.Body.Close()
+
+	// what happens if i only update btc?
+	var updateStoreData UpdateStoreParams
+	err = json.Unmarshal(requestBody, &updateStoreData)
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	store, err := services.FindStoreById(appState, storeId)
+
+	if store.Owner_id != userContext.ID {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	// update store
+	store, err = services.UpdateStoresById(appState, storeId, updateStoreData.Name, updateStoreData.Description)
 
 	json, err := store.Export()
 

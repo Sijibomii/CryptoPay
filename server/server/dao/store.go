@@ -48,3 +48,17 @@ func CreateStore(e *actor.Engine, conn *actor.PID, ownerId uuid.UUID, name, desc
 
 	return &store, nil
 }
+
+// address is the new address to be added
+func UpdateStoresById(e *actor.Engine, conn *actor.PID, storeId uuid.UUID, name, description string) (*models.Store, error) {
+	store, err := models.UpdateStore(e, conn, storeId, models.StorePayload{
+		Name:        name,
+		Description: description,
+	})
+
+	if err != nil {
+		return nil, util.NewErrNotFound("store failed to be created")
+	}
+
+	return &store, nil
+}

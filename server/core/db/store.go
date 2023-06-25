@@ -16,22 +16,32 @@ func insertStore(conn *gorm.DB, payload models.Store) models.Store {
 }
 
 func updateStore(conn *gorm.DB, id uuid.UUID, payload models.Store) models.Store {
-	store := models.Store{}
-	if err := conn.Where("id = ? AND deleted_at IS NULL", id).First(&store).Error; err != nil {
-		panic(err)
+	store := models.Store{
+		ID: payload.ID,
 	}
 
-	if err := conn.Save(&payload).Error; err != nil {
-		panic(err)
+	fieldsToUpdate := map[string]interface{}{}
+
+	if payload.Name != "" {
+		fieldsToUpdate["Name"] = payload.Name
 	}
 
+	if payload.Description != "" {
+		fieldsToUpdate["Description"] = payload.Description
+	}
+
+	result := conn.Model(&store).Updates(fieldsToUpdate)
+
+	if err := result.Error; err != nil {
+		panic(err)
+	}
 	return payload
 }
 
 func findStoreById(conn *gorm.DB, id uuid.UUID) models.Store {
 
 	store := models.Store{}
-	if err := conn.Where("id = ? AND deleted_at IS NULL", id).First(&store).Error; err != nil {
+	if err := conn.Where("id = ? AND NOT del", id).First(&store).Error; err != nil {
 		panic(err)
 	}
 
@@ -68,7 +78,7 @@ func findStoreByOwner(conn *gorm.DB, ownerID uuid.UUID, limit, offset int64) []m
 func deleteStore(conn *gorm.DB, id uuid.UUID) int64 {
 	result := conn.
 		Where("id = ?", id).
-		Where("deleted_at IS NULL").
+		Where("NOT del").
 		Delete(&models.Store{})
 
 	if result.Error != nil {
@@ -84,7 +94,7 @@ func softDeleteStore(conn *gorm.DB, id uuid.UUID) bool {
 	result := conn.
 		Model(&models.Store{}).
 		Where("id = ?", id).
-		Where("deleted_at IS NULL").
+		Where("NOT del").
 		Updates(payload)
 
 	if result.Error != nil {
@@ -103,7 +113,7 @@ func softDeleteStoreByOwnerID(conn *gorm.DB, ownerID uuid.UUID) bool {
 	result := conn.
 		Model(&models.Store{}).
 		Where("owner_id = ?", ownerID).
-		Where("deleted_at IS NULL").
+		Where("NOT del").
 		Updates(payload)
 
 	if result.Error != nil {

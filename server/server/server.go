@@ -98,12 +98,14 @@ func Run(config config.Config) {
 	}).Methods("GET")
 
 	secureRoutes.HandleFunc("/stores/:id", func(w http.ResponseWriter, r *http.Request) {
-		controllers.GetStoresList(w, r, appState)
+		controllers.UpdateStoresById(w, r, appState)
 	}).Methods("PATCH")
 
 	secureRoutes.HandleFunc("/stores/:id", func(w http.ResponseWriter, r *http.Request) {
 		controllers.GetStoresList(w, r, appState)
 	}).Methods("DELETE")
+
+	// add separate route for addition of address
 
 	// /payments
 

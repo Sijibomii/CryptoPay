@@ -60,3 +60,16 @@ func CreateStore(appState *util.AppState, ownerId uuid.UUID, name, description s
 
 	return store, nil
 }
+
+func UpdateStoresById(appState *util.AppState, storeId uuid.UUID, name, description string) (*models.Store, error) {
+	var store *models.Store
+	var err error
+
+	store, err = dao.UpdateStoresById(appState.Engine, appState.Postgres, storeId, name, description)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "error geting store")
+	}
+
+	return store, nil
+}
