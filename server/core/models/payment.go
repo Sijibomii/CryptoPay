@@ -9,7 +9,7 @@ import (
 )
 
 type PaymentPayload struct {
-	ID                     string
+	ID                     uuid.UUID
 	Status                 string
 	Store_id               uuid.UUID
 	Index                  int
@@ -21,7 +21,7 @@ type PaymentPayload struct {
 	Amount_paid            string
 	Transaction_hash       string
 	Fiat                   string
-	Price                  int
+	Price                  string
 	Crypto                 string
 	Address                string
 	Charge                 string
@@ -41,8 +41,9 @@ func (p *PaymentPayload) Set_updated_at() error {
 	return nil
 }
 
+// i used str for double bc golang doesn't have an impl. I'll use an external library to convert
 type Payment struct {
-	ID                     string    `json:"id"`
+	ID                     uuid.UUID `json:"id"`
 	Status                 string    `json:"payment_status"`
 	Store_id               uuid.UUID `json:"store_id"`
 	Index                  int       `json:"index"`
@@ -54,7 +55,7 @@ type Payment struct {
 	Amount_paid            string    `json:"amount_paid"`
 	Transaction_hash       string    `json:"transaction_hash"`
 	Fiat                   string    `json:"fiat"`
-	Price                  int       `json:"price"`
+	Price                  string    `json:"price"`
 	Crypto                 string    `json:"crypto"`
 	Address                string    `json:"address"`
 	Charge                 string    `json:"charge"`
@@ -65,7 +66,6 @@ type Payment struct {
 }
 
 func (p *PaymentPayload) ToPayment() Payment {
-
 	return Payment{
 		ID:                     p.ID,
 		Status:                 p.Status,

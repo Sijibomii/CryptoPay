@@ -107,7 +107,11 @@ func Run(config config.Config) {
 
 	// add separate route for addition of address
 
-	secureRoutes.HandleFunc("/payments", func(w http.ResponseWriter, r *http.Request) {
+	paymentRoutes := r.PathPrefix("/payments").Subrouter()
+
+	paymentRoutes.Use(middleware.PaymentMiddleware(appState))
+
+	paymentRoutes.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		controllers.CreatePayment(w, r, appState)
 	}).Methods("POST")
 

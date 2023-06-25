@@ -133,6 +133,13 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 		ctx.Respond(payload)
 
+	// payment
+
+	case models.InsertPaymentMessage:
+		payload := insertPayment(d.DB, l.Payload)
+
+		ctx.Respond(payload)
+
 	// sesssion
 
 	case models.InsertSessionMessage:

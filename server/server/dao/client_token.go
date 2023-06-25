@@ -17,6 +17,17 @@ func GetClientTokenListByStoreId(e *actor.Engine, conn *actor.PID, id uuid.UUID,
 	return tokens, nil
 }
 
+// domain is the store it will be used i.e www.amazon.com
+func GetClientTokenByToken(e *actor.Engine, conn *actor.PID, token uuid.UUID, domain string) (*models.ClientToken, error) {
+	client_token, err := models.FindClientTokenByTokenAndDomain(e, conn, token, domain)
+
+	if err != nil {
+		return nil, util.NewErrNotFound("Client token not found")
+	}
+
+	return &client_token, nil
+}
+
 func CreateClientToken(e *actor.Engine, conn *actor.PID, store_id uuid.UUID, name, domain string) (*models.ClientToken, error) {
 	token, err := models.InsertClientToken(e, conn, models.ClientTokenPayload{
 		ID:       uuid.New(),
