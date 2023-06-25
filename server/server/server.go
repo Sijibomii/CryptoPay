@@ -23,7 +23,7 @@ func Run(config config.Config) {
 
 	pg := *initPool(config.Postgres, 10)
 
-	pg.DB.AutoMigrate(&models.User{}, &models.Store{}, &models.ClientToken{}, &models.Session{})
+	pg.DB.AutoMigrate(&models.User{}, &models.Store{}, &models.ClientToken{}, &models.Session{}, models.Payment{})
 
 	// define app state
 
@@ -107,7 +107,9 @@ func Run(config config.Config) {
 
 	// add separate route for addition of address
 
-	// /payments
+	secureRoutes.HandleFunc("/payments", func(w http.ResponseWriter, r *http.Request) {
+		controllers.CreatePayment(w, r, appState)
+	}).Methods("POST")
 
 	// /payments/{id}/status
 

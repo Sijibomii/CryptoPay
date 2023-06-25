@@ -1,0 +1,114 @@
+package models
+
+import (
+	"errors"
+	"time"
+
+	"github.com/anthdm/hollywood/actor"
+	"github.com/google/uuid"
+)
+
+type PaymentPayload struct {
+	ID                     string
+	Status                 string
+	Store_id               uuid.UUID
+	Index                  int
+	Created_by             uuid.UUID
+	Created_at             time.Time
+	Updated_at             time.Time
+	Expires_at             time.Time
+	Paid_at                time.Time
+	Amount_paid            string
+	Transaction_hash       string
+	Fiat                   string
+	Price                  int
+	Crypto                 string
+	Address                string
+	Charge                 string
+	Confirmations_required int
+	Block_height_required  int
+	Btc_network            string
+	Identifier             string
+}
+
+func (p *PaymentPayload) Set_created_at() error {
+	p.Created_at = time.Now()
+	return nil
+}
+
+func (p *PaymentPayload) Set_updated_at() error {
+	p.Updated_at = time.Now()
+	return nil
+}
+
+type Payment struct {
+	ID                     string    `json:"id"`
+	Status                 string    `json:"payment_status"`
+	Store_id               uuid.UUID `json:"store_id"`
+	Index                  int       `json:"index"`
+	Created_by             uuid.UUID `json:"created_by"`
+	Created_at             time.Time `json:"created_at"`
+	Updated_at             time.Time `json:"updated_at"`
+	Expires_at             time.Time `json:"expires_at"`
+	Paid_at                time.Time `json:"paid_at"`
+	Amount_paid            string    `json:"amount_paid"`
+	Transaction_hash       string    `json:"transaction_hash"`
+	Fiat                   string    `json:"fiat"`
+	Price                  int       `json:"price"`
+	Crypto                 string    `json:"crypto"`
+	Address                string    `json:"address"`
+	Charge                 string    `json:"charge"`
+	Confirmations_required int       `json:"confirmations_required"`
+	Block_height_required  int       `json:"block_height_required"`
+	Btc_network            string    `json:"btc_network"`
+	Identifier             string    `json:"identifier"`
+}
+
+func (p *PaymentPayload) ToPayment() Payment {
+
+	return Payment{
+		ID:                     p.ID,
+		Status:                 p.Status,
+		Store_id:               p.Store_id,
+		Index:                  p.Index,
+		Created_by:             p.Created_by,
+		Created_at:             p.Created_at,
+		Updated_at:             p.Updated_at,
+		Expires_at:             p.Expires_at,
+		Paid_at:                p.Paid_at,
+		Amount_paid:            p.Amount_paid,
+		Transaction_hash:       p.Transaction_hash,
+		Fiat:                   p.Fiat,
+		Price:                  p.Price,
+		Crypto:                 p.Crypto,
+		Address:                p.Address,
+		Charge:                 p.Charge,
+		Confirmations_required: p.Confirmations_required,
+		Block_height_required:  p.Block_height_required,
+		Btc_network:            p.Btc_network,
+		Identifier:             p.Identifier,
+	}
+}
+
+type InsertPaymentMessage struct {
+	Payload Payment
+}
+
+func InsertPayment(e *actor.Engine, conn *actor.PID, d PaymentPayload) (Payment, error) {
+	d.Set_created_at()
+	var resp = e.Request(conn, InsertPaymentMessage{
+		Payload: d.ToPayment(),
+	}, time.Millisecond*100)
+
+	res, err := resp.Result()
+	if err != nil {
+		return Payment{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(Payment)
+
+	if !ok {
+		return Payment{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
+}
