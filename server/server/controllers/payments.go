@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"os"
 
 	"github.com/sijibomii/cryptopay/core/models"
 	"github.com/sijibomii/cryptopay/server/client"
 	"github.com/sijibomii/cryptopay/server/services"
 	"github.com/sijibomii/cryptopay/server/util"
-	"github.com/sijibomii/cryptopay/types/bitcoin"
 	"github.com/sijibomii/cryptopay/types/currency"
 )
 
@@ -18,6 +18,17 @@ type CreatePaymentParams struct {
 	Crypto     string `json:"crypto"`
 	Fiat       string `json:"fiat"`
 	Identifier string `json:"indentifier"`
+}
+
+type storeParams struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+}
+
+type PaymentResponse struct {
+	Payment models.Payment `json:"payment"`
+	Token   string         `json:"token"`
+	Store   storeParams    `json:"store"`
 }
 
 // api key comes in auth header
@@ -77,14 +88,34 @@ func CreatePayment(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 		return
 	}
 
-	var min_charge string
+	payment, err := services.CreatePayment(appState, *store, payload)
 
-	switch crypto {
-	case currency.Btc:
-		payload.Confirmations_required = store.Btc_confirmations_required
-		payload.Btc_network = bitcoin.Test.String()
-		min_charge = "0.01"
-
+	jwtPayload := util.JwtPayload{
+		Client:     reqClient,
+		Expires_at: payment.Expires_at,
 	}
 
+	key := os.Getenv("JWT_SECRET_KEY")
+	token, err := jwtPayload.Encode(key)
+
+	if err != nil {
+		util.ErrorResponseFunc(w, r, util.NewErrUnauthorized("payment error (jwt)"))
+		return
+	}
+
+	json, err := json.Marshal(PaymentResponse{
+		Payment: *payment,
+		Store: storeParams{
+			Name:        store.Name,
+			Description: store.Description,
+		},
+		Token: token,
+	})
+	if err != nil {
+		util.ErrorResponseFunc(w, r, err)
+		return
+	}
+
+	util.JsonBytesResponse(w, http.StatusOK, json)
+	return
 }

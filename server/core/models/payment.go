@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -111,4 +112,52 @@ func InsertPayment(e *actor.Engine, conn *actor.PID, d PaymentPayload) (Payment,
 	}
 
 	return myStruct, nil
+}
+
+func (p *Payment) Export() ([]byte, error) {
+	data := struct {
+		ID                     uuid.UUID `json:"id"`
+		Status                 string    `json:"payment_status"`
+		Store_id               uuid.UUID `json:"store_id"`
+		Index                  int       `json:"index"`
+		Created_by             uuid.UUID `json:"created_by"`
+		Created_at             time.Time `json:"created_at"`
+		Updated_at             time.Time `json:"updated_at"`
+		Expires_at             time.Time `json:"expires_at"`
+		Paid_at                time.Time `json:"paid_at"`
+		Amount_paid            string    `json:"amount_paid"`
+		Transaction_hash       string    `json:"transaction_hash"`
+		Fiat                   string    `json:"fiat"`
+		Price                  string    `json:"price"`
+		Crypto                 string    `json:"crypto"`
+		Address                string    `json:"address"`
+		Charge                 string    `json:"charge"`
+		Confirmations_required int       `json:"confirmations_required"`
+		Block_height_required  int       `json:"block_height_required"`
+		Btc_network            string    `json:"btc_network"`
+		Identifier             string    `json:"identifier"`
+	}{
+		ID:                     p.ID,
+		Status:                 p.Status,
+		Store_id:               p.Store_id,
+		Index:                  p.Index,
+		Created_by:             p.Created_by,
+		Created_at:             p.Created_at,
+		Updated_at:             p.Updated_at,
+		Expires_at:             p.Expires_at,
+		Paid_at:                p.Paid_at,
+		Amount_paid:            p.Amount_paid,
+		Transaction_hash:       p.Transaction_hash,
+		Fiat:                   p.Fiat,
+		Price:                  p.Price,
+		Crypto:                 p.Crypto,
+		Address:                p.Address,
+		Charge:                 p.Charge,
+		Confirmations_required: p.Confirmations_required,
+		Block_height_required:  p.Block_height_required,
+		Btc_network:            p.Btc_network,
+		Identifier:             p.Identifier,
+	}
+
+	return json.Marshal(data)
 }
