@@ -20,8 +20,9 @@ func CreatePayment(appState *util.AppState, store models.Store, payload models.P
 
 	path += "/"
 
-	path += strconv.FormatInt(createdTime.Unix(), 10)
+	path += strconv.FormatInt(payload.Created_at.Unix(), 10)
 	path += "/"
 
-	path += strconv.Itoa(createdTime.Nanosecond() / 1000)
+	path += strconv.Itoa(payload.Created_at.Nanosecond() / 1000)
+
 }
