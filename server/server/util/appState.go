@@ -15,6 +15,7 @@ type AppState struct {
 	Engine     *actor.Engine
 	Mailer     *actor.PID
 	CoinClient *actor.PID
+	BtcClient  *actor.PID
 }
 
 type AppHandler struct {

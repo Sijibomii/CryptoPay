@@ -14,6 +14,7 @@ type PaymentPayload struct {
 	Status                 string
 	Store_id               uuid.UUID
 	Index                  int
+	TotalFee               float64
 	Created_by             uuid.UUID
 	Created_at             time.Time
 	Updated_at             time.Time
@@ -30,6 +31,7 @@ type PaymentPayload struct {
 	Block_height_required  int
 	Btc_network            string
 	Identifier             string
+	Fee                    float64
 }
 
 func (p *PaymentPayload) Set_created_at() error {
@@ -39,6 +41,11 @@ func (p *PaymentPayload) Set_created_at() error {
 
 func (p *PaymentPayload) Set_updated_at() error {
 	p.Updated_at = time.Now()
+	return nil
+}
+
+func (p *PaymentPayload) Set_id() error {
+	p.ID = uuid.New()
 	return nil
 }
 
@@ -64,6 +71,8 @@ type Payment struct {
 	Block_height_required  int       `json:"block_height_required"`
 	Btc_network            string    `json:"btc_network"`
 	Identifier             string    `json:"identifier"`
+	TotalFee               float64   `json:"total"`
+	Fee                    float64   `json:"miners_fee"`
 }
 
 func (p *PaymentPayload) ToPayment() Payment {
@@ -88,6 +97,7 @@ func (p *PaymentPayload) ToPayment() Payment {
 		Block_height_required:  p.Block_height_required,
 		Btc_network:            p.Btc_network,
 		Identifier:             p.Identifier,
+		Fee:                    p.Fee,
 	}
 }
 
@@ -136,6 +146,8 @@ func (p *Payment) Export() ([]byte, error) {
 		Block_height_required  int       `json:"block_height_required"`
 		Btc_network            string    `json:"btc_network"`
 		Identifier             string    `json:"identifier"`
+		TotalFee               float64   `json:"total"`
+		Fee                    float64   `json:"miners_fee"`
 	}{
 		ID:                     p.ID,
 		Status:                 p.Status,
@@ -156,7 +168,9 @@ func (p *Payment) Export() ([]byte, error) {
 		Confirmations_required: p.Confirmations_required,
 		Block_height_required:  p.Block_height_required,
 		Btc_network:            p.Btc_network,
+		TotalFee:               p.TotalFee,
 		Identifier:             p.Identifier,
+		Fee:                    p.Fee,
 	}
 
 	return json.Marshal(data)

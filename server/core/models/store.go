@@ -14,6 +14,8 @@ import (
 	"github.com/tyler-smith/go-bip32"
 )
 
+// TODO: func to convert from private and public key from str back to  bip32.Key
+
 type StorePayload struct {
 	ID                         uuid.UUID
 	Name                       string
@@ -59,8 +61,8 @@ type Store struct {
 	Created_at                 time.Time
 	Updated_at                 time.Time
 	Owner_id                   uuid.UUID
-	Private_key                bip32.Key
-	Public_key                 bip32.Key
+	Private_key                string
+	Public_key                 string
 	Btc_payout_user_addresses  string
 	Btc_confirmations_required int
 	Mnemonic                   string
@@ -83,8 +85,8 @@ func (sp *StorePayload) ToStore() Store {
 		Created_at:                 sp.Created_at,
 		Updated_at:                 sp.Updated_at,
 		Owner_id:                   sp.Owner_id,
-		Private_key:                sp.Private_key,
-		Public_key:                 sp.Public_key,
+		Private_key:                sp.Private_key.String(),
+		Public_key:                 sp.Public_key.String(),
 		Btc_payout_user_addresses:  joinedAddresses,
 		Btc_confirmations_required: sp.Btc_confirmations_required,
 		Mnemonic:                   sp.Mnemonic,
@@ -287,6 +289,8 @@ func (s *Store) Export() ([]byte, error) {
 	for i, address := range s.Btc_payout_user_addresses {
 		addressStrings[i] = bitcoin.Address(address)
 	}
+	// pub
+	// bip32.Deserialize()
 
 	data := struct {
 		ID                         uuid.UUID         `json:"id"`
@@ -294,7 +298,7 @@ func (s *Store) Export() ([]byte, error) {
 		Name                       string            `json:"name"`
 		Btc_payout_addresses       []bitcoin.Address `json:"btc_payout_addresses"`
 		Btc_confirmations_required int               `json:"btc_confirmations_required"`
-		Public_key                 bip32.Key         `json:"public_key"`
+		Public_key                 string            `json:"public_key"`
 		Can_accept_btc             bool              `json:"can_accept_btc"`
 		CreatedAt                  time.Time         `json:"created_at"`
 		UpdatedAt                  time.Time         `json:"updated_at"`
