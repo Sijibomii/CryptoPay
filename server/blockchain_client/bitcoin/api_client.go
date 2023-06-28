@@ -99,7 +99,7 @@ func (client *BlockchainClient) Get_Block_endpoint(block_hash string) string {
 	return u.String()
 }
 
-func (client *BlockchainClient) Get_Block(block_hash string) (*Block, error) {
+func (client *BlockchainClient) get_Block(block_hash string) (*Block, error) {
 
 	resp, err := http.Get(client.Get_Block_endpoint(block_hash))
 
@@ -137,7 +137,7 @@ func (client *BlockchainClient) Get_Block_with_height_endpoint(block_height int)
 	return u.String()
 }
 
-func (client *BlockchainClient) Get_Block_with_height(block_height int) (*Block, error) {
+func (client *BlockchainClient) get_Block_with_height(block_height int) (*Block, error) {
 	resp, err := http.Get(client.Get_Block_with_height_endpoint(block_height))
 
 	if err != nil {
@@ -217,7 +217,7 @@ type Status struct {
 	BlockTime   int    `json:"block_time"`
 }
 
-func (client *BlockchainClient) Get_Transaction_By_Hash_height(tx_hash string) (*Transaction, error) {
+func (client *BlockchainClient) get_Transaction_By_Hash_height(tx_hash string) (*Transaction, error) {
 
 	resp, err := http.Get(client.Get_Transaction_by_hash_endpoint(tx_hash))
 
@@ -250,7 +250,7 @@ func (client *BlockchainClient) BroadcastTransaction_endpoint() string {
 	return u.String()
 }
 
-func (client *BlockchainClient) BroadcastTransaction(rawTx string) error {
+func (client *BlockchainClient) broadcastTransaction(rawTx string) error {
 	url := client.BroadcastTransaction_endpoint()
 	// Create a JSON payload containing the raw transaction
 	payload := []byte(fmt.Sprintf(`{"tx": "%s"}`, rawTx))
@@ -293,7 +293,7 @@ func (client *BlockchainClient) GetFeeEstimates_endpoint() string {
 	return u.String()
 }
 
-func (client *BlockchainClient) GetFeeEstimates() (*FeeEstimates, error) {
+func (client *BlockchainClient) getFeeEstimates() (*FeeEstimates, error) {
 	url := client.GetFeeEstimates_endpoint()
 
 	resp, err := http.Get(url)
