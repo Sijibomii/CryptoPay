@@ -119,3 +119,5 @@ func CreatePayment(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 	util.JsonBytesResponse(w, http.StatusOK, json)
 	return
 }
+
+// payment status

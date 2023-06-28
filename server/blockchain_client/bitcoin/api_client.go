@@ -3,7 +3,6 @@ package bitcoin
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -22,80 +21,60 @@ type BlockCountStatsResponse struct {
 
 func New(bc_url, bs_url string) *BlockchainClient {
 	return &BlockchainClient{
-		BCUrl: bc_url,
 		BSUrl: bs_url,
 	}
 }
 
+// https://blockstream.info/api/blocks/tip/height
+
 // https://api-r.bitcoinchain.com/v1/status
 func (client *BlockchainClient) Block_count_endpoint() string {
-	baseURL, _ := url.Parse(client.BCUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/status")})
+	baseURL, _ := url.Parse(client.BSUrl)
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/blocks/tip/height")})
 	return u.String()
 }
 
 func (client *BlockchainClient) get_block_count() (int, error) {
-	req, err := http.NewRequest("GET", client.Block_count_endpoint(), nil)
-
+	response, err := http.Get(client.Block_count_endpoint())
 	if err != nil {
-		fmt.Printf("Error creating request: %s \n", err.Error())
-		return 0, errors.New("Error creating request: %s")
+		return 0, err
+	}
+	defer response.Body.Close()
+
+	// Read response body
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return 0, err
 	}
 
-	cl := http.Client{}
-	resp, err := cl.Do(req)
-
+	// Parse response to integer
+	value, err := strconv.Atoi(string(body))
 	if err != nil {
-		fmt.Printf("Error making request: %s \n", err.Error())
-		return 0, errors.New("Error creating request: %s")
-	}
-	defer resp.Body.Close()
-	// Read the response body
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		fmt.Printf("Error reading response body: %s \n", err.Error())
-		return 0, errors.New("Error reading response body: %s")
+		return 0, err
 	}
 
-	// Parse the JSON response
-	var stats BlockCountStatsResponse
-	err = json.Unmarshal(body, &stats)
-	if err != nil {
-		fmt.Println("Error parsing JSON:", err)
-		return 0, errors.New("Error reading response body: %s")
-	}
-
-	// Extract the number of blocks
-	numBlocks := stats.Blocks
-
-	return numBlocks, nil
+	return value, nil
 }
 
 type Block struct {
-	Hash       string   `json:"hash"`
-	Height     int      `json:"height"`
-	PrevBlock  string   `json:"prev_block"`
-	NextBlock  string   `json:"next_block"`
-	MerkleRoot string   `json:"mrkl_root"`
-	Tx         []string `json:"tx"`
-	TxCount    int      `json:"tx_count"`
-	Reward     string   `json:"reward"`
-	Fee        string   `json:"fee"`
-	VoutSum    string   `json:"vout_sum"`
-	IsMain     bool     `json:"is_main"`
-	Version    string   `json:"version"`
-	Difficulty string   `json:"difficulty"`
-	Size       int      `json:"size"`
-	Bits       string   `json:"bits"`
-	Nonce      string   `json:"nonce"`
-	Time       int      `json:"time"`
+	ID                string `json:"id"`
+	Height            int    `json:"height"`
+	Version           int    `json:"version"`
+	Timestamp         int    `json:"timestamp"`
+	TxCount           int    `json:"tx_count"`
+	Size              int    `json:"size"`
+	Weight            int    `json:"weight"`
+	MerkleRoot        string `json:"merkle_root"`
+	PreviousBlockHash string `json:"previousblockhash"`
+	Mediantime        int    `json:"mediantime"`
+	Nonce             int    `json:"nonce"`
+	Bits              int    `json:"bits"`
+	Difficulty        int64  `json:"difficulty"`
 }
 
-// https://api-r.bitcoinchain.com/v1/block/0000000000000000000fa2283ae08d7e4b4da949c19a40b68c4d0e1267647250/withTx
 func (client *BlockchainClient) Get_Block_endpoint(block_hash string) string {
-	baseURL, _ := url.Parse(client.BCUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/blocks/%s/withTx", block_hash)})
+	baseURL, _ := url.Parse(client.BSUrl)
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/block/%s/", block_hash)})
 	return u.String()
 }
 
@@ -115,7 +94,7 @@ func (client *BlockchainClient) get_Block(block_hash string) (*Block, error) {
 		return nil, err
 	}
 
-	var data []Block
+	var data Block
 
 	err = json.Unmarshal(body, &data)
 
@@ -123,48 +102,61 @@ func (client *BlockchainClient) get_Block(block_hash string) (*Block, error) {
 		return nil, err
 	}
 
-	if len(data) > 0 {
-		return &data[0], nil
-	}
-
-	return nil, errors.New("empty response")
+	return &data, nil
 }
 
-// https://api-r.bitcoinchain.com/v1/block/{blockHeight}/withTx
-func (client *BlockchainClient) Get_Block_with_height_endpoint(block_height int) string {
+func (client *BlockchainClient) Get_Block_Hash_with_height_endpoint(block_height int) string {
 	baseURL, _ := url.Parse(client.BCUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/blocks/%s/withTx", strconv.Itoa(block_height))})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/block-height/%s/", strconv.Itoa(block_height))})
 	return u.String()
 }
 
-func (client *BlockchainClient) get_Block_with_height(block_height int) (*Block, error) {
-	resp, err := http.Get(client.Get_Block_with_height_endpoint(block_height))
+func (client *BlockchainClient) get_Block_Hash_with_height(block_height int) (string, error) {
+
+	response, err := http.Get(client.Get_Block_Hash_with_height_endpoint(block_height))
+	if err != nil {
+		return "", err
+	}
+	defer response.Body.Close()
+
+	// Read response body
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	value := string(body)
+
+	return value, nil
+}
+
+func (client *BlockchainClient) Get_Transactions_by_Block_hash_endpoint(block_hash string) string {
+	baseURL, _ := url.Parse(client.BSUrl)
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/block/%s/txids", block_hash)})
+	return u.String()
+}
+
+func (client *BlockchainClient) get_Transactions_by_Block_hash(block_hash string) ([]string, error) {
+
+	response, err := http.Get(client.Get_Transactions_by_Block_hash_endpoint(block_hash))
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []string
+	err = json.Unmarshal(body, &result)
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var data []Block
-
-	err = json.Unmarshal(body, &data)
-
-	if err != nil {
-		return nil, err
-	}
-
-	if len(data) > 0 {
-		return &data[0], nil
-	}
-
-	return nil, errors.New("empty response")
+	return result, nil
 }
 
 func (client *BlockchainClient) Get_Transaction_by_hash_endpoint(tx_hash string) string {
@@ -174,40 +166,33 @@ func (client *BlockchainClient) Get_Transaction_by_hash_endpoint(tx_hash string)
 }
 
 type Transaction struct {
-	TxID     string  `json:"txid"`
-	Version  int     `json:"version"`
-	LockTime int     `json:"locktime"`
-	Vin      []Vin   `json:"vin"`
-	Vout     []Vout  `json:"vout"`
-	Size     int     `json:"size"`
-	Weight   int     `json:"weight"`
-	Fee      float64 `json:"fee"`
-	Status   Status  `json:"status"`
+	TxID     string `json:"txid"`
+	Version  int    `json:"version"`
+	Locktime int    `json:"locktime"`
+	Vin      []Vin  `json:"vin"`
+	Vout     []Vout `json:"vout"`
+	Size     int    `json:"size"`
+	Weight   int    `json:"weight"`
+	Fee      int    `json:"fee"`
+	Status   Status `json:"status"`
 }
 
 type Vin struct {
-	TxID       string  `json:"txid"`
-	Vout       int     `json:"vout"`
-	Prevout    Prevout `json:"prevout"`
-	ScriptSig  string  `json:"scriptsig"`
-	IsCoinbase bool    `json:"is_coinbase"`
-	Sequence   uint32  `json:"sequence"`
-}
-
-type Prevout struct {
-	ScriptPubKey        string  `json:"scriptpubkey"`
-	ScriptPubKeyAsm     string  `json:"scriptpubkey_asm"`
-	ScriptPubKeyType    string  `json:"scriptpubkey_type"`
-	ScriptPubKeyAddress string  `json:"scriptpubkey_address"`
-	Value               float64 `json:"value"`
+	TxID         string   `json:"txid"`
+	Vout         int      `json:"vout"`
+	ScriptSig    string   `json:"scriptsig"`
+	ScriptSigAsm string   `json:"scriptsig_asm"`
+	Witness      []string `json:"witness"`
+	IsCoinbase   bool     `json:"is_coinbase"`
+	Sequence     int      `json:"sequence"`
 }
 
 type Vout struct {
-	ScriptPubKey        string  `json:"scriptpubkey"`
-	ScriptPubKeyAsm     string  `json:"scriptpubkey_asm"`
-	ScriptPubKeyType    string  `json:"scriptpubkey_type"`
-	ScriptPubKeyAddress string  `json:"scriptpubkey_address"`
-	Value               float64 `json:"value"`
+	ScriptPubKey        string `json:"scriptpubkey"`
+	ScriptPubKeyAsm     string `json:"scriptpubkey_asm"`
+	ScriptPubKeyType    string `json:"scriptpubkey_type"`
+	ScriptPubKeyAddress string `json:"scriptpubkey_address"`
+	Value               int    `json:"value"`
 }
 
 type Status struct {
@@ -217,7 +202,9 @@ type Status struct {
 	BlockTime   int    `json:"block_time"`
 }
 
-func (client *BlockchainClient) get_Transaction_By_Hash_height(tx_hash string) (*Transaction, error) {
+// https://blockstream.info/testnet/api/
+
+func (client *BlockchainClient) get_Transaction_By_Hash(tx_hash string) (*Transaction, error) {
 
 	resp, err := http.Get(client.Get_Transaction_by_hash_endpoint(tx_hash))
 
@@ -243,6 +230,40 @@ func (client *BlockchainClient) get_Transaction_By_Hash_height(tx_hash string) (
 
 	return &data, nil
 }
+
+// GET /blocks/tip/hash hash of the last block
+
+func (client *BlockchainClient) Get_Hash_For_Last_Block_endpoint() string {
+	baseURL, _ := url.Parse(client.BSUrl)
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/blocks/tip/hash/")})
+	return u.String()
+}
+
+func (client *BlockchainClient) get_Hash_For_Last_Block() (string, error) {
+	response, err := http.Get(client.Get_Hash_For_Last_Block_endpoint())
+	if err != nil {
+		return "", err
+	}
+	defer response.Body.Close()
+
+	// Read response body
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+
+	value := string(body)
+
+	return value, nil
+}
+
+// GET /block/:hash info about the block
+
+// GET /block/:hash/txid/:index
+
+// GET /tx/:txid
+
+// GET /tx/:txid/status
 
 func (client *BlockchainClient) BroadcastTransaction_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
