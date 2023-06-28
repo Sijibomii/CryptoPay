@@ -278,3 +278,88 @@ func (client *BlockchainClient) BroadcastTransaction(rawTx string) error {
 
 	return nil
 }
+
+type FeeEstimates struct {
+	OneHourFee        float64 `json:"1"`
+	ThreeHourFee      float64 `json:"3"`
+	SixHourFee        float64 `json:"6"`
+	TwelveHourFee     float64 `json:"12"`
+	TwentyFourHourFee float64 `json:"24"`
+}
+
+func (client *BlockchainClient) GetFeeEstimates_endpoint() string {
+	baseURL, _ := url.Parse(client.BSUrl)
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/fee-estimates/")})
+	return u.String()
+}
+
+func (client *BlockchainClient) GetFeeEstimates() (*FeeEstimates, error) {
+	url := client.GetFeeEstimates_endpoint()
+
+	resp, err := http.Get(url)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get fee estimates: %s", resp.Status)
+	}
+
+	var feeEstimates FeeEstimates
+
+	err = json.Unmarshal(body, &feeEstimates)
+	if err != nil {
+		return nil, err
+	}
+
+	return &feeEstimates, nil
+}
+
+type MempoolEntry struct {
+	TxID  string `json:"txid"`
+	Fee   int    `json:"fee"`
+	VSize int    `json:"vsize"`
+	Value int    `json:"value"`
+}
+
+func (client *BlockchainClient) GetRawMempool_endpoint() string {
+	baseURL, _ := url.Parse(client.BSUrl)
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/mempool/recent/")})
+	return u.String()
+}
+
+func (client *BlockchainClient) GetRawMempool() ([]MempoolEntry, error) {
+	url := client.GetRawMempool_endpoint()
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("failed to get raw mempool: %s", resp.Status)
+	}
+
+	var mempool []MempoolEntry
+	err = json.Unmarshal(body, &mempool)
+	if err != nil {
+		return nil, err
+	}
+
+	return mempool, nil
+}
