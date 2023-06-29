@@ -257,11 +257,7 @@ func (client *BlockchainClient) get_Hash_For_Last_Block() (string, error) {
 	return value, nil
 }
 
-// GET /block/:hash info about the block
-
 // GET /block/:hash/txid/:index
-
-// GET /tx/:txid
 
 // GET /tx/:txid/status
 
