@@ -56,7 +56,7 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 		Outputs:   outputs,
 	}
 
-	payments, err := models.FindAllPendingPaymentsByAddresses(processor.Engine, processor.PostgresClient, processedBlockStream.Addresses, "btc")
+	payments, err := models.FindAllPaymentsByAddresses(processor.Engine, processor.PostgresClient, processedBlockStream.Addresses, "btc")
 
 	if err != nil {
 		fmt.Printf("error...")
@@ -99,30 +99,8 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 				paymentPayload.Status = "expired"
 			}
 
-		case "insufficient":
-			// cont
-			paid, _ := decimal.NewFromString(paymentPayload.Amount_paid)
-			if btcPaid.Cmp(decimal.NewFromFloat(fee).Sub(paid)) > 0 {
-				// paid enough
-				paymentPayload.Status = "paid"
-				paymentPayload.Amount_paid = btcPaid.String()
-				paymentPayload.Set_paid_at()
-			}
-			if btcPaid.Cmp(decimal.NewFromFloat(fee).Sub(paid)) < 0 {
-				// get remaining by fee - amount_paid // remaining can still be paid before expiration
-				paymentPayload.Status = "insufficient"
-				//
-				prev, _ := decimal.NewFromString(paymentPayload.Amount_paid)
-				paymentPayload.Amount_paid = btcPaid.Add(prev).String()
-			}
-
-			if payment.Expires_at.Before(time.Now().UTC()) {
-				paymentPayload.Status = "expired"
-			}
-
-			if payment.Expires_at.Before(time.Now().UTC()) {
-				paymentPayload.Status = "expired"
-			}
+		default:
+			fmt.Printf("PAYMENT STATUS OF %s NOT RECOGNIZED \n", payment.Status)
 		}
 
 		models.UpdatePayment(processor.Engine, processor.PostgresClient, paymentPayload.ID, paymentPayload)
@@ -130,6 +108,8 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 	}
 }
 
+// transactions will be first processed in the mempool and will be marked as paid but will be eventually confirmed when the mempool becomes a block
+// a payout is created for a valid (i.e confirmed) payment. bc that's when we can guarantee that the money got to us
 func (processor *Processor) processBlock(block bitcoin.Block) {
 	log.Printf("Processing block: %v\n", *&block.Height)
 
@@ -157,26 +137,62 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 		}
 	}
 
-	payments, err := models.FindAllPendingPaymentsByAddresses(processor.Engine, processor.PostgresClient, addresses, "btc")
+	payments, err := models.FindAllPaymentsByAddresses(processor.Engine, processor.PostgresClient, addresses, "btc")
 
 	for _, payment := range payments {
 		txid := txids[payment.Address]
 
 		transaction := findTransaction(transactions, txid)
 		vout := outputs[payment.Address]
+
 		btcPaid, _ := decimal.NewFromString(fmt.Sprintf("%v", vout.Value))
 
 		block_height_required := block.Height + payment.Confirmations_required - 1
 
 		// insert payout. A payment session can have many payouts...
 
+		paymentPayload := models.PaymentPayload{}
+
+		paymentPayload = paymentPayload.FromPayment(payment)
+
+		paymentPayload.Transaction_hash = transaction.TxID
+		paymentPayload.Block_height_required = block_height_required
+		paymentPayload.Set_paid_at()
+		paymentPayload.Amount_paid = btcPaid.String()
+
+		var payoutAction string
+
+		if payment.Status == "paid" || payment.Status == "pending" {
+			if btcPaid.Cmp(decimal.NewFromFloat(payment.TotalFee)) >= 0 {
+				// paid enough
+				paymentPayload.Status = "confirmed"
+				paymentPayload.Amount_paid = btcPaid.String()
+				paymentPayload.Set_paid_at()
+				payoutAction = "payout"
+			} else {
+				payoutAction = "refund"
+				paymentPayload.Status = "insufficient"
+			}
+		}
+
+		// update payment
+		models.UpdatePayment(processor.Engine, processor.PostgresClient, paymentPayload.ID, paymentPayload)
+
+		models.InsertPayout(processor.Engine, processor.PostgresClient, models.PayoutPayload{
+			Status:                "pending",
+			Store_id:              payment.Store_id,
+			Payment_id:            payment.ID,
+			Type:                  "btc",
+			Block_height_required: block_height_required,
+			Transaction_hash:      transaction.TxID,
+			Action:                payoutAction,
+		})
+		// transaction
+		models.InsertTransaction(processor.Engine, processor.PostgresClient, models.BtcTransactionPayload{
+			Hash:        transaction.TxID,
+			Transaction: *transaction,
+		})
 	}
-
-	// filter where vout has addresses
-
-	// store address, txids, vouts in sep []
-
-	//
 }
 
 // helper func

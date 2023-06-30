@@ -155,14 +155,14 @@ func InsertPayment(e *actor.Engine, conn *actor.PID, d PaymentPayload) (Payment,
 	return myStruct, nil
 }
 
-type FindAllPendingPaymentByAddressesMessage struct {
+type FindAllPaymentByAddressesMessage struct {
 	Address []string
 	// btc
 	Crypto string
 }
 
-func FindAllPendingPaymentsByAddresses(e *actor.Engine, conn *actor.PID, address []string, crypto string) ([]Payment, error) {
-	var resp = e.Request(conn, FindAllPendingPaymentByAddressesMessage{
+func FindAllPaymentsByAddresses(e *actor.Engine, conn *actor.PID, address []string, crypto string) ([]Payment, error) {
+	var resp = e.Request(conn, FindAllPaymentByAddressesMessage{
 		Address: address,
 		Crypto:  crypto,
 	}, time.Millisecond*100)

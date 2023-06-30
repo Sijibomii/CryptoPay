@@ -17,6 +17,7 @@ type PayoutPayload struct {
 	Block_height_required int
 	Transaction_hash      string
 	Created_at            time.Time
+	Action                string
 }
 
 func (p *PayoutPayload) Set_created_at() error {
@@ -32,6 +33,7 @@ func (p *PayoutPayload) Set_id() error {
 type Payout struct {
 	ID                    uuid.UUID `json:"id"`
 	Status                string    `json:"status"`
+	Action                string    `json:"action"`
 	Store_id              uuid.UUID `json:"store_id"`
 	Payment_id            uuid.UUID `json:"payment_id"`
 	Type                  string    `json:"crypto_type"`
@@ -74,5 +76,6 @@ func (p *PayoutPayload) ToPayout() Payout {
 		Block_height_required: p.Block_height_required,
 		Transaction_hash:      p.Transaction_hash,
 		Created_at:            p.Created_at,
+		Action:                p.Action,
 	}
 }

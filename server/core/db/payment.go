@@ -17,13 +17,13 @@ func insertPayment(conn *gorm.DB, payload models.Payment) models.Payment {
 	return payload
 }
 
-func findAllPendingPayementByAddresses(conn *gorm.DB, addresses []string, cryto string) []models.Payment {
+// not pending
+func findAllPayementByAddresses(conn *gorm.DB, addresses []string, cryto string) []models.Payment {
 	var payments []models.Payment
 
 	result := conn.
 		Where("address IN (?)", addresses).
 		Where("crypto = ?", cryto).
-		Where("status = ? OR status = ?", "pending", "insufficient").
 		Find(&payments)
 
 	if result.Error != nil {

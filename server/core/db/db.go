@@ -140,8 +140,8 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 		ctx.Respond(payload)
 
-	case models.FindAllPendingPaymentByAddressesMessage:
-		payload := findAllPendingPayementByAddresses(d.DB, l.Address, l.Crypto)
+	case models.FindAllPaymentByAddressesMessage:
+		payload := findAllPayementByAddresses(d.DB, l.Address, l.Crypto)
 
 		ctx.Respond(payload)
 
