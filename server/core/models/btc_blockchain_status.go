@@ -27,6 +27,11 @@ func (bcs *BtcBlockChainStatusPayload) Set_created_at() error {
 	return nil
 }
 
+func (bcs *BtcBlockChainStatusPayload) Set_id_token() error {
+	bcs.ID = uuid.New()
+	return nil
+}
+
 func (bcs *BtcBlockChainStatusPayload) ToBtcBlockChainStatus() BtcBlockChainStatus {
 	return BtcBlockChainStatus{
 		ID:           bcs.ID,
@@ -46,6 +51,7 @@ type FindBtcBlockChainStatusByNetworkMessage struct {
 
 func InsertBtcBlockChainStatus(e *actor.Engine, conn *actor.PID, d BtcBlockChainStatusPayload) (BtcBlockChainStatus, error) {
 	d.Set_created_at()
+	d.Set_id_token()
 	var resp = e.Request(conn, InsertBtcBlockChainStatusMessage{
 		Payload: d.ToBtcBlockChainStatus(),
 	}, time.Millisecond*100)

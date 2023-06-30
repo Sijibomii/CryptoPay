@@ -6,7 +6,9 @@ import (
 	"time"
 
 	"github.com/anthdm/hollywood/actor"
+	"github.com/google/uuid"
 	"github.com/sijibomii/cryptopay/blockchain_client/bitcoin"
+	"github.com/sijibomii/cryptopay/core/models"
 )
 
 type Poller struct {
@@ -32,8 +34,29 @@ type StartPollingMessage struct {
 func (poller *Poller) startPolling(e *actor.Engine, conn *actor.PID, ignore_prev_blocks bool) (bool, error) {
 
 	// send bootstrap message.
+	var resp = e.Request(conn, BootstrapPollerMessage{
+		Ignore_previous_blocks: true,
+	}, time.Millisecond*200)
+
+	res, err := resp.Result()
+	if err != nil {
+		fmt.Printf("error...")
+		panic("error getting resp from boostrap")
+	}
+
+	current_block, ok := res.(int)
+
+	if !ok {
+		fmt.Printf("error...")
+		panic("error parsing resp from bootstrap")
+	}
 
 	// get current block from response and send poll message
+
+	e.Send(conn, Poll{
+		Block_number: current_block,
+		Retry_count:  0,
+	})
 
 	return false, nil
 }
@@ -42,7 +65,41 @@ type BootstrapPollerMessage struct {
 	Ignore_previous_blocks bool
 }
 
-func (poller *Poller) bootstrapPoller(ig_prev_blocks bool) {
+func (poller *Poller) bootstrapPoller(e *actor.Engine, conn *actor.PID, ig_prev_blocks bool) (int, error) {
+
+	var resp = e.Request(poller.BtcClient, bitcoin.GetBlockCountMessage{}, time.Millisecond*200)
+
+	res, err := resp.Result()
+	if err != nil {
+		fmt.Printf("error...")
+		panic("error getting block count")
+	}
+
+	blockCount, ok := res.(int)
+
+	if !ok {
+		fmt.Printf("error...")
+		panic("error getting block count")
+	}
+
+	status, err := models.FindBtcBlockChainStatusByNetwork(e, poller.PostgresClient, poller.Network)
+
+	if status.ID == uuid.Nil || status.Network == "" || status.Block_Height == 0 || status.Created_at.IsZero() {
+		// insert new one
+		payload := models.BtcBlockChainStatusPayload{
+			Network:      poller.Network,
+			Block_Height: blockCount,
+		}
+
+		status, err = models.InsertBtcBlockChainStatus(e, poller.PostgresClient, payload)
+	}
+
+	if err != nil {
+		fmt.Printf("error...")
+		panic("error finding or inserting bloack status")
+	}
+
+	return status.Block_Height, nil
 
 }
 
