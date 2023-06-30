@@ -39,6 +39,11 @@ func (p *PaymentPayload) Set_created_at() error {
 	return nil
 }
 
+func (p *PaymentPayload) Set_paid_at() error {
+	p.Paid_at = time.Now()
+	return nil
+}
+
 func (p *PaymentPayload) Set_updated_at() error {
 	p.Updated_at = time.Now()
 	return nil
@@ -73,6 +78,32 @@ type Payment struct {
 	Identifier             string    `json:"identifier"`
 	TotalFee               float64   `json:"total"`
 	Fee                    float64   `json:"miners_fee"`
+}
+
+func (p *PaymentPayload) FromPayment(Payment) PaymentPayload {
+	return PaymentPayload{
+		ID:                     p.ID,
+		Status:                 p.Status,
+		Store_id:               p.Store_id,
+		Index:                  p.Index,
+		Created_by:             p.Created_by,
+		Created_at:             p.Created_at,
+		Updated_at:             p.Updated_at,
+		Expires_at:             p.Expires_at,
+		Paid_at:                p.Paid_at,
+		Amount_paid:            p.Amount_paid,
+		Transaction_hash:       p.Transaction_hash,
+		Fiat:                   p.Fiat,
+		Price:                  p.Price,
+		Crypto:                 p.Crypto,
+		Address:                p.Address,
+		Charge:                 p.Charge,
+		Confirmations_required: p.Confirmations_required,
+		Block_height_required:  p.Block_height_required,
+		Btc_network:            p.Btc_network,
+		Identifier:             p.Identifier,
+		Fee:                    p.Fee,
+	}
 }
 
 func (p *PaymentPayload) ToPayment() Payment {
@@ -112,6 +143,57 @@ func InsertPayment(e *actor.Engine, conn *actor.PID, d PaymentPayload) (Payment,
 	}, time.Millisecond*100)
 
 	res, err := resp.Result()
+	if err != nil {
+		return Payment{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(Payment)
+
+	if !ok {
+		return Payment{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
+}
+
+type FindAllPendingPaymentByAddressesMessage struct {
+	Address []string
+	// btc
+	Crypto string
+}
+
+func FindAllPendingPaymentsByAddresses(e *actor.Engine, conn *actor.PID, address []string, crypto string) ([]Payment, error) {
+	var resp = e.Request(conn, FindAllPendingPaymentByAddressesMessage{
+		Address: address,
+		Crypto:  crypto,
+	}, time.Millisecond*100)
+
+	res, err := resp.Result()
+	var cts []Payment
+	if err != nil {
+		return cts, errors.New("An error occured!")
+	}
+	myStruct, ok := res.([]Payment)
+
+	if !ok {
+		return cts, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
+}
+
+type UpdatePaymentMessage struct {
+	Payload Payment
+	Id      uuid.UUID
+}
+
+func UpdatePayment(e *actor.Engine, conn *actor.PID, id uuid.UUID, d PaymentPayload) (Payment, error) {
+	var resp = e.Request(conn, UpdatePaymentMessage{
+		Payload: d.ToPayment(),
+		Id:      id,
+	}, time.Millisecond*100)
+
+	res, err := resp.Result()
+
 	if err != nil {
 		return Payment{}, errors.New("An error occured!")
 	}

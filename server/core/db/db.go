@@ -140,6 +140,19 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 		ctx.Respond(payload)
 
+	case models.FindAllPendingPaymentByAddressesMessage:
+		payload := findAllPendingPayementByAddresses(d.DB, l.Address, l.Crypto)
+
+		ctx.Respond(payload)
+
+	case models.UpdatePaymentMessage:
+
+		payload, err := updatePayment(d.DB, l.Id, l.Payload)
+		if err != nil {
+			panic(err)
+		}
+		ctx.Respond(payload)
+
 	// sesssion
 
 	case models.InsertSessionMessage:

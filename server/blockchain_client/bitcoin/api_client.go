@@ -165,6 +165,8 @@ func (client *BlockchainClient) Get_Transaction_by_hash_endpoint(tx_hash string)
 	return u.String()
 }
 
+// GET /tx/:txid/outspends
+
 type Transaction struct {
 	TxID     string `json:"txid"`
 	Version  int    `json:"version"`
