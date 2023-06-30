@@ -51,20 +51,20 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 
 	case GetBlockByHeightMessage:
 
-		payload, err := client.get_Block_with_height(l.Block_Height)
+		// payload, err := client.get_Block_with_height(l.Block_Height)
 
-		if err != nil {
-			ctx.Respond(err.Error())
-		}
-		ctx.Respond(payload)
+		// if err != nil {
+		// 	ctx.Respond(err.Error())
+		// }
+		// ctx.Respond(payload)
 
 	case GetRawTransactionMessage:
-		payload, err := client.get_Transaction_By_Hash_height(l.Transaction_Hash)
+		// payload, err := client.get_Transaction_By_Hash_height(l.Transaction_Hash)
 
-		if err != nil {
-			ctx.Respond(err.Error())
-		}
-		ctx.Respond(payload)
+		// if err != nil {
+		// 	ctx.Respond(err.Error())
+		// }
+		// ctx.Respond(payload)
 
 	case BroadcastRawTransactionMessage:
 
