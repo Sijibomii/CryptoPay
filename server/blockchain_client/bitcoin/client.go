@@ -221,7 +221,8 @@ func GetRawMempool(e *actor.Engine, conn *actor.PID) (*[]MempoolEntry, error) {
 }
 
 // TODO:
-
 func GetAllTransactionsByBlockHeight(e *actor.Engine, conn *actor.PID) ([]Transaction, error) {
+	var transactions []Transaction
 
+	return transactions, nil
 }
