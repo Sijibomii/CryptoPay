@@ -162,6 +162,18 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 		// how to catch a panic?
 		ctx.Respond(payload)
 
+	// Btc Blockchain status
+
+	case models.InsertBtcBlockChainStatusMessage:
+		payload := insertBtcBlockChainStatus(d.DB, l.Payload)
+
+		ctx.Respond(payload)
+
+	case models.FindBtcBlockChainStatusByNetworkMessage:
+		payload := findBtcBlockChainStatus(d.DB, l.Network)
+
+		ctx.Respond(payload)
+
 	default:
 		fmt.Println("UNKNOWN MESSAGE TO USER DB")
 	}
