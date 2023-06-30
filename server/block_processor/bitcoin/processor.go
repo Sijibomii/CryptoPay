@@ -163,6 +163,12 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 		txid := txids[payment.Address]
 
 		transaction := findTransaction(transactions, txid)
+		vout := outputs[payment.Address]
+		btcPaid, _ := decimal.NewFromString(fmt.Sprintf("%v", vout.Value))
+
+		block_height_required := block.Height + payment.Confirmations_required - 1
+
+		// insert payout. A payment session can have many payouts...
 
 	}
 
