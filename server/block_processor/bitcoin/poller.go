@@ -42,7 +42,9 @@ type BootstrapPollerMessage struct {
 	Ignore_previous_blocks bool
 }
 
-func (poller *Poller) bootstrapPoller()
+func (poller *Poller) bootstrapPoller(ig_prev_blocks bool) {
+
+}
 
 type Poll struct {
 	Block_number int
@@ -97,6 +99,9 @@ func (poller *Poller) Receive(ctx *actor.Context) {
 		}
 
 		ctx.Respond(payload)
+
+	case Poll:
+		poller.poll(ctx.Engine(), ctx.PID(), l.Block_number, l.Retry_count)
 
 	default:
 		fmt.Println("UNKNOWN MESSAGE TO POLLER CLIENT")

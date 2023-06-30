@@ -76,7 +76,7 @@ func InsertClientToken(e *actor.Engine, conn *actor.PID, d ClientTokenPayload) (
 	d.Set_created_at()
 	var resp = e.Request(conn, InsertClientTokenMessage{
 		Payload: d.ToClientToken(),
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return ClientToken{}, errors.New("An error occured!")
@@ -95,7 +95,7 @@ func FindClientTokensByStore(e *actor.Engine, conn *actor.PID, store_id uuid.UUI
 		Store_id: store_id,
 		Limit:    limit,
 		Offset:   offset,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	var cts []ClientToken
 	if err != nil {
@@ -113,7 +113,7 @@ func FindClientTokensByStore(e *actor.Engine, conn *actor.PID, store_id uuid.UUI
 func FindClientTokenById(e *actor.Engine, conn *actor.PID, id uuid.UUID) (ClientToken, error) {
 	var resp = e.Request(conn, FindClientTokenByIdMessage{
 		Id: id,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return ClientToken{}, errors.New("An error occured!")
@@ -131,7 +131,7 @@ func FindClientTokenByTokenAndDomain(e *actor.Engine, conn *actor.PID, token uui
 	var resp = e.Request(conn, FindClientTokenByTokenAndDomainMessage{
 		Token:  token,
 		Domain: domain,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return ClientToken{}, errors.New("An error occured!")
@@ -148,7 +148,7 @@ func FindClientTokenByTokenAndDomain(e *actor.Engine, conn *actor.PID, token uui
 func DeleteClientToken(e *actor.Engine, conn *actor.PID, id uuid.UUID) (bool, error) {
 	var resp = e.Request(conn, DeleteClientTokenMessage{
 		Id: id,
-	}, 500)
+	}, time.Millisecond*100)
 	res, err := resp.Result()
 	if err != nil {
 		return false, errors.New("An error occured!")
