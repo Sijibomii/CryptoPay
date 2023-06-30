@@ -80,29 +80,29 @@ type Payment struct {
 	Fee                    float64   `json:"miners_fee"`
 }
 
-func (p *PaymentPayload) FromPayment(Payment) PaymentPayload {
+func (p *PaymentPayload) FromPayment(payment Payment) PaymentPayload {
 	return PaymentPayload{
-		ID:                     p.ID,
-		Status:                 p.Status,
-		Store_id:               p.Store_id,
-		Index:                  p.Index,
-		Created_by:             p.Created_by,
-		Created_at:             p.Created_at,
-		Updated_at:             p.Updated_at,
-		Expires_at:             p.Expires_at,
-		Paid_at:                p.Paid_at,
-		Amount_paid:            p.Amount_paid,
-		Transaction_hash:       p.Transaction_hash,
-		Fiat:                   p.Fiat,
-		Price:                  p.Price,
-		Crypto:                 p.Crypto,
-		Address:                p.Address,
-		Charge:                 p.Charge,
-		Confirmations_required: p.Confirmations_required,
-		Block_height_required:  p.Block_height_required,
-		Btc_network:            p.Btc_network,
-		Identifier:             p.Identifier,
-		Fee:                    p.Fee,
+		ID:                     payment.ID,
+		Status:                 payment.Status,
+		Store_id:               payment.Store_id,
+		Index:                  payment.Index,
+		Created_by:             payment.Created_by,
+		Created_at:             payment.Created_at,
+		Updated_at:             payment.Updated_at,
+		Expires_at:             payment.Expires_at,
+		Paid_at:                payment.Paid_at,
+		Amount_paid:            payment.Amount_paid,
+		Transaction_hash:       payment.Transaction_hash,
+		Fiat:                   payment.Fiat,
+		Price:                  payment.Price,
+		Crypto:                 payment.Crypto,
+		Address:                payment.Address,
+		Charge:                 payment.Charge,
+		Confirmations_required: payment.Confirmations_required,
+		Block_height_required:  payment.Block_height_required,
+		Btc_network:            payment.Btc_network,
+		Identifier:             payment.Identifier,
+		Fee:                    payment.Fee,
 	}
 }
 

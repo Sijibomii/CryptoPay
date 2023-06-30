@@ -30,6 +30,12 @@ type GetFeeEstimatesMessage struct{}
 
 type GetRawMempoolMessage struct{}
 
+// TODO:
+
+type GetAllTransactionsByBlockHeightMessage struct {
+	Block_Height int
+}
+
 func (client *BlockchainClient) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 
@@ -66,6 +72,9 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 		// }
 		// ctx.Respond(payload)
 
+	case GetAllTransactionsByBlockHeightMessage:
+
+		//
 	case BroadcastRawTransactionMessage:
 
 		payload := client.broadcastTransaction(l.RawTx)
@@ -209,4 +218,10 @@ func GetRawMempool(e *actor.Engine, conn *actor.PID) (*[]MempoolEntry, error) {
 	}
 
 	return &mempool, nil
+}
+
+// TODO:
+
+func GetAllTransactionsByBlockHeight(e *actor.Engine, conn *actor.PID) ([]Transaction, error) {
+
 }

@@ -2,6 +2,7 @@ package bitcoin
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/anthdm/hollywood/actor"
@@ -14,6 +15,7 @@ type Processor struct {
 	Network        string
 	PostgresClient *actor.PID
 	Engine         *actor.Engine
+	BtcClient      *actor.PID
 }
 
 type ProcessBlockMessage struct {
@@ -126,6 +128,49 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 		models.UpdatePayment(processor.Engine, processor.PostgresClient, paymentPayload.ID, paymentPayload)
 
 	}
+}
+
+func (processor *Processor) processBlock(block bitcoin.Block) {
+	log.Printf("Processing block: %v\n", *&block.Height)
+
+	// get transactions
+	transactions, err := bitcoin.GetAllTransactionsByBlockHeight(processor.Engine, processor.BtcClient)
+
+	if err != nil {
+		fmt.Printf("error...")
+		panic("error finding all transactions by block height")
+	}
+
+	var addresses []string
+	txids := make(map[string]string)
+	outputs := make(map[string]bitcoin.Vout)
+
+	for _, transaction := range transactions {
+		for _, output := range transaction.Vout {
+			if output.ScriptPubKeyAddress != "" {
+				outputAddresses := output.ScriptPubKeyAddress
+				addresses = append(addresses, outputAddresses)
+
+				txids[outputAddresses] = transaction.TxID
+				outputs[outputAddresses] = output
+			}
+		}
+	}
+
+	payments, err := models.FindAllPendingPaymentsByAddresses(processor.Engine, processor.PostgresClient, addresses, "btc")
+
+	for _, payment := range payments {
+		txid := txids[payment.Address]
+
+		transaction := findTransaction(transactions, txid)
+
+	}
+
+	// filter where vout has addresses
+
+	// store address, txids, vouts in sep []
+
+	//
 }
 
 // helper func

@@ -23,7 +23,7 @@ func Run(config config.Config) {
 
 	pg := *initPool(config.Postgres, 10)
 
-	pg.DB.AutoMigrate(&models.User{}, &models.Store{}, &models.ClientToken{}, &models.Session{}, models.Payment{})
+	pg.DB.AutoMigrate(&models.User{}, &models.Store{}, &models.ClientToken{}, &models.Session{}, models.Payment{}, models.Payout{}, models.BtcBlockChainStatus{})
 
 	// define app state
 
