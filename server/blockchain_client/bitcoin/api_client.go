@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 )
 
 type BlockchainClient struct {
@@ -136,7 +137,7 @@ func (client *BlockchainClient) Get_Transactions_by_Block_hash_endpoint(block_ha
 	return u.String()
 }
 
-func (client *BlockchainClient) get_Transactions_by_Block_hash(block_hash string) ([]string, error) {
+func (client *BlockchainClient) get_Transactions_id_by_Block_hash(block_hash string) ([]string, error) {
 
 	response, err := http.Get(client.Get_Transactions_by_Block_hash_endpoint(block_hash))
 	if err != nil {
@@ -381,4 +382,47 @@ func (client *BlockchainClient) GetRawMempool() ([]MempoolEntry, error) {
 	}
 
 	return mempool, nil
+}
+
+func (client *BlockchainClient) get_Block_with_height(block_height int) (*Block, error) {
+	hash, err := client.get_Block_Hash_with_height(block_height)
+
+	if err != nil {
+		fmt.Printf("error getting hash")
+	}
+
+	block, err := client.get_Block(hash)
+
+	if err != nil {
+		fmt.Printf("error getting block")
+	}
+
+	return block, nil
+}
+
+func (client *BlockchainClient) get_all_transactions_by_block_height(block_height int) ([]Transaction, error) {
+
+	hash, err := client.get_Block_Hash_with_height(block_height)
+
+	if err != nil {
+		fmt.Printf("error getting hash")
+	}
+
+	txids, err := client.get_Transactions_id_by_Block_hash(hash)
+
+	result := make([]Transaction, 0)
+
+	for _, txid := range txids {
+		trans, err := client.get_Transaction_By_Hash(txid)
+
+		if err != nil {
+			fmt.Printf("error getting trans %s \n", txid)
+		}
+
+		result = append(result, *trans)
+
+		time.Sleep(20 * time.Microsecond)
+	}
+
+	return result, nil
 }

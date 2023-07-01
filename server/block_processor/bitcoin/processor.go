@@ -114,7 +114,7 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 	log.Printf("Processing block: %v\n", *&block.Height)
 
 	// get transactions
-	transactions, err := bitcoin.GetAllTransactionsByBlockHeight(processor.Engine, processor.BtcClient)
+	transactions, err := bitcoin.GetAllTransactionsByBlockHeight(processor.Engine, processor.BtcClient, block.Height)
 
 	if err != nil {
 		fmt.Printf("error...")
