@@ -30,8 +30,6 @@ type GetFeeEstimatesMessage struct{}
 
 type GetRawMempoolMessage struct{}
 
-// TODO:
-
 type GetAllTransactionsByBlockHeightMessage struct {
 	Block_Height int
 }
@@ -226,7 +224,6 @@ func GetRawMempool(e *actor.Engine, conn *actor.PID) (*[]MempoolEntry, error) {
 	return &mempool, nil
 }
 
-// TODO:
 func GetAllTransactionsByBlockHeight(e *actor.Engine, conn *actor.PID, block_height int) ([]Transaction, error) {
 
 	var resp = e.Request(conn, GetAllTransactionsByBlockHeightMessage{

@@ -19,7 +19,10 @@ func insertBtcBlockChainStatus(conn *gorm.DB, payload models.BtcBlockChainStatus
 func findBtcBlockChainStatus(conn *gorm.DB, network string) models.BtcBlockChainStatus {
 
 	btcs := models.BtcBlockChainStatus{}
-	if err := conn.Where("network", network).First(&btcs).Error; err != nil {
+
+	if err := conn.Where("network", network).
+		Order("created_at DESC").
+		First(&btcs).Error; err != nil {
 		panic(err)
 	}
 

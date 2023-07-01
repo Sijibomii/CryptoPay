@@ -206,6 +206,27 @@ func UpdatePayment(e *actor.Engine, conn *actor.PID, id uuid.UUID, d PaymentPayl
 	return myStruct, nil
 }
 
+type FindPaymentByIdMessage struct {
+	Id uuid.UUID
+}
+
+func Find_Payment_By_Id(e *actor.Engine, conn *actor.PID, id uuid.UUID) (Payment, error) {
+
+	var resp = e.Request(conn, FindPaymentByIdMessage{
+		Id: id,
+	}, time.Millisecond*100)
+	res, err := resp.Result()
+	if err != nil {
+		return Payment{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(Payment)
+
+	if !ok {
+		return Payment{}, errors.New("An error occured!")
+	}
+	return myStruct, nil
+}
+
 func (p *Payment) Export() ([]byte, error) {
 	data := struct {
 		ID                     uuid.UUID `json:"id"`

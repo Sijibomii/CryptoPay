@@ -116,8 +116,8 @@ func Run(config config.Config) {
 	}).Methods("POST")
 
 	paymentRoutes.HandleFunc("/payments/:id/status", func(w http.ResponseWriter, r *http.Request) {
-		controllers.CreatePayment(w, r, appState)
-	}).Methods("POST")
+		controllers.GetPaymentStatus(w, r, appState)
+	}).Methods("GET")
 
 	// /vouchers
 

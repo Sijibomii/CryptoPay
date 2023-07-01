@@ -145,6 +145,12 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 		ctx.Respond(payload)
 
+	case models.FindPaymentByIdMessage:
+
+		payload := findPaymentById(d.DB, l.Id)
+
+		ctx.Respond(payload)
+
 	case models.UpdatePaymentMessage:
 
 		payload, err := updatePayment(d.DB, l.Id, l.Payload)

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sijibomii/cryptopay/blockchain_client/bitcoin"
 	"github.com/sijibomii/cryptopay/core/models"
@@ -61,6 +62,19 @@ func CreatePayment(appState *util.AppState, store models.Store, payload models.P
 	payload.Charge = strconv.FormatFloat(charge, 'f', -1, 64)
 	payload.Fee = fee.OneHourFee
 	payment, err := dao.CreatePayment(appState.Engine, appState.Postgres, payload)
+
+	return payment, nil
+}
+
+func GetPaymentById(appState *util.AppState, payment_id uuid.UUID) (*models.Payment, error) {
+	var payment *models.Payment
+	var err error
+
+	payment, err = dao.GetPaymentById(appState.Engine, appState.Postgres, payment_id)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "error geting payment")
+	}
 
 	return payment, nil
 }

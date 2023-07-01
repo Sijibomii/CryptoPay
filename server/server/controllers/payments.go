@@ -6,8 +6,11 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/sijibomii/cryptopay/core/models"
 	"github.com/sijibomii/cryptopay/server/client"
+	"github.com/sijibomii/cryptopay/server/dao"
 	"github.com/sijibomii/cryptopay/server/services"
 	"github.com/sijibomii/cryptopay/server/util"
 	"github.com/sijibomii/cryptopay/types/currency"
@@ -120,4 +123,67 @@ func CreatePayment(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 	return
 }
 
-// payment status
+type PaymentStatusResponse struct {
+	Status                  string `json:"status"`
+	Confirmations_required  int    `json:"confirmations_required"`
+	Remaining_confirmations int    `json:"remaining_confirmations"`
+}
+
+// payment status a token was sent back to the user, that will be decoded and be sent now instead of api key
+func GetPaymentStatus(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+
+	jwtPayload := r.Context().Value("Payload").(*util.JwtPayload)
+
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	paymentId, tokenErr := uuid.Parse(id)
+
+	if tokenErr != nil {
+		util.ErrorResponseFunc(w, r, tokenErr)
+		return
+	}
+
+	payment, err := services.GetPaymentById(appState, paymentId)
+
+	// validate payment owner
+	if payment.Created_by != jwtPayload.Client.ID || err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	switch payment.Crypto {
+	case "btc":
+		//get the current payment status
+		status, err := dao.FindBtcBlockChainStatusByNetwork(appState.Engine, appState.Postgres, payment.Btc_network)
+
+		remaining_conf := payment.Confirmations_required - status.Block_Height
+
+		if payment.Status == "paid" {
+			remaining_conf = 0
+		}
+
+		block_height_required := payment.Block_height_required
+
+		if block_height_required < status.Block_Height {
+			remaining_conf = 0
+		} else {
+			remaining_conf = block_height_required - status.Block_Height
+		}
+
+		json, err := json.Marshal(PaymentStatusResponse{
+			Remaining_confirmations: remaining_conf,
+			Confirmations_required:  payment.Confirmations_required,
+			Status:                  payment.Status,
+		})
+		if err != nil {
+			util.ErrorResponseFunc(w, r, err)
+			return
+		}
+
+		util.JsonBytesResponse(w, http.StatusOK, json)
+		return
+
+	}
+
+}
