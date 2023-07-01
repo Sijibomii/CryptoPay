@@ -204,3 +204,21 @@ func findTransaction(transactions []bitcoin.Transaction, txid string) *bitcoin.T
 	}
 	return nil
 }
+
+// recive
+func (processor *Processor) Receive(ctx *actor.Context) {
+	switch l := ctx.Message().(type) {
+
+	case actor.Started:
+		fmt.Println("processor actor started")
+
+	case ProcessBlockMessage:
+		processor.processBlock(l.Block)
+
+	case ProcessMempoolTransactionsMessage:
+		processor.processMempoolTransactions(l.Transactions)
+
+	default:
+		fmt.Println("UNKNOWN MESSAGE TO PROCESSOR CLIENT")
+	}
+}

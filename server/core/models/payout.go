@@ -66,6 +66,35 @@ func InsertPayout(e *actor.Engine, conn *actor.PID, d PayoutPayload) (Payout, er
 	return myStruct, nil
 }
 
+type FindAllConfirmedPayoutMessage struct {
+	Block_number int
+	Crypto       string
+}
+
+func FindAllConfirmedPayout(e *actor.Engine, conn *actor.PID, block_number int, crypto string) ([]Payout, error) {
+	var payouts []Payout
+
+	var resp = e.Request(conn, FindAllConfirmedPayoutMessage{
+		Block_number: block_number,
+		Crypto:       crypto,
+	}, time.Millisecond*100)
+
+	res, err := resp.Result()
+
+	if err != nil {
+		return payouts, errors.New("An error occured!")
+	}
+
+	myStruct, ok := res.([]Payout)
+
+	if !ok {
+		return payouts, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
+
+}
+
 func (p *PayoutPayload) ToPayout() Payout {
 	return Payout{
 		ID:                    p.ID,

@@ -15,3 +15,18 @@ func insertPayout(conn *gorm.DB, payload models.Payout) models.Payout {
 	}
 	return payload
 }
+
+func findAllConfirmedPayout(conn *gorm.DB, block_number int, cryto string) []models.Payout {
+	var payouts []models.Payout
+	result := conn.
+		Where("status = ?", "pending").
+		Where("crypto = ?", cryto).
+		Where("block_height_required < ?", block_number).
+		Find(&payouts)
+
+	if result.Error != nil {
+		panic(result.Error)
+	}
+
+	return payouts
+}

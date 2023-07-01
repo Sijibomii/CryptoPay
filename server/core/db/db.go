@@ -193,6 +193,18 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 		ctx.Respond(payload)
 
+	// payout
+	case models.InsertPayoutMessage:
+		payload := insertPayout(d.DB, l.Payload)
+
+		ctx.Respond(payload)
+
+	case models.FindAllConfirmedPayoutMessage:
+
+		payload := findAllConfirmedPayout(d.DB, l.Block_number, l.Crypto)
+
+		ctx.Respond(payload)
+
 	default:
 		fmt.Println("UNKNOWN MESSAGE TO USER DB")
 	}

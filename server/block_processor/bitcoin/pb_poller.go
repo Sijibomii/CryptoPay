@@ -117,3 +117,21 @@ func difference(sliceA, sliceB []bitcoin.MempoolEntry) []bitcoin.MempoolEntry {
 
 	return result
 }
+
+// messages receive
+func (poller *PBPoller) Receive(ctx *actor.Context) {
+	switch l := ctx.Message().(type) {
+
+	case actor.Started:
+		fmt.Println("pending poller actor started")
+
+	case StartPBPollingMessage:
+		poller.startPolling(ctx.Engine(), ctx.PID())
+
+	case PBPollMessage:
+		poller.poll(ctx.Engine(), ctx.PID(), l.Previous, l.Retry_count)
+
+	default:
+		fmt.Println("UNKNOWN MESSAGE TO PBPoller CLIENT")
+	}
+}
