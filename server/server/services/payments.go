@@ -44,7 +44,7 @@ func CreatePayment(appState *util.AppState, store models.Store, payload models.P
 
 	childKey, _ := util.NewChildKeyFromString(masterKey, path)
 
-	payload.Address = childKey.String()
+	payload.Address = childKey.PublicKey().String()
 
 	rate, err := util.GetRate(appState.Engine, appState.CoinClient, payload.Fiat, payload.Crypto)
 
