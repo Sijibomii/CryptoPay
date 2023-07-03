@@ -270,7 +270,7 @@ func (client *BlockchainClient) BroadcastTransaction_endpoint() string {
 	return u.String()
 }
 
-func (client *BlockchainClient) broadcastTransaction(rawTx string) error {
+func (client *BlockchainClient) broadcastTransaction(rawTx string) (string, error) {
 	url := client.BroadcastTransaction_endpoint()
 	// Create a JSON payload containing the raw transaction
 	payload := []byte(fmt.Sprintf(`{"tx": "%s"}`, rawTx))
@@ -278,25 +278,27 @@ func (client *BlockchainClient) broadcastTransaction(rawTx string) error {
 	// Send a POST request to the Esplora API
 	resp, err := http.Post(url, "application/json", bytes.NewBuffer(payload))
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 
 	// Read the response body
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// Check the response status code
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("failed to broadcast transaction: %s", resp.Status)
+		return "", fmt.Errorf("failed to broadcast transaction: %s", resp.Status)
 	}
+
+	// should return hash
 
 	// Print the response body
 	fmt.Println(string(body))
 
-	return nil
+	return string(body), nil
 }
 
 type FeeEstimates struct {

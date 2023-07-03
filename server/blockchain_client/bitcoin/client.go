@@ -81,7 +81,11 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 
 	case BroadcastRawTransactionMessage:
 
-		payload := client.broadcastTransaction(l.RawTx)
+		payload, err := client.broadcastTransaction(l.RawTx)
+
+		if err != nil {
+			ctx.Respond(err.Error())
+		}
 
 		ctx.Respond(payload)
 
@@ -171,23 +175,24 @@ func GetRawTransaction(e *actor.Engine, conn *actor.PID, transaction_hash string
 
 }
 
-func BroadcastRawTransaction(e *actor.Engine, conn *actor.PID, rawTx string) (bool, error) {
+func BroadcastRawTransaction(e *actor.Engine, conn *actor.PID, rawTx string) (string, error) {
 	var resp = e.Request(conn, BroadcastRawTransactionMessage{
 		RawTx: rawTx,
 	}, time.Millisecond*100)
 
 	res, err := resp.Result()
+
 	if err != nil {
-		return false, errors.New("An error occured!")
+		return "", errors.New("An error occured!")
 	}
 
-	error, ok := res.(error)
+	str, ok := res.(string)
 
 	if !ok {
-		return true, nil
+		return "", errors.New("An error occured!")
 	}
 
-	return false, error
+	return str, nil
 }
 
 func GetFeeEstimates(e *actor.Engine, conn *actor.PID) (*FeeEstimates, error) {

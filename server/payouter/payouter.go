@@ -3,6 +3,7 @@ package payouter
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/anthdm/hollywood/actor"
 	"github.com/sijibomii/cryptopay/blockchain_client/bitcoin"
@@ -92,4 +93,73 @@ func (p *Payouter) preparePayout(e *actor.Engine, dbConn *actor.PID, payout mode
 		Fee:         fee.OneHourFee,
 	}, nil
 
+}
+
+func (p *Payouter) payout(e *actor.Engine, dbConn *actor.PID, payout models.Payout) (string, error) {
+
+	resp, err := p.preparePayout(e, dbConn, payout)
+
+	if err != nil {
+		fmt.Printf("unable to prepare payout")
+		panic("unable to prepare payout")
+	}
+
+	if resp.Store.Btc_payout_user_addresses == "" {
+		fmt.Printf("no payout address in payouter")
+		panic("no payout address in payouter")
+	}
+
+	recipient := resp.PublicKey.String()
+
+	// Btc_payout_user_addresses might be a comma sep value
+
+	addresses := strings.Split(resp.Store.Btc_payout_user_addresses, ",")
+	utxo_idx := 0
+	for idx, output := range resp.Transaction.Vout {
+		// pubkeyhash
+		if output.ScriptPubKeyType == "pubkeyhash" {
+			if output.ScriptPubKeyAddress == recipient {
+				utxo_idx = idx
+			}
+		} else {
+			fmt.Printf("unexpected script type in payouter %s", output.ScriptPubKeyType)
+			panic("unexpected script type in payouter")
+		}
+	}
+
+	utxo := resp.Transaction.Vout[utxo_idx]
+
+	value := (utxo.Value * 100_000_000)
+
+	tx_fee_per_byte := float64(resp.Fee) / 1000
+
+	if float64(value) <= tx_fee_per_byte*192 {
+		fmt.Printf("Insufficient funds to pay out.")
+		panic("Insufficient funds to pay out.")
+	}
+	var inputs []bitcoin.TransactionInput
+	var outputs []bitcoin.TransactionOutput
+	inputs = append(inputs, bitcoin.TransactionInput{
+		Transaction: resp.Transaction,
+		Idx:         utxo_idx,
+	})
+
+	outputs = append(outputs, bitcoin.TransactionOutput{
+		Address: addresses[0],
+		Amount:  float64(value) - tx_fee_per_byte,
+	})
+
+	tx := bitcoin.NewUnsignedTransaction(inputs, outputs)
+
+	tx.Sign(resp.PrivateKey, resp.PublicKey)
+	raw_transaction := tx.Into_raw_transaction()
+
+	hash, err := bitcoin.BroadcastRawTransaction(e, p.BtcClient, string(raw_transaction))
+
+	if err != nil {
+		fmt.Printf("unable to broadcast transaction in payouter")
+		panic("unable to broadcast transaction in payouter")
+	}
+
+	return hash, nil
 }
