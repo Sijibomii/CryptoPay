@@ -20,10 +20,6 @@ type Payouter struct {
 	Network         string
 }
 
-type ProcessPayoutMessage struct {
-	Payout models.Payout
-}
-
 type PreparePayoutResponse struct {
 	PrivateKey  *bip32.Key
 	PublicKey   *bip32.Key
@@ -162,4 +158,40 @@ func (p *Payouter) payout(e *actor.Engine, dbConn *actor.PID, payout models.Payo
 	}
 
 	return hash, nil
+}
+
+type ProcessPayoutMessage struct {
+	Payout models.Payout
+}
+
+type PayoutMessage struct {
+	Payout models.Payout
+}
+
+func (client *Payouter) Receive(ctx *actor.Context) {
+	switch l := ctx.Message().(type) {
+
+	case actor.Started:
+		fmt.Println("payrouter started")
+
+	case ProcessPayoutMessage:
+		payload, err := client.preparePayout(ctx.Engine(), client.PostgresClieint, l.Payout)
+
+		if err != nil {
+			ctx.Respond(err.Error())
+		}
+		ctx.Respond(payload)
+
+	case PayoutMessage:
+
+		payload, err := client.payout(ctx.Engine(), client.PostgresClieint, l.Payout)
+
+		if err != nil {
+			ctx.Respond(err.Error())
+		}
+		ctx.Respond(payload)
+
+	default:
+		fmt.Println("UNKNOWN MESSAGE TO Payrouter")
+	}
 }
