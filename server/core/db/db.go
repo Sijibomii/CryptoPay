@@ -205,6 +205,8 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 		ctx.Respond(payload)
 
+	case models.UpdatePayoutWithPaymentMessage:
+
 	default:
 		fmt.Println("UNKNOWN MESSAGE TO USER DB")
 	}

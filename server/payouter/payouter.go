@@ -175,23 +175,44 @@ func (client *Payouter) Receive(ctx *actor.Context) {
 		fmt.Println("payrouter started")
 
 	case ProcessPayoutMessage:
-		payload, err := client.preparePayout(ctx.Engine(), client.PostgresClieint, l.Payout)
-
-		if err != nil {
-			ctx.Respond(err.Error())
-		}
-		ctx.Respond(payload)
+		client.SendPayoutMessage(ctx.Engine(), client.BtcClient, l.Payout)
 
 	case PayoutMessage:
-
-		payload, err := client.payout(ctx.Engine(), client.PostgresClieint, l.Payout)
-
-		if err != nil {
-			ctx.Respond(err.Error())
-		}
-		ctx.Respond(payload)
 
 	default:
 		fmt.Println("UNKNOWN MESSAGE TO Payrouter")
 	}
+}
+
+func (p *Payouter) SendPayoutMessage(e *actor.Engine, conn *actor.PID, payout models.Payout) {
+	e.Send(conn, PayoutMessage{
+		Payout: payout,
+	})
+}
+
+func (p *Payouter) DoPayout(e *actor.Engine, conn *actor.PID, payout models.Payout) {
+	hash, err := p.payout(e, conn, payout)
+
+	if err != nil {
+		fmt.Printf("unable to get payout")
+		panic("unable to get payout")
+	}
+
+	payout_payload := models.PayoutPayload{}
+
+	payout_payload = payout_payload.FromPayout(payout)
+
+	payout_payload.Transaction_hash = hash
+	payout_payload.Status = "paidout"
+
+	payment_payload := models.PaymentPayload{}
+
+	payment_payload.Status = "completed"
+
+	_, err = dao.UpdatePayoutWithPayment(e, conn, payout.ID, payout_payload, payment_payload)
+
+	if err != nil {
+		panic("insufficient funds")
+	}
+	fmt.Printf("payload updated")
 }
