@@ -9,13 +9,16 @@ import (
 )
 
 type AppState struct {
-	PgExecutor utils.PgExecutor
-	Config     *config.Config
-	Postgres   *actor.PID
-	Engine     *actor.Engine
-	Mailer     *actor.PID
-	CoinClient *actor.PID
-	BtcClient  *actor.PID
+	PgExecutor      utils.PgExecutor
+	Config          *config.Config
+	Postgres        *actor.PID
+	Engine          *actor.Engine
+	Mailer          *actor.PID
+	CoinClient      *actor.PID
+	BtcClient       *actor.PID
+	ProcessorClient *actor.PID
+	PollerClient    *actor.PID
+	PBPollerClient  *actor.PID
 }
 
 type AppHandler struct {

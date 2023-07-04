@@ -12,7 +12,6 @@ import (
 )
 
 type BlockchainClient struct {
-	BCUrl string
 	BSUrl string
 }
 
@@ -107,7 +106,7 @@ func (client *BlockchainClient) get_Block(block_hash string) (*Block, error) {
 }
 
 func (client *BlockchainClient) Get_Block_Hash_with_height_endpoint(block_height int) string {
-	baseURL, _ := url.Parse(client.BCUrl)
+	baseURL, _ := url.Parse(client.BSUrl)
 	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/block-height/%s/", strconv.Itoa(block_height))})
 	return u.String()
 }

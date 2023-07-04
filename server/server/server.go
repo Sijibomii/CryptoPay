@@ -4,9 +4,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/anthdm/hollywood/actor"
 	"github.com/gorilla/mux"
+	btc_processor "github.com/sijibomii/cryptopay/block_processor/bitcoin"
+	"github.com/sijibomii/cryptopay/blockchain_client/bitcoin"
+	coinclient "github.com/sijibomii/cryptopay/coin_client"
 	"github.com/sijibomii/cryptopay/config"
 	"github.com/sijibomii/cryptopay/core/db"
 	"github.com/sijibomii/cryptopay/core/models"
@@ -25,20 +29,42 @@ func Run(config config.Config) {
 
 	pg.DB.AutoMigrate(&models.User{}, &models.Store{}, &models.ClientToken{}, &models.Session{}, models.Payment{}, models.Payout{}, models.BtcBlockChainStatus{})
 
-	// define app state
-
-	// spawn up db client
 	e := actor.NewEngine()
+
 	pid := e.Spawn(newDbClient(pg), "dbClient")
 
 	mailerPid := e.Spawn(newMailerClient(&config.Mailer), "mailer")
 
+	// currencyClient
+	value := os.Getenv("COIN_API_KEY")
+	client_url := os.Getenv("BITCOIN_CHAIN_URL")
+	coinClientPid := e.Spawn(newCoinClient(value), "coinClient")
+
+	btcChainClient := e.Spawn(newBtcChainClient(client_url), "btcChainClient")
+
+	processorClient := e.Spawn(newProcessorClient("testnet", pid, e, btcChainClient), "processorClient")
+
+	pollerClient := e.Spawn(newPollerClient("testnet", pid, btcChainClient, processorClient), "pollerClient")
+
+	// send message
+	e.Send(pollerClient, btc_processor.StartPollingMessage{
+		Ignore_previous_blocks: true,
+	})
+
+	pendingPollerClient := e.Spawn(newPendingPollerClient("testnet", pid, btcChainClient, processorClient), "pollerClient")
+	e.Send(pendingPollerClient, btc_processor.StartPBPollingMessage{})
+
 	appState := &util.AppState{
-		Postgres:   pid,
-		PgExecutor: pg,
-		Config:     &config,
-		Engine:     e,
-		Mailer:     mailerPid,
+		Postgres:        pid,
+		PgExecutor:      pg,
+		Config:          &config,
+		Engine:          e,
+		Mailer:          mailerPid,
+		CoinClient:      coinClientPid,
+		BtcClient:       btcChainClient,
+		ProcessorClient: processorClient,
+		PollerClient:    pollerClient,
+		PBPollerClient:  pendingPollerClient,
 	}
 
 	// routes register
@@ -128,6 +154,55 @@ func Run(config config.Config) {
 
 	log.Printf("Server listening on %s:%d\n", config.Server.Host, config.Server.Port)
 	log.Fatal(server.ListenAndServe())
+}
+
+func newPendingPollerClient(network string, postgresClient, btcClient, processorClient *actor.PID) actor.Producer {
+	return func() actor.Receiver {
+		return &btc_processor.PBPoller{
+			PostgresClient: postgresClient,
+			Network:        network,
+			BlockProcessor: processorClient,
+			BtcClient:      btcClient,
+		}
+	}
+}
+
+func newPollerClient(network string, postgresClient, btcClient, processorClient *actor.PID) actor.Producer {
+	return func() actor.Receiver {
+		return &btc_processor.Poller{
+			PostgresClient: postgresClient,
+			Network:        network,
+			BlockProcessor: processorClient,
+			BtcClient:      btcClient,
+		}
+	}
+}
+
+func newProcessorClient(network string, postgresClient *actor.PID, engine *actor.Engine, btcClient *actor.PID) actor.Producer {
+	return func() actor.Receiver {
+		return &btc_processor.Processor{
+			PostgresClient: postgresClient,
+			Network:        network,
+			Engine:         engine,
+			BtcClient:      btcClient,
+		}
+	}
+}
+
+func newBtcChainClient(url_string string) actor.Producer {
+	return func() actor.Receiver {
+		return &bitcoin.BlockchainClient{
+			BSUrl: "https://blockstream.info/api",
+		}
+	}
+}
+
+func newCoinClient(api_key string) actor.Producer {
+	return func() actor.Receiver {
+		return &coinclient.CoinClient{
+			Key: api_key,
+		}
+	}
 }
 
 func newMailerClient(m *config.MailerConfig) actor.Producer {
