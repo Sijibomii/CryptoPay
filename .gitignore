@@ -1,2 +1,3 @@
 server/.env
 server/data
+sdk/node_modules
