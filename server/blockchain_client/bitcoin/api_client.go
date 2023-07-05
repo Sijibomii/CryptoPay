@@ -35,24 +35,28 @@ func (client *BlockchainClient) Block_count_endpoint() string {
 }
 
 func (client *BlockchainClient) get_block_count() (int, error) {
-	response, err := http.Get(client.Block_count_endpoint())
+	fmt.Printf("block count message \n")
+	// client.Block_count_endpoint()
+	response, err := http.Get("https://blockstream.info/api/blocks/tip/height")
+	//
 	if err != nil {
+		fmt.Printf("block count message \n #############  %s", err.Error())
 		return 0, err
 	}
 	defer response.Body.Close()
 
 	// Read response body
 	body, err := ioutil.ReadAll(response.Body)
+
 	if err != nil {
 		return 0, err
 	}
-
+	fmt.Println(string(body))
 	// Parse response to integer
 	value, err := strconv.Atoi(string(body))
 	if err != nil {
 		return 0, err
 	}
-
 	return value, nil
 }
 
@@ -66,15 +70,20 @@ type Block struct {
 	Weight            int    `json:"weight"`
 	MerkleRoot        string `json:"merkle_root"`
 	PreviousBlockHash string `json:"previousblockhash"`
-	Mediantime        int    `json:"mediantime"`
+	MedianTime        int    `json:"mediantime"`
 	Nonce             int    `json:"nonce"`
 	Bits              int    `json:"bits"`
-	Difficulty        int64  `json:"difficulty"`
+	Difficulty        int    `json:"difficulty"`
+}
+
+func (b Block) String() string {
+	return fmt.Sprintf("Block: ID=%s, Height=%d, Version=%d, Timestamp=%d, TxCount=%d, Size=%d, Weight=%d, MerkleRoot=%s, PreviousBlock=%s, MedianTime=%d, Nonce=%d, Bits=%d, Difficulty=%d",
+		b.ID, b.Height, b.Version, b.Timestamp, b.TxCount, b.Size, b.Weight, b.MerkleRoot, b.PreviousBlockHash, b.MedianTime, b.Nonce, b.Bits, b.Difficulty)
 }
 
 func (client *BlockchainClient) Get_Block_endpoint(block_hash string) string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/block/%s/", block_hash)})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/block/%s", block_hash)})
 	return u.String()
 }
 
@@ -107,11 +116,14 @@ func (client *BlockchainClient) get_Block(block_hash string) (*Block, error) {
 
 func (client *BlockchainClient) Get_Block_Hash_with_height_endpoint(block_height int) string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/block-height/%s/", strconv.Itoa(block_height))})
+	fmt.Printf(baseURL.String())
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/block-height/%s", strconv.Itoa(block_height))})
+	fmt.Printf(u.String())
 	return u.String()
 }
 
 func (client *BlockchainClient) get_Block_Hash_with_height(block_height int) (string, error) {
+	fmt.Printf("Getting block with height \n")
 
 	response, err := http.Get(client.Get_Block_Hash_with_height_endpoint(block_height))
 	if err != nil {
@@ -127,12 +139,14 @@ func (client *BlockchainClient) get_Block_Hash_with_height(block_height int) (st
 
 	value := string(body)
 
+	fmt.Printf("value: %s \n", value)
+
 	return value, nil
 }
 
 func (client *BlockchainClient) Get_Transactions_by_Block_hash_endpoint(block_hash string) string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/block/%s/txids", block_hash)})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/block/%s/txids", block_hash)})
 	return u.String()
 }
 
@@ -161,7 +175,7 @@ func (client *BlockchainClient) get_Transactions_id_by_Block_hash(block_hash str
 
 func (client *BlockchainClient) Get_Transaction_by_hash_endpoint(tx_hash string) string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/tx/%s/", tx_hash)})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/tx/%s", tx_hash)})
 	return u.String()
 }
 
@@ -218,6 +232,8 @@ func (client *BlockchainClient) get_Transaction_By_Hash(tx_hash string) (*Transa
 
 	body, err := ioutil.ReadAll(resp.Body)
 
+	fmt.Printf("\n transaction request body: %s \n", string(body))
+
 	if err != nil {
 		return nil, err
 	}
@@ -237,7 +253,7 @@ func (client *BlockchainClient) get_Transaction_By_Hash(tx_hash string) (*Transa
 
 func (client *BlockchainClient) Get_Hash_For_Last_Block_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/blocks/tip/hash/")})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/blocks/tip/hash")})
 	return u.String()
 }
 
@@ -265,7 +281,7 @@ func (client *BlockchainClient) get_Hash_For_Last_Block() (string, error) {
 
 func (client *BlockchainClient) BroadcastTransaction_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/tx/")})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/tx")})
 	return u.String()
 }
 
@@ -310,7 +326,7 @@ type FeeEstimates struct {
 
 func (client *BlockchainClient) GetFeeEstimates_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/fee-estimates/")})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/fee-estimates")})
 	return u.String()
 }
 
@@ -354,7 +370,7 @@ type MempoolEntry struct {
 
 func (client *BlockchainClient) GetRawMempool_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/mempool/recent/")})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/mempool/recent")})
 	return u.String()
 }
 
@@ -395,7 +411,7 @@ func (client *BlockchainClient) get_Block_with_height(block_height int) (*Block,
 	block, err := client.get_Block(hash)
 
 	if err != nil {
-		fmt.Printf("error getting block")
+		fmt.Printf("error getting block %s", err.Error())
 	}
 
 	return block, nil
@@ -419,11 +435,13 @@ func (client *BlockchainClient) get_all_transactions_by_block_height(block_heigh
 		if err != nil {
 			fmt.Printf("error getting trans %s \n", txid)
 		}
-
+		fmt.Printf("transaction request complete: ", trans)
 		result = append(result, *trans)
 
 		time.Sleep(20 * time.Microsecond)
 	}
+
+	fmt.Printf(" \n transactions: ", result)
 
 	return result, nil
 }

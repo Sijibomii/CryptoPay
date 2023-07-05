@@ -32,27 +32,32 @@ type StartPollingMessage struct {
 }
 
 func (poller *Poller) startPolling(e *actor.Engine, conn *actor.PID, ignore_prev_blocks bool) (bool, error) {
-
+	fmt.Print("START POLLING MESSAGE \n")
 	// send bootstrap message.
-	var resp = e.Request(conn, BootstrapPollerMessage{
-		Ignore_previous_blocks: true,
-	}, time.Millisecond*200)
 
-	res, err := resp.Result()
+	current_block, err := poller.bootstrapPoller(e, conn, ignore_prev_blocks)
+	// var resp = e.Request(conn, BootstrapPollerMessage{
+	// 	Ignore_previous_blocks: true,
+	// }, time.Millisecond*200)
+
+	// _, err := resp.Result()
 	if err != nil {
-		fmt.Printf("error...")
+		fmt.Printf("error...123 %s", err.Error())
 		panic("error getting resp from boostrap")
 	}
 
-	current_block, ok := res.(int)
+	// currentblock, ok := res.(int)
 
-	if !ok {
-		fmt.Printf("error...")
-		panic("error parsing resp from bootstrap")
-	}
+	fmt.Print("CURRENT BLOCK  ", current_block, "\n")
+
+	// if !ok {
+	// 	fmt.Printf("error...")
+	// 	panic("error parsing resp from bootstrap")
+	// }
 
 	// get current block from response and send poll message
 
+	fmt.Print("POLL MESSAGE SENDING... \n")
 	e.Send(conn, Poll{
 		Block_number: current_block,
 		Retry_count:  0,
@@ -66,12 +71,12 @@ type BootstrapPollerMessage struct {
 }
 
 func (poller *Poller) bootstrapPoller(e *actor.Engine, conn *actor.PID, ig_prev_blocks bool) (int, error) {
-
-	var resp = e.Request(poller.BtcClient, bitcoin.GetBlockCountMessage{}, time.Millisecond*200)
+	fmt.Printf("BLOCK COUNT MESSAGE SENT \n")
+	var resp = e.Request(poller.BtcClient, bitcoin.GetBlockCountMessage{}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 	if err != nil {
-		fmt.Printf("error...")
+		fmt.Printf("error... \n")
 		panic("error getting block count")
 	}
 
@@ -112,26 +117,29 @@ func (poller *Poller) poll(e *actor.Engine, conn *actor.PID, block_number, retry
 
 	var resp = e.Request(poller.BtcClient, bitcoin.GetBlockByHeightMessage{
 		Block_Height: block_number,
-	}, time.Millisecond*200)
+	}, time.Millisecond*1200)
 
 	res, err := resp.Result()
+
 	if err != nil {
 		return false, errors.New("An error occured!")
 	}
-	block, ok := res.(bitcoin.Block)
+	str, ok := res.(string)
 
 	if !ok {
 		return false, errors.New("An error occured!")
 	}
+	block, err := parseBlockString(str)
 
 	e.Send(poller.BlockProcessor, ProcessBlockMessage{
 		Block: block,
 	})
-
+	fmt.Print("hereee sending poll2")
 	delay := time.NewTimer(time.Second * 5).C
 
 	select {
 	case <-delay:
+		fmt.Print("hereee sending poll")
 		e.Send(conn, Poll{
 			Block_number: block_number + 1,
 			Retry_count:  retry_count,
@@ -145,17 +153,28 @@ func (poller *Poller) poll(e *actor.Engine, conn *actor.PID, block_number, retry
 
 }
 
+func parseBlockString(str string) (bitcoin.Block, error) {
+	var block bitcoin.Block
+	_, err := fmt.Sscanf(str, "Block: ID=%s, Height=%d, Version=%d, Timestamp=%d, TxCount=%d, Size=%d, Weight=%d, MerkleRoot=%s, PreviousBlock=%s, MedianTime=%d, Nonce=%d, Bits=%d, Difficulty=%d",
+		&block.ID, &block.Height, &block.Version, &block.Timestamp, &block.TxCount, &block.Size, &block.Weight, &block.MerkleRoot, &block.PreviousBlockHash, &block.MedianTime, &block.Nonce, &block.Bits, &block.Difficulty)
+	if err != nil {
+		return bitcoin.Block{}, err
+	}
+	return block, nil
+}
+
 func (poller *Poller) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 
 	case StartPollingMessage:
-		payload, err := poller.startPolling(ctx.Engine(), ctx.PID(), l.Ignore_previous_blocks)
 
-		if err != nil {
-			ctx.Respond(err.Error())
-		}
+		_, _ = poller.startPolling(ctx.Engine(), ctx.PID(), l.Ignore_previous_blocks)
 
-		ctx.Respond(payload)
+		// if err != nil {
+		// 	ctx.Respond(err.Error())
+		// }
+
+		// ctx.Respond(payload)
 
 	case Poll:
 		poller.poll(ctx.Engine(), ctx.PID(), l.Block_number, l.Retry_count)

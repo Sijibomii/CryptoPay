@@ -20,7 +20,7 @@ func findBtcBlockChainStatus(conn *gorm.DB, network string) models.BtcBlockChain
 
 	btcs := models.BtcBlockChainStatus{}
 
-	if err := conn.Where("network", network).
+	if err := conn.Where("network = ?", network).
 		Order("created_at DESC").
 		First(&btcs).Error; err != nil {
 		panic(err)

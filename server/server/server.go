@@ -37,10 +37,10 @@ func Run(config config.Config) {
 
 	// currencyClient
 	value := os.Getenv("COIN_API_KEY")
-	client_url := os.Getenv("BITCOIN_CHAIN_URL")
+
 	coinClientPid := e.Spawn(newCoinClient(value), "coinClient")
 
-	btcChainClient := e.Spawn(newBtcChainClient(client_url), "btcChainClient")
+	btcChainClient := e.Spawn(newBtcChainClient(), "btcChainClient")
 
 	processorClient := e.Spawn(newProcessorClient("testnet", pid, e, btcChainClient), "processorClient")
 
@@ -189,7 +189,7 @@ func newProcessorClient(network string, postgresClient *actor.PID, engine *actor
 	}
 }
 
-func newBtcChainClient(url_string string) actor.Producer {
+func newBtcChainClient() actor.Producer {
 	return func() actor.Receiver {
 		return &bitcoin.BlockchainClient{
 			BSUrl: "https://blockstream.info/api",

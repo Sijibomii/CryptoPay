@@ -38,6 +38,8 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 
 	case GetBlockCountMessage:
+		fmt.Printf("revcieved block count message \n")
+
 		payload, err := client.get_block_count()
 
 		if err != nil {
@@ -60,7 +62,7 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 		if err != nil {
 			ctx.Respond(err.Error())
 		}
-		ctx.Respond(payload)
+		ctx.Respond(payload.String())
 
 	case GetRawTransactionMessage:
 		payload, err := client.get_Transaction_By_Hash(l.Transaction_Hash)
@@ -104,7 +106,7 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 
 func GetBlockCount(e *actor.Engine, conn *actor.PID) (int, error) {
 
-	var resp = e.Request(conn, GetBlockCountMessage{}, time.Millisecond*100)
+	var resp = e.Request(conn, GetBlockCountMessage{}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -122,7 +124,7 @@ func GetBlockCount(e *actor.Engine, conn *actor.PID) (int, error) {
 func GetBlock(e *actor.Engine, conn *actor.PID, block_hash string) (*Block, error) {
 	var resp = e.Request(conn, GetBlockMessage{
 		Block_hash: block_hash,
-	}, time.Millisecond*100)
+	}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -140,7 +142,7 @@ func GetBlock(e *actor.Engine, conn *actor.PID, block_hash string) (*Block, erro
 func GetBlockByHeight(e *actor.Engine, conn *actor.PID, block_height int) (*Block, error) {
 	var resp = e.Request(conn, GetBlockByHeightMessage{
 		Block_Height: block_height,
-	}, time.Millisecond*100)
+	}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -159,7 +161,7 @@ func GetRawTransaction(e *actor.Engine, conn *actor.PID, transaction_hash string
 
 	var resp = e.Request(conn, GetRawTransactionMessage{
 		Transaction_Hash: transaction_hash,
-	}, time.Millisecond*100)
+	}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -178,7 +180,7 @@ func GetRawTransaction(e *actor.Engine, conn *actor.PID, transaction_hash string
 func BroadcastRawTransaction(e *actor.Engine, conn *actor.PID, rawTx string) (string, error) {
 	var resp = e.Request(conn, BroadcastRawTransactionMessage{
 		RawTx: rawTx,
-	}, time.Millisecond*100)
+	}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 
@@ -196,7 +198,7 @@ func BroadcastRawTransaction(e *actor.Engine, conn *actor.PID, rawTx string) (st
 }
 
 func GetFeeEstimates(e *actor.Engine, conn *actor.PID) (*FeeEstimates, error) {
-	var resp = e.Request(conn, GetFeeEstimatesMessage{}, time.Millisecond*100)
+	var resp = e.Request(conn, GetFeeEstimatesMessage{}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -213,7 +215,7 @@ func GetFeeEstimates(e *actor.Engine, conn *actor.PID) (*FeeEstimates, error) {
 }
 
 func GetRawMempool(e *actor.Engine, conn *actor.PID) (*[]MempoolEntry, error) {
-	var resp = e.Request(conn, GetRawMempoolMessage{}, time.Millisecond*100)
+	var resp = e.Request(conn, GetRawMempoolMessage{}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -233,7 +235,7 @@ func GetAllTransactionsByBlockHeight(e *actor.Engine, conn *actor.PID, block_hei
 
 	var resp = e.Request(conn, GetAllTransactionsByBlockHeightMessage{
 		Block_Height: block_height,
-	}, time.Millisecond*500)
+	}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 

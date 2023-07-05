@@ -2,7 +2,6 @@ package bitcoin
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/anthdm/hollywood/actor"
@@ -111,7 +110,7 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 // transactions will be first processed in the mempool and will be marked as paid but will be eventually confirmed when the mempool becomes a block
 // a payout is created for a valid (i.e confirmed) payment. bc that's when we can guarantee that the money got to us
 func (processor *Processor) processBlock(block bitcoin.Block) {
-	log.Printf("Processing block: %v\n", *&block.Height)
+	fmt.Printf("Processing block: %v\n", *&block.Height)
 
 	// get transactions
 	transactions, err := bitcoin.GetAllTransactionsByBlockHeight(processor.Engine, processor.BtcClient, block.Height)
@@ -127,8 +126,11 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 
 	for _, transaction := range transactions {
 		for _, output := range transaction.Vout {
+			fmt.Printf("\n output: ", output)
+			fmt.Printf("\n address: ", output.ScriptPubKeyAddress)
 			if output.ScriptPubKeyAddress != "" {
 				outputAddresses := output.ScriptPubKeyAddress
+
 				addresses = append(addresses, outputAddresses)
 
 				txids[outputAddresses] = transaction.TxID
@@ -136,6 +138,8 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 			}
 		}
 	}
+
+	fmt.Printf("\n find all payments by addresses: ", addresses)
 
 	payments, err := models.FindAllPaymentsByAddresses(processor.Engine, processor.PostgresClient, addresses, "btc")
 

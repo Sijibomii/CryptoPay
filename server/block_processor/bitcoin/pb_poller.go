@@ -44,7 +44,7 @@ type PBPollMessage struct {
 
 func (pb *PBPoller) poll(e *actor.Engine, conn *actor.PID, previous []bitcoin.MempoolEntry, retry_size int) {
 
-	var resp = e.Request(pb.BtcClient, bitcoin.GetRawMempoolMessage{}, time.Millisecond*200)
+	var resp = e.Request(pb.BtcClient, bitcoin.GetRawMempoolMessage{}, time.Millisecond*1200)
 
 	res, err := resp.Result()
 	if err != nil {
@@ -67,7 +67,7 @@ func (pb *PBPoller) poll(e *actor.Engine, conn *actor.PID, previous []bitcoin.Me
 
 		var resp = e.Request(pb.BtcClient, bitcoin.GetRawTransactionMessage{
 			Transaction_Hash: transaction.TxID,
-		}, time.Millisecond*200)
+		}, time.Millisecond*1200)
 
 		res, err := resp.Result()
 
