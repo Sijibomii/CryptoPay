@@ -5,5 +5,5 @@ export type Config = Options & {
 };
 
 export type Options = {
-    
+
 }

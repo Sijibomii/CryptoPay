@@ -1,4 +1,3 @@
 
-
 export type Target = HTMLElement;
-export type Current = string | null;
+export type Current = string;
