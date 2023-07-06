@@ -1,6 +1,6 @@
 import { Component } from "./components";
 
-export default class Modal extends Component {
+export class Modal extends Component {
 
     public mountPoint: HTMLElement | null = null;
 
