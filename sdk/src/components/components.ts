@@ -2,6 +2,7 @@ import {Navigation} from "../lib/navigation";
 import { Config } from "../types";
 import { Overlay } from "./overlay";
 import { Modal } from "./modal";
+import { ApiClient } from "../lib";
 
 export type navigatorParam = {
     dataset: dataset
@@ -11,21 +12,23 @@ type ComponentInputs = {
     config?: Config
     navigation?: Navigation
     modal?: Modal
-    onSuccess?: (ticket: any) => null
+    onSuccess: (ticket: any) => null
     element : HTMLElement
     overlay?: Overlay
     dataset?: any
+    apiClient: ApiClient
 }
 
 export class Component {
     public config: Config | undefined;
     public navigation: Navigation  | undefined;
     public modal: Modal  | undefined
-    public onSuccess?: undefined | ((ticket: any) => null);
+    public onSuccess: ((ticket: any) => null);
     public element: HTMLElement
     public overlay?: Overlay | undefined
     public navigatorParams?: navigatorParam
     public dataset?: dataset
+    public apiClient: ApiClient
     
     constructor(options: ComponentInputs) {
         this.config = options.config;
@@ -36,6 +39,7 @@ export class Component {
         this.onSuccess = options.onSuccess;
         this.element = document.createElement("div");
         this.overlay = options.overlay;
+        this.apiClient = options.apiClient;
     }
 
     willMount() {
