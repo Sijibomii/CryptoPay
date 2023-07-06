@@ -1,14 +1,14 @@
-import { Components, navigatorParam } from "../components";
+import { Component, navigatorParam } from "../components";
 import { Current, Target } from "../types";
 
 type navigationInitInput = {
-    routes: Record<string, Components>
+    routes: Record<string, Component>
 }
 
-export default class Navigation {
+export class Navigation {
     private target?: Target;
     private current: Current;
-    private routes: Record<string, Components>;
+    private routes: Record<string, Component>;
 
     constructor() {
         this.target = document.createElement("div");

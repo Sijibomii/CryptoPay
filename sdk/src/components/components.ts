@@ -1,6 +1,6 @@
-import Navigation from "../lib/navigation";
+import {Navigation} from "../lib/navigation";
 import { Config } from "../types";
-
+import { Overlay } from "./overlay";
 export type navigatorParam = {
     dataset: dataset
 }
@@ -11,17 +11,17 @@ type ComponentInputs = {
     modal?: HTMLElement | null
     onSuccess?: (ticket: any) => null
     element : HTMLElement
-    overlay?: HTMLElement | null
+    overlay?: Overlay
     dataset?: any
 }
 
-export class Components {
+export class Component {
     public config: Config | undefined;
     public navigation: Navigation  | undefined;
     public modal: HTMLElement | null  | undefined
     public onSuccess?: undefined | ((ticket: any) => null);
     public element: HTMLElement
-    public overlay?: HTMLElement | null | undefined
+    public overlay?: Overlay | undefined
     public navigatorParams?: navigatorParam
     public dataset?: dataset
     
