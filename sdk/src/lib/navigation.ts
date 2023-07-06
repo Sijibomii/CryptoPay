@@ -6,7 +6,7 @@ type navigationInitInput = {
 }
 
 export class Navigation {
-    private target?: Target;
+    public target?: Target;
     private current: Current;
     private routes: Record<string, Component>;
 

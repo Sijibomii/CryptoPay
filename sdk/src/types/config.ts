@@ -9,4 +9,5 @@ export type Options = {
     identifier: string
     apiUrl: string
     apiKey: string
+    currencies: string[]
 }

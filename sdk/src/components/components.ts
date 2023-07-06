@@ -8,7 +8,7 @@ export type navigatorParam = {
     dataset: dataset
 }
 type dataset = any
-type ComponentInputs = {
+export type ComponentInputs = {
     config?: Config
     navigation?: Navigation
     modal?: Modal
@@ -16,6 +16,7 @@ type ComponentInputs = {
     element : HTMLElement
     overlay?: Overlay
     dataset?: any
+    currencies: string[]
     apiClient: ApiClient
 }
 
