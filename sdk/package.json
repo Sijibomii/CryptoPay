@@ -11,6 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.3.3",
+    "@types/qrcode": "^1.5.1",
     "autoprefixer": "^10.4.14",
     "babel-core": "^6.26.3",
     "babel-loader": "^9.1.2",
@@ -24,6 +25,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
+    "qrcode": "^1.5.3",
     "ts-loader": "^9.4.4",
     "webpack": "^5.88.1",
     "webpack-cli": "^5.1.4"
