@@ -1,5 +1,5 @@
 import {Component} from "./components";
-import errorImg from "../images/error.png";
+import errorImg from "../images/btc.png";
 
 export default class PaymentError extends Component {
 
