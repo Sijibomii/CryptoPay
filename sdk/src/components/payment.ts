@@ -1,7 +1,6 @@
 import { Component, ComponentInputs } from "./components";
 import QRCode from "qrcode";
 
-
 export class Payment extends Component {
 
     public timeLeft: string;
