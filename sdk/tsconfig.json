@@ -15,9 +15,12 @@
       "esModuleInterop": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
-      "typeRoots": ["./node_modules/@types", "./src/declarations.d.ts"]
+      "typeRoots": ["./node_modules/@types", "./src/declarations.d.ts"],
+      "outDir": "./dist"
     },
     "$schema": "https://json.schemastore.org/tsconfig",
     "display": "Strictest",
-    "_version": "2.0.0"
+    "_version": "2.0.0",
+    "exclude": ["coverage/**/*", "dist/**/*", "node_modules", "tmp", "webpack.config.js"],
+    "include": ["./src/**/*"]
   }
