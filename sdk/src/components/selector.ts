@@ -3,7 +3,7 @@ import bitcoinImg from "../images/btc.png";
 import { Config } from "../types";
 
 
-export default class Select extends Component {
+export class Select extends Component {
 
     public buttons:  NodeListOf<Element>;
 

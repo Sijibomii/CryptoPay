@@ -1,7 +1,7 @@
 import {Component} from "./components";
 import errorImg from "../images/btc.png";
 
-export default class PaymentError extends Component {
+export class PaymentError extends Component {
 
   override onMounted() {
     let closeButton = this.modal!.element.querySelector(".btn-close");

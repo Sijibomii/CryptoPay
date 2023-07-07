@@ -1,6 +1,6 @@
 import { Component } from "./components";
 
-export default class Success extends Component {
+export class Success extends Component {
 
     override onMounted() {
         this.modal!.element.querySelector(".btn-close")!.classList.remove("disabled");

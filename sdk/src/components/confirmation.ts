@@ -1,6 +1,6 @@
 import { Component, ComponentInputs }from "./components";
 
-export default class Confirmation extends Component {
+export class Confirmation extends Component {
     public polling: NodeJS.Timeout
 
     constructor(options: ComponentInputs) {

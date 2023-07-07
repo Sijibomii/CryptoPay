@@ -12,8 +12,7 @@ export type ComponentInputs = {
     config?: Config
     navigation?: Navigation
     modal?: Modal
-    onSuccess: (ticket: any) => null
-    element : HTMLElement
+    onSuccess: (ticket: any) => void
     overlay?: Overlay
     dataset?: any
     currencies: string[]
@@ -24,7 +23,7 @@ export class Component {
     public config: Config | undefined;
     public navigation: Navigation  | undefined;
     public modal: Modal  | undefined
-    public onSuccess: ((ticket: any) => null);
+    public onSuccess: ((ticket: any) => void);
     public element: HTMLElement
     public overlay?: Overlay | undefined
     public navigatorParams?: navigatorParam
