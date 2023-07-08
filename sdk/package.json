@@ -1,6 +1,6 @@
 {
   "name": "@sijibomi/cryptopay-sdk",
-  "version": "2.0.0",
+  "version": "3.1.0",
   "description": "sdk for github.com/sijibomii/CryptoPay",
   "main": "./lib/main.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "start": "webpack-dev-server --config ./example/webpack.config.js --mode development --open --hot"
   },
   "homepage": "https://github.com/Sijibomii/CryptoPay",
-  "types": "typings/index.d.ts",
+  "types": "dist/index.d.ts",
   "author": {
     "name": "Ajayi sijibomi",
     "url": "https://github.com/Sijibomii/"

@@ -150,7 +150,7 @@ func GetClientTokenByIdHandler(w http.ResponseWriter, r *http.Request, appState 
 }
 
 func CreateClientTokensHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
-	userContext := r.Context().Value("user").(models.User)
+	userContext := r.Context().Value("user").(*models.User)
 
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {

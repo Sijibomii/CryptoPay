@@ -34,7 +34,7 @@ export class Payment extends Component {
             colorLight: "#ffffff"
             };
 
-            QRCode.toCanvas(qrcodeElement, JSON.stringify(qrcodeOptions), (error) => {
+            QRCode.toCanvas(qrcodeElement, JSON.stringify(qrcodeOptions), (error : any) => {
                 if (error) {
                   console.error("Failed to generate QR code:", error);
                 } else {
