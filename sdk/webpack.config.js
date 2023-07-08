@@ -1,13 +1,31 @@
 const path = require('path');
+const webpack = require("webpack");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
+const libraryName = "cryptopay-sdk";
 module.exports = {
-  entry: './src/index.ts',
-  mode: 'production',
+  entry: path.join(__dirname, "src"),
   output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.join(__dirname, "lib"),
+    // library: libraryName,
+    // filename: libraryName + ".js",
+    // libraryTarget: "umd",
+    // umdNamedDefine: true,
+    // publicPath: "/"
   },
   watch: true,
+  optimization: {
+    splitChunks: {
+        cacheGroups: {
+            styles: {
+                name: "styles",
+                test: /\.css$/,
+                chunks: "all",
+                enforce: true
+            }
+        }
+    },
+  },
   module: {
     rules: [
       {
@@ -55,7 +73,6 @@ module.exports = {
             loader: "postcss-loader",
             options: {
               sourceMap: true,
-              plugins: [require("autoprefixer")({ grid: true })]
             }
           }
         ]
@@ -73,8 +90,14 @@ module.exports = {
     host: "localhost",
     port: "5000",
     compress: true,
-    // hot: true,
-    // liveReload: true,
-    // watchFiles: true
-  }
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+
+    new MiniCssExtractPlugin({
+        filename: libraryName + ".css",
+        chunkFilename: libraryName + ".[id].css"
+    }),
+
+  ]
 };

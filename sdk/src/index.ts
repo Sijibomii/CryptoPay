@@ -8,7 +8,9 @@ import {
     Confirmation,
     Success,
     PaymentError
-  } from "./components";
+} from "./components";
+
+import "./main.css";
 
 export default class CryptoPay{
     private config: Config;
