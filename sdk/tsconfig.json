@@ -17,7 +17,8 @@
       "forceConsistentCasingInFileNames": true,
       "typeRoots": ["./node_modules/@types", "./src/declarations.d.ts"],
       "outDir": "./dist",
-      "declaration": true
+      "declaration": true,
+      "lib": ["es6", "dom"]
     },
     "$schema": "https://json.schemastore.org/tsconfig",
     "display": "Strictest",

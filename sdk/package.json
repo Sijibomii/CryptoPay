@@ -1,17 +1,28 @@
 {
   "name": "@sijibomi/cryptopay-sdk",
-  "version": "3.1.0",
+  "version": "4.1.0",
   "description": "sdk for github.com/sijibomii/CryptoPay",
-  "main": "./lib/main.js",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "source": "src/index.ts",
+  "types": "dist/cjs/index.d.ts",
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
-    "build": "rimraf dist lib && npm run build:types && npm run build:js",
     "build:types": "tsc --declaration",
-    "build:js": "babel src --out-dir lib --extensions \".tsx\" --ignore \"**/*.test.tsx\" --source-maps inline",
-    "build:bundle": "webpack-cli --config ./webpack.config.js --mode production",
-    "start": "webpack-dev-server --config ./example/webpack.config.js --mode development --open --hot"
+    "build": "npm run build-js && npm run copy-styles",
+    "build-js": "npm run build-js-cjs",
+    "build-js-esm": "tsc --project tsconfig.build.json --outDir dist/esm --module esnext",
+    "build-js-cjs": "tsc --project tsconfig.build.json --outDir dist/cjs --module commonjs",
+    "clean": "rimraf dist",
+    "copy-styles": "node --loader ts-node/esm ./copy-styles.ts"
   },
   "homepage": "https://github.com/Sijibomii/CryptoPay",
-  "types": "dist/index.d.ts",
   "author": {
     "name": "Ajayi sijibomi",
     "url": "https://github.com/Sijibomii/"
@@ -26,7 +37,7 @@
   "keywords": [],
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^20.3.3",
+    "@types/node": "^20.4.1",
     "@types/qrcode": "^1.5.1",
     "autoprefixer": "^10.4.14",
     "babel-core": "^6.26.3",
@@ -38,6 +49,7 @@
     "mini-css-extract-plugin": "^2.7.6",
     "postcss-loader": "^7.3.3",
     "style-loader": "^3.3.3",
+    "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
     "url-loader": "^4.1.1",
     "webpack-dev-server": "^4.15.1"
