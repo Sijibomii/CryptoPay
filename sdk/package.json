@@ -1,6 +1,6 @@
 {
   "name": "@sijibomi/cryptopay-sdk",
-  "version": "4.1.0",
+  "version": "5.0.1",
   "description": "sdk for github.com/sijibomii/CryptoPay",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

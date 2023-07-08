@@ -11,7 +11,7 @@ export class Select extends Component {
     constructor(options: ComponentInputs) {
         super(options)
         // could not get a better initializer
-        this.buttons = this.element.querySelectorAll("");
+        this.buttons = this.element.querySelectorAll(".btn");
     }
     override onMounted() {
         this.activateCurrencySelectButton();

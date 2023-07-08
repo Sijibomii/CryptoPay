@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import CryptoPay from "@sijibomi/cryptopay-sdk/dist/index.js";
+import CryptoPay from "@sijibomi/cryptopay-sdk";
 
 const Cart = () => {
 
@@ -15,7 +15,8 @@ const Cart = () => {
             onSuccess: function(voucher: any) {
                 console.log("Successfully completed the payment.", voucher);
                 return null
-            }
+            },
+        
         })
         console.log(cryptoPay)
         cryptoPay.init()
