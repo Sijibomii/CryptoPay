@@ -5,12 +5,13 @@
   "main": "./lib/main.js",
   "scripts": {
     "build": "rimraf dist lib && npm run build:types && npm run build:js",
-    "build:types": "tsc --emitDeclarationOnly",
+    "build:types": "tsc --declaration",
     "build:js": "babel src --out-dir lib --extensions \".tsx\" --ignore \"**/*.test.tsx\" --source-maps inline",
     "build:bundle": "webpack-cli --config ./webpack.config.js --mode production",
     "start": "webpack-dev-server --config ./example/webpack.config.js --mode development --open --hot"
   },
   "homepage": "https://github.com/Sijibomii/CryptoPay",
+  "types": "typings/index.d.ts",
   "author": {
     "name": "Ajayi sijibomi",
     "url": "https://github.com/Sijibomii/"

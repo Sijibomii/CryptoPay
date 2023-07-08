@@ -12,7 +12,10 @@ import {
 
 import "./main.css";
 
+// take redirect link. redirect to payment page after payment redirect back
+
 export default class CryptoPay{
+
     private config: Config;
     private navigation: Navigation
     private apiClient: ApiClient
@@ -98,7 +101,7 @@ export default class CryptoPay{
     }
 
     init() {
-        this.mount();
+      this.mount();
     }
     
     resize() {}
@@ -113,6 +116,10 @@ export default class CryptoPay{
     }
     
       activate() {
+
+        // redirect page to new page
+        // redirect to payment page
+        
         this.overlay.set(document.body);
     
         this.navigation.target = this.overlay.element.querySelector(
