@@ -7,11 +7,6 @@ module.exports = {
   entry: path.join(__dirname, "src"),
   output: {
     path: path.join(__dirname, "lib"),
-    // library: libraryName,
-    // filename: libraryName + ".js",
-    // libraryTarget: "umd",
-    // umdNamedDefine: true,
-    // publicPath: "/"
   },
   watch: true,
   optimization: {
