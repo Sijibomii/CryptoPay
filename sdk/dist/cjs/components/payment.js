@@ -63,7 +63,7 @@ var Payment = /** @class */ (function (_super) {
         var _this = _super.call(this, options) || this;
         // could not get a better initializer
         _this.timeLeft = "";
-        _this.copyButton = _this.element.querySelector("");
+        _this.copyButton = _this.element.querySelector(".copy-btn");
         _this.timer = setTimeout(function () { }, 100);
         _this.polling = setTimeout(function () { }, 100);
         return _this;

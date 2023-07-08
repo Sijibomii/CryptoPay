@@ -62,7 +62,7 @@ var Select = /** @class */ (function (_super) {
     function Select(options) {
         var _this = _super.call(this, options) || this;
         // could not get a better initializer
-        _this.buttons = _this.element.querySelectorAll("");
+        _this.buttons = _this.element.querySelectorAll(".btn");
         return _this;
     }
     Select.prototype.onMounted = function () {
@@ -86,7 +86,7 @@ var Select = /** @class */ (function (_super) {
                     case 0:
                         e.stopPropagation();
                         this.navigation.target.removeChild(this.element);
-                        this.modal.set(this.overlay.element.querySelector("checkout-overlay-content"));
+                        this.modal.set(this.overlay.element.querySelector(".checkout-overlay-content"));
                         this.navigation.target = (_a = this.modal) === null || _a === void 0 ? void 0 : _a.element.querySelector(".content-root");
                         return [4 /*yield*/, this.apiClient.createPayment(currency)];
                     case 1:

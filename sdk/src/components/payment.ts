@@ -11,7 +11,7 @@ export class Payment extends Component {
         super(options)
         // could not get a better initializer
         this.timeLeft = "";
-        this.copyButton = this.element.querySelector("") as Element;
+        this.copyButton = this.element.querySelector(".copy-btn") as Element;
         this.timer =  setTimeout(() => {}, 100);
         this.polling =  setTimeout(() => {}, 100);
     }

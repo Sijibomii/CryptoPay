@@ -1,6 +1,6 @@
 {
   "name": "@sijibomi/cryptopay-sdk",
-  "version": "5.0.1",
+  "version": "5.1.1",
   "description": "sdk for github.com/sijibomii/CryptoPay",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build:types": "tsc --declaration",
-    "build": "npm run build-js && npm run copy-styles",
+    "build": "npm run build-js-esm && npm run build-js && npm run copy-styles",
     "build-js": "npm run build-js-cjs",
     "build-js-esm": "tsc --project tsconfig.build.json --outDir dist/esm --module esnext",
     "build-js-cjs": "tsc --project tsconfig.build.json --outDir dist/cjs --module commonjs",

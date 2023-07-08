@@ -1,7 +1,6 @@
 
 export type Config = Options & {
     modal?: HTMLElement | null
-    button?: HTMLElement
 };
 
 export type Options = {
@@ -12,4 +11,5 @@ export type Options = {
     apiKey: string
     currencies: string[]
     onSuccess: (ticket: any) => null
+    button?: HTMLElement
 }

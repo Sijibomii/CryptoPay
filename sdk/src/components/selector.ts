@@ -7,7 +7,6 @@ export class Select extends Component {
 
     public buttons:  NodeListOf<Element>;
 
-
     constructor(options: ComponentInputs) {
         super(options)
         // could not get a better initializer
@@ -27,14 +26,14 @@ export class Select extends Component {
                 (event: Event) => this.navigateToPayment(el.dataset['type']!, event)
             );
         });
-    }
+    } 
 
     async navigateToPayment(currency: string, e: Event) { 
         e.stopPropagation();
 
         this.navigation!.target!.removeChild(this.element);
 
-        this.modal!.set(this.overlay!.element.querySelector("checkout-overlay-content") as HTMLElement);
+        this.modal!.set(this.overlay!.element.querySelector(".checkout-overlay-content") as HTMLElement);
 
         this.navigation!.target = this.modal?.element.querySelector(".content-root") as HTMLElement;
 
