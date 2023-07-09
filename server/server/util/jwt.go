@@ -1,6 +1,7 @@
 package util
 
 import (
+	"crypto/rsa"
 	"fmt"
 	"time"
 
@@ -14,7 +15,7 @@ type JwtPayload struct {
 	Expires_at time.Time
 }
 
-func (payload *JwtPayload) Encode(jwtPrivate string) (string, error) {
+func (payload *JwtPayload) Encode(jwtPrivate *rsa.PrivateKey) (string, error) {
 
 	t := jwt.NewWithClaims(jwt.SigningMethodRS256,
 		jwt.MapClaims{
@@ -22,6 +23,7 @@ func (payload *JwtPayload) Encode(jwtPrivate string) (string, error) {
 			"store_id":   payload.Client.Store_id,
 			"expires_at": payload.Expires_at,
 		})
+
 	return t.SignedString(jwtPrivate)
 }
 

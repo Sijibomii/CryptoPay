@@ -136,7 +136,7 @@ func (s *Store) Can_accept(crypto currency.Crypto) bool {
 		// if s.Btc_payout_addresses != "" && s.Btc_confirmations_required != 0 {
 		// 	return true
 		// }
-		return false
+		return true
 	case currency.Eth:
 		fmt.Println("Ethereum (ETH)")
 	default:
@@ -309,7 +309,7 @@ func (s *Store) Export() ([]byte, error) {
 		Btc_payout_addresses:       addressStrings,
 		Btc_confirmations_required: s.Btc_confirmations_required,
 		Public_key:                 s.Public_key,
-		Can_accept_btc:             false, //s.Can_accept(currency.Btc),
+		Can_accept_btc:             s.Can_accept(currency.Btc),
 	}
 
 	return json.Marshal(data)

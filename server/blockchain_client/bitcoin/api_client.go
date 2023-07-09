@@ -330,35 +330,39 @@ func (client *BlockchainClient) GetFeeEstimates_endpoint() string {
 	return u.String()
 }
 
-func (client *BlockchainClient) getFeeEstimates() (*FeeEstimates, error) {
+func (client *BlockchainClient) getFeeEstimates() (FeeEstimates, error) {
 	url := client.GetFeeEstimates_endpoint()
 
-	resp, err := http.Get(url)
+	f := FeeEstimates{}
 
+	fmt.Printf("\n fee url: %s \n", url)
+	resp, err := http.Get(url)
+	fmt.Print("\n resp: ", resp)
 	if err != nil {
-		return nil, err
+		return f, err
 	}
 
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
-
+	fmt.Print("\n body: ", body)
 	if err != nil {
-		return nil, err
+		return f, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to get fee estimates: %s", resp.Status)
+		return f, fmt.Errorf("failed to get fee estimates: %s", resp.Status)
 	}
 
 	var feeEstimates FeeEstimates
 
 	err = json.Unmarshal(body, &feeEstimates)
+	fmt.Print("\n feeEstimates: ", feeEstimates)
 	if err != nil {
-		return nil, err
+		return f, err
 	}
 
-	return &feeEstimates, nil
+	return feeEstimates, nil
 }
 
 type MempoolEntry struct {

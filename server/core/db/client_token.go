@@ -44,7 +44,7 @@ func findClientTokenById(conn *gorm.DB, id uuid.UUID) models.ClientToken {
 
 func findClientTokenByTokenAndDomain(conn *gorm.DB, token uuid.UUID, domain string) models.ClientToken {
 	res := models.ClientToken{}
-	if err := conn.Where("token = ? AND domain = ?", token, domain).First(&token).Error; err != nil {
+	if err := conn.Where("token = ? AND domain = ?", token, domain).First(&res).Error; err != nil {
 		panic(err)
 	}
 

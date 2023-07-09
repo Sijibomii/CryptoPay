@@ -124,6 +124,7 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 		ctx.Respond(payload)
 
 	case models.FindClientTokenByTokenAndDomainMessage:
+		fmt.Print("FIND TOKEN BY DOMAIN \n")
 		payload := findClientTokenByTokenAndDomain(d.DB, l.Token, l.Domain)
 
 		ctx.Respond(payload)

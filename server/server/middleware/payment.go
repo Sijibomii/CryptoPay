@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"regexp"
@@ -16,7 +17,7 @@ import (
 func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			util.EnableCors(&w)
+			// util.EnableCors(&w)
 			auth := r.Header.Get("Authorization")
 
 			parts := strings.Split(auth, " ")
@@ -42,7 +43,7 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 			regex := regexp.MustCompile(pattern)
 
 			// Check if the URL path matches the regex pattern
-			if regex.MatchString(r.URL.Path) || r.URL.Path == "/vouchers" {
+			if regex.MatchString(r.URL.Path) || r.URL.Path == "/p/vouchers" {
 				// session token is added here instead of api token
 				key := os.Getenv("JWT_SECRET_KEY")
 
@@ -62,8 +63,8 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 				// Call the next handler
 				next.ServeHTTP(w, r)
 
-			} else if r.URL.Path == "/payment" {
-
+			} else if r.URL.Path == "/p/payments" {
+				fmt.Print("PAYMENTTTTTTT ############### \n")
 				// create payment
 				clientToken, tokenErr := uuid.Parse(token)
 
@@ -72,21 +73,24 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 					return
 				}
 				originHeader := r.Header.Get("Origin")
-				if originHeader == "" {
-					http.Error(w, "invalid origin header", http.StatusUnauthorized)
-					return
-				}
+				// if originHeader == "" {
+
+				// 	http.Error(w, "invalid origin header", http.StatusUnauthorized)
+				// 	return
+				// }
 
 				originHeaderParts := strings.Split(originHeader, "://")
-				if len(originHeaderParts) != 2 {
-					http.Error(w, "invalid origin header", http.StatusUnauthorized)
-					return
-				}
-
-				domain := strings.TrimSuffix(originHeaderParts[1], "/")
+				// if len(originHeaderParts) != 2 {
+				// 	http.Error(w, "invalid origin header", http.StatusUnauthorized)
+				// 	return
+				// }
+				fmt.Print("\n ORIGIN HEADERRR", originHeader)
+				fmt.Print("\n ORIGIN HEADERRR PARTSSSS", originHeaderParts)
+				fmt.Print("\n")
+				// domain := strings.TrimSuffix(originHeaderParts[1], "/")
 
 				// // domain is the store it will be used i.e www.amazon.com
-				client_token, err := dao.GetClientTokenByToken(appState.Engine, appState.Postgres, clientToken, domain)
+				client_token, err := dao.GetClientTokenByToken(appState.Engine, appState.Postgres, clientToken, "localhost:3000")
 
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -101,6 +105,7 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 				// Call the next handler
 				next.ServeHTTP(w, r)
 			} else {
+				fmt.Print("NOT FOUNDDDD \n")
 				http.NotFound(w, r)
 			}
 

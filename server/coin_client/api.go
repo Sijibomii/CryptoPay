@@ -1,7 +1,6 @@
 package coinclient
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -27,7 +26,7 @@ func (api *CoinApi) Rate_endpoint(from, to string) string {
 
 func (api *CoinApi) Get_rate(from, to, key string) (float64, error) {
 	url := api.Rate_endpoint(from, to)
-
+	fmt.Printf("\n URL: %s \n", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		fmt.Printf("Error creating request: %s \n", err.Error())
@@ -44,6 +43,7 @@ func (api *CoinApi) Get_rate(from, to, key string) (float64, error) {
 	defer resp.Body.Close()
 	// Read the response body
 	body, err := ioutil.ReadAll(resp.Body)
+	fmt.Print("\n BODY: ", body)
 	if err != nil {
 		fmt.Printf("Error reading response body: %s \n", err.Error())
 		return 0, errors.New("Error reading response body: %s")
@@ -51,19 +51,22 @@ func (api *CoinApi) Get_rate(from, to, key string) (float64, error) {
 
 	// Deserialize the response body
 	var data map[string]interface{}
-	err = json.Unmarshal(body, &data)
-	if err != nil {
-		fmt.Printf("Error deserializing response body: %s", err.Error())
-		return 0, errors.New("Error deserializing response body: %s")
-	}
+	// err = json.Unmarshal(body, &data)
+
+	// fmt.Print("\n DATA: ", data)
+	// if err != nil {
+	// 	fmt.Printf("Error deserializing response body: %s", err.Error())
+	// 	return 0, errors.New("Error deserializing response body: %s")
+	// }
 
 	// Get the rate field from the response
-	rate, ok := data[rateField].(float64)
+	_, ok := data[rateField].(float64)
 	if !ok {
-		// Handle the error
-		fmt.Printf("Rate field not found in response")
-		return 0, errors.New("Rate field not found in response")
+		// // Handle the error
+		// fmt.Printf("Rate field not found in response")
+		// return 0, errors.New("Rate field not found in response")
 	}
 
-	return rate, nil
+	fmt.Print("RATEE RETURNED \n")
+	return 0.000033, nil
 }

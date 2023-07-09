@@ -1,6 +1,8 @@
 package server
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
 	"fmt"
 	"log"
 	"net/http"
@@ -42,6 +44,13 @@ func CORS(next http.Handler) http.Handler {
 
 // posgress connection string should come in config
 func Run(config config.Config) {
+
+	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
+
+	if err != nil {
+		log.Fatal("Failed to generate RSA private key:", err)
+	}
+
 	r := mux.NewRouter()
 	// r.Use(CORS)
 	r.Use(cors.Default().Handler)
@@ -86,6 +95,7 @@ func Run(config config.Config) {
 		ProcessorClient: processorClient,
 		PollerClient:    pollerClient,
 		PBPollerClient:  pendingPollerClient,
+		PrivateKey:      privateKey,
 	}
 
 	// routes register
@@ -112,7 +122,7 @@ func Run(config config.Config) {
 	}).Methods("POST")
 
 	// protected routes
-	secureRoutes := r.PathPrefix("/").Subrouter()
+	secureRoutes := r.PathPrefix("/s").Subrouter()
 	// secureRoutes.Use(CORS)
 	secureRoutes.Use(cors.Default().Handler)
 	secureRoutes.Use(middleware.AuthMiddleware(appState))
@@ -156,13 +166,13 @@ func Run(config config.Config) {
 
 	// add separate route for addition of address
 
-	paymentRoutes := r.PathPrefix("/payments").Subrouter()
-	// paymentRoutes.Use(CORS)
+	paymentRoutes := r.PathPrefix("/p").Subrouter()
+	paymentRoutes.Use(CORS)
 	paymentRoutes.Use(cors.Default().Handler)
 
 	paymentRoutes.Use(middleware.PaymentMiddleware(appState))
 
-	paymentRoutes.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	paymentRoutes.HandleFunc("/payments", func(w http.ResponseWriter, r *http.Request) {
 		// util.EnableCors(&w)
 		controllers.CreatePayment(w, r, appState)
 	}).Methods("POST")

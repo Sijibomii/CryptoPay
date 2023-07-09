@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -20,7 +21,7 @@ type CreatePaymentParams struct {
 	Price      string `json:"price"`
 	Crypto     string `json:"crypto"`
 	Fiat       string `json:"fiat"`
-	Identifier string `json:"indentifier"`
+	Identifier string `json:"identifier"`
 }
 
 type storeParams struct {
@@ -54,10 +55,10 @@ func CreatePayment(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 		return
 	}
 
-	store, err := services.FindStoreById(appState, clientTokenContext.ID)
+	store, err := services.FindStoreById(appState, clientTokenContext.Store_id)
 
 	var crypto currency.Crypto
-	err = crypto.Scan(createPaymentData.Crypto)
+	err = crypto.Scan([]byte(createPaymentData.Crypto))
 	if err != nil {
 		// return response
 		http.Error(w, "crypto field is invalid", http.StatusBadRequest)
@@ -99,9 +100,12 @@ func CreatePayment(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 	}
 
 	key := os.Getenv("JWT_SECRET_KEY")
-	token, err := jwtPayload.Encode(key)
+	fmt.Printf("jwt secret key: %s", key)
+
+	token, err := jwtPayload.Encode(appState.PrivateKey)
 
 	if err != nil {
+		fmt.Print("\n error", err.Error())
 		util.ErrorResponseFunc(w, r, util.NewErrUnauthorized("payment error (jwt)"))
 		return
 	}

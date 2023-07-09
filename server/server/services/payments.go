@@ -58,9 +58,12 @@ func CreatePayment(appState *util.AppState, store models.Store, payload models.P
 	fee, err := bitcoin.GetFeeEstimates(appState.Engine, appState.BtcClient)
 
 	charge := (rate * float64(price)) + fee.OneHourFee
-
+	fmt.Print("\n charge: ", charge)
+	fmt.Print("\n")
 	payload.Charge = strconv.FormatFloat(charge, 'f', -1, 64)
 	payload.Fee = fee.OneHourFee
+	fmt.Print("\n fee: ", fee)
+	fmt.Print("\n")
 	payment, err := dao.CreatePayment(appState.Engine, appState.Postgres, payload)
 
 	return payment, nil

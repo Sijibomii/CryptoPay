@@ -22,9 +22,12 @@ func (c *CoinClient) Receive(ctx *actor.Context) {
 		key := c.Key
 		payload, err := getRate(key, l.From, l.To)
 
+		fmt.Print("\n RATE: ", payload)
+		fmt.Print("\n")
 		if err != nil {
 			ctx.Respond(err.Error())
 		}
+
 		ctx.Respond(payload)
 
 	default:

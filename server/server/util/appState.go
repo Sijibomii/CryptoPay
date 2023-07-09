@@ -1,6 +1,7 @@
 package util
 
 import (
+	"crypto/rsa"
 	"net/http"
 
 	"github.com/anthdm/hollywood/actor"
@@ -19,6 +20,7 @@ type AppState struct {
 	ProcessorClient *actor.PID
 	PollerClient    *actor.PID
 	PBPollerClient  *actor.PID
+	PrivateKey      *rsa.PrivateKey
 }
 
 type AppHandler struct {

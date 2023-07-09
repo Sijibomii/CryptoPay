@@ -131,7 +131,8 @@ func FindClientTokenByTokenAndDomain(e *actor.Engine, conn *actor.PID, token uui
 	var resp = e.Request(conn, FindClientTokenByTokenAndDomainMessage{
 		Token:  token,
 		Domain: domain,
-	}, time.Millisecond*100)
+	}, time.Millisecond*200)
+
 	res, err := resp.Result()
 	if err != nil {
 		return ClientToken{}, errors.New("An error occured!")
