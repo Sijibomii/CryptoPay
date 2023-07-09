@@ -56,6 +56,7 @@ type ProfileResponse struct {
 }
 
 func ResetPasswordHandler(w http.ResponseWriter, r *http.Request, appState *util.AppState) {
+
 	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		util.ErrorResponseFunc(w, r, err)

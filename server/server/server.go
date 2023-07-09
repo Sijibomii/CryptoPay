@@ -8,6 +8,7 @@ import (
 
 	"github.com/anthdm/hollywood/actor"
 	"github.com/gorilla/mux"
+	"github.com/rs/cors"
 	btc_processor "github.com/sijibomii/cryptopay/block_processor/bitcoin"
 	"github.com/sijibomii/cryptopay/blockchain_client/bitcoin"
 	coinclient "github.com/sijibomii/cryptopay/coin_client"
@@ -21,9 +22,29 @@ import (
 	"github.com/sijibomii/cryptopay/server/util"
 )
 
+func CORS(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		// Handle preflight requests
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Call the next handler
+		next.ServeHTTP(w, r)
+	})
+}
+
 // posgress connection string should come in config
 func Run(config config.Config) {
 	r := mux.NewRouter()
+	// r.Use(CORS)
+	r.Use(cors.Default().Handler)
 
 	pg := *initPool(config.Postgres, 10)
 
@@ -92,6 +113,8 @@ func Run(config config.Config) {
 
 	// protected routes
 	secureRoutes := r.PathPrefix("/").Subrouter()
+	// secureRoutes.Use(CORS)
+	secureRoutes.Use(cors.Default().Handler)
 	secureRoutes.Use(middleware.AuthMiddleware(appState))
 
 	secureRoutes.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
@@ -134,10 +157,13 @@ func Run(config config.Config) {
 	// add separate route for addition of address
 
 	paymentRoutes := r.PathPrefix("/payments").Subrouter()
+	// paymentRoutes.Use(CORS)
+	paymentRoutes.Use(cors.Default().Handler)
 
 	paymentRoutes.Use(middleware.PaymentMiddleware(appState))
 
 	paymentRoutes.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// util.EnableCors(&w)
 		controllers.CreatePayment(w, r, appState)
 	}).Methods("POST")
 
@@ -146,12 +172,11 @@ func Run(config config.Config) {
 	}).Methods("GET")
 
 	// /vouchers
-
+	handler := cors.Default().Handler(r)
 	server := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port),
-		Handler: r,
+		Handler: handler,
 	}
-
 	log.Printf("Server listening on %s:%d\n", config.Server.Host, config.Server.Port)
 	log.Fatal(server.ListenAndServe())
 }

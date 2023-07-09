@@ -16,6 +16,7 @@ import (
 func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			util.EnableCors(&w)
 			auth := r.Header.Get("Authorization")
 
 			parts := strings.Split(auth, " ")
