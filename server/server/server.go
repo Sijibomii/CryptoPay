@@ -81,7 +81,11 @@ func Run(config config.Config) {
 		Ignore_previous_blocks: true,
 	})
 
-	pendingPollerClient := e.Spawn(newPendingPollerClient("testnet", pid, btcChainClient, processorClient), "pollerClient")
+	pbBtcChainClient := e.Spawn(newBtcChainClient(), "pbBtcChainClient")
+
+	pbProcessorClient := e.Spawn(newProcessorClient("testnet", pid, e, pbBtcChainClient), "pbProcessorClient")
+
+	pendingPollerClient := e.Spawn(newPendingPollerClient("testnet", pid, pbBtcChainClient, pbProcessorClient), "pendingPollerClient")
 	e.Send(pendingPollerClient, btc_processor.StartPBPollingMessage{})
 
 	appState := &util.AppState{
@@ -227,7 +231,7 @@ func newProcessorClient(network string, postgresClient *actor.PID, engine *actor
 func newBtcChainClient() actor.Producer {
 	return func() actor.Receiver {
 		return &bitcoin.BlockchainClient{
-			BSUrl: "https://blockstream.info/api",
+			BSUrl: "https://blockstream.info/testnet/api",
 		}
 	}
 }

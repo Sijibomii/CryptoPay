@@ -3,6 +3,8 @@ package bitcoin
 import (
 	"errors"
 	"fmt"
+	"regexp"
+	"strconv"
 	"time"
 
 	"github.com/anthdm/hollywood/actor"
@@ -11,6 +13,7 @@ import (
 	"github.com/sijibomii/cryptopay/core/models"
 )
 
+// each poller, processor has a monitor that receives a message when done processing and waits after sometime and send message back
 type Poller struct {
 	BtcClient      *actor.PID
 	PostgresClient *actor.PID
@@ -58,6 +61,7 @@ func (poller *Poller) startPolling(e *actor.Engine, conn *actor.PID, ignore_prev
 	// get current block from response and send poll message
 
 	fmt.Print("POLL MESSAGE SENDING... \n")
+
 	e.Send(conn, Poll{
 		Block_number: current_block,
 		Retry_count:  0,
@@ -125,29 +129,22 @@ func (poller *Poller) poll(e *actor.Engine, conn *actor.PID, block_number, retry
 		return false, errors.New("An error occured!")
 	}
 	str, ok := res.(string)
-
+	fmt.Print("\n recieved string from req: ", str)
 	if !ok {
 		return false, errors.New("An error occured!")
 	}
 	block, err := parseBlockString(str)
-
-	e.Send(poller.BlockProcessor, ProcessBlockMessage{
-		Block: block,
-	})
+	stringify := block.String()
+	fmt.Print("\n sending block string: ", stringify)
+	// e.Send(poller.BlockProcessor, ProcessBlockMessage{
+	// 	BlockString: stringify,
+	// })
 	fmt.Print("hereee sending poll2")
-	delay := time.NewTimer(time.Second * 5).C
 
-	select {
-	case <-delay:
-		fmt.Print("hereee sending poll")
-		e.Send(conn, Poll{
-			Block_number: block_number + 1,
-			Retry_count:  retry_count,
-		})
-
-	default:
-		return false, nil
-	}
+	e.SendRepeat(conn, Poll{
+		Block_number: block_number + 1,
+		Retry_count:  retry_count,
+	}, time.Millisecond*2000)
 
 	return true, nil
 
@@ -155,11 +152,28 @@ func (poller *Poller) poll(e *actor.Engine, conn *actor.PID, block_number, retry
 
 func parseBlockString(str string) (bitcoin.Block, error) {
 	var block bitcoin.Block
-	_, err := fmt.Sscanf(str, "Block: ID=%s, Height=%d, Version=%d, Timestamp=%d, TxCount=%d, Size=%d, Weight=%d, MerkleRoot=%s, PreviousBlock=%s, MedianTime=%d, Nonce=%d, Bits=%d, Difficulty=%d",
-		&block.ID, &block.Height, &block.Version, &block.Timestamp, &block.TxCount, &block.Size, &block.Weight, &block.MerkleRoot, &block.PreviousBlockHash, &block.MedianTime, &block.Nonce, &block.Bits, &block.Difficulty)
-	if err != nil {
-		return bitcoin.Block{}, err
+
+	regex := regexp.MustCompile(`Block: ID=(.*), Height=(\d+), Version=(\d+), Timestamp=(\d+), TxCount=(\d+), Size=(\d+), Weight=(\d+), MerkleRoot=(.*), PreviousBlock=(.*), MedianTime=(\d+), Nonce=(\d+), Bits=(\d+), Difficulty=(\d+)`)
+	match := regex.FindStringSubmatch(str)
+	if match == nil {
+		fmt.Printf("\n miss match ###################### \n")
+		return bitcoin.Block{}, fmt.Errorf("invalid block string format")
 	}
+
+	block.ID = match[1]
+	block.Height, _ = strconv.Atoi(match[2])
+	block.Version, _ = strconv.Atoi(match[3])
+	block.Timestamp, _ = strconv.Atoi(match[4])
+	block.TxCount, _ = strconv.Atoi(match[5])
+	block.Size, _ = strconv.Atoi(match[6])
+	block.Weight, _ = strconv.Atoi(match[7])
+	block.MerkleRoot = match[8]
+	block.PreviousBlockHash = match[9]
+	block.MedianTime, _ = strconv.Atoi(match[10])
+	block.Nonce, _ = strconv.Atoi(match[11])
+	block.Bits, _ = strconv.Atoi(match[12])
+	block.Difficulty, _ = strconv.Atoi(match[13])
+
 	return block, nil
 }
 
@@ -177,6 +191,7 @@ func (poller *Poller) Receive(ctx *actor.Context) {
 		// ctx.Respond(payload)
 
 	case Poll:
+		fmt.Print("polling message recieved")
 		poller.poll(ctx.Engine(), ctx.PID(), l.Block_number, l.Retry_count)
 
 	default:

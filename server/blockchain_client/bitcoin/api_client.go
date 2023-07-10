@@ -37,7 +37,7 @@ func (client *BlockchainClient) Block_count_endpoint() string {
 func (client *BlockchainClient) get_block_count() (int, error) {
 	fmt.Printf("block count message \n")
 	// client.Block_count_endpoint()
-	response, err := http.Get("https://blockstream.info/api/blocks/tip/height")
+	response, err := http.Get("https://blockstream.info/testnet/api/blocks/tip/height")
 	//
 	if err != nil {
 		fmt.Printf("block count message \n #############  %s", err.Error())

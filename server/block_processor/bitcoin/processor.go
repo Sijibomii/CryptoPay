@@ -18,7 +18,7 @@ type Processor struct {
 }
 
 type ProcessBlockMessage struct {
-	Block bitcoin.Block
+	BlockString string
 }
 
 type ProcessMempoolTransactionsMessage struct {
@@ -110,7 +110,7 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 // transactions will be first processed in the mempool and will be marked as paid but will be eventually confirmed when the mempool becomes a block
 // a payout is created for a valid (i.e confirmed) payment. bc that's when we can guarantee that the money got to us
 func (processor *Processor) processBlock(block bitcoin.Block) {
-	fmt.Printf("Processing block: %v\n", *&block.Height)
+	fmt.Printf("\n Processing block: %v \n", *&block)
 
 	// get transactions
 	transactions, err := bitcoin.GetAllTransactionsByBlockHeight(processor.Engine, processor.BtcClient, block.Height)
@@ -126,8 +126,8 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 
 	for _, transaction := range transactions {
 		for _, output := range transaction.Vout {
-			fmt.Printf("\n output: ", output)
-			fmt.Printf("\n address: ", output.ScriptPubKeyAddress)
+			fmt.Print("\n output: ", output)
+			fmt.Print("\n address: ", output.ScriptPubKeyAddress)
 			if output.ScriptPubKeyAddress != "" {
 				outputAddresses := output.ScriptPubKeyAddress
 
@@ -139,7 +139,7 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 		}
 	}
 
-	fmt.Printf("\n find all payments by addresses: ", addresses)
+	fmt.Print("\n find all payments by addresses: ", addresses)
 
 	payments, err := models.FindAllPaymentsByAddresses(processor.Engine, processor.PostgresClient, addresses, "btc")
 
@@ -217,9 +217,19 @@ func (processor *Processor) Receive(ctx *actor.Context) {
 		fmt.Println("processor actor started")
 
 	case ProcessBlockMessage:
-		processor.processBlock(l.Block)
+		fmt.Print("process block message received! \n")
+
+		fmt.Print("block string recived ", l.BlockString)
+		fmt.Println("")
+		block, err := parseBlockString(l.BlockString)
+
+		if err != nil {
+			fmt.Println("/n not valid block")
+		}
+		processor.processBlock(block)
 
 	case ProcessMempoolTransactionsMessage:
+		fmt.Print("process mempool transactions message received! \n")
 		processor.processMempoolTransactions(l.Transactions)
 
 	default:

@@ -70,7 +70,11 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 		if err != nil {
 			ctx.Respond(err.Error())
 		}
-		ctx.Respond(payload)
+
+		// stringify:
+		fmt.Print("\n TRANSACTION RAW MESSAGE : ", *payload)
+		fmt.Println("")
+		ctx.Respond(*payload)
 
 	case GetAllTransactionsByBlockHeightMessage:
 
@@ -93,6 +97,14 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 
 	case GetFeeEstimatesMessage:
 		payload, err := client.getFeeEstimates()
+
+		if err != nil {
+			ctx.Respond(err.Error())
+		}
+		ctx.Respond(payload)
+
+	case GetRawMempoolMessage:
+		payload, err := client.GetRawMempool()
 
 		if err != nil {
 			ctx.Respond(err.Error())
@@ -215,12 +227,17 @@ func GetFeeEstimates(e *actor.Engine, conn *actor.PID) (*FeeEstimates, error) {
 }
 
 func GetRawMempool(e *actor.Engine, conn *actor.PID) (*[]MempoolEntry, error) {
-	var resp = e.Request(conn, GetRawMempoolMessage{}, time.Millisecond*1000)
+	var resp = e.Request(conn, GetRawMempoolMessage{}, time.Millisecond*2000)
 
 	res, err := resp.Result()
+
+	fmt.Printf("\n res returned mempool \n")
+
 	if err != nil {
 		return nil, errors.New("An error occured!")
 	}
+
+	fmt.Printf("\n res returned mempool .....\n")
 
 	mempool, ok := res.([]MempoolEntry)
 
