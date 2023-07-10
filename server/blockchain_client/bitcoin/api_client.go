@@ -83,7 +83,8 @@ func (b Block) String() string {
 
 func (client *BlockchainClient) Get_Block_endpoint(block_hash string) string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/block/%s", block_hash)})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/block/%s", block_hash)})
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -117,7 +118,7 @@ func (client *BlockchainClient) get_Block(block_hash string) (*Block, error) {
 func (client *BlockchainClient) Get_Block_Hash_with_height_endpoint(block_height int) string {
 	baseURL, _ := url.Parse(client.BSUrl)
 	fmt.Printf(baseURL.String())
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/block-height/%s", strconv.Itoa(block_height))})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/block-height/%s", strconv.Itoa(block_height))})
 	fmt.Printf(u.String())
 	return u.String()
 }
@@ -146,7 +147,8 @@ func (client *BlockchainClient) get_Block_Hash_with_height(block_height int) (st
 
 func (client *BlockchainClient) Get_Transactions_by_Block_hash_endpoint(block_hash string) string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/block/%s/txids", block_hash)})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/block/%s/txids", block_hash)})
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -175,7 +177,8 @@ func (client *BlockchainClient) get_Transactions_id_by_Block_hash(block_hash str
 
 func (client *BlockchainClient) Get_Transaction_by_hash_endpoint(tx_hash string) string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/tx/%s", tx_hash)})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/tx/%s", tx_hash)})
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -254,6 +257,7 @@ func (client *BlockchainClient) get_Transaction_By_Hash(tx_hash string) (*Transa
 func (client *BlockchainClient) Get_Hash_For_Last_Block_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
 	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/blocks/tip/hash")})
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -281,7 +285,8 @@ func (client *BlockchainClient) get_Hash_For_Last_Block() (string, error) {
 
 func (client *BlockchainClient) BroadcastTransaction_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/tx")})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/tx")})
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -326,7 +331,8 @@ type FeeEstimates struct {
 
 func (client *BlockchainClient) GetFeeEstimates_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/fee-estimates")})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/fee-estimates")})
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -374,7 +380,8 @@ type MempoolEntry struct {
 
 func (client *BlockchainClient) GetRawMempool_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/api/mempool/recent")})
+	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/mempool/recent")})
+	fmt.Printf(u.String())
 	return u.String()
 }
 

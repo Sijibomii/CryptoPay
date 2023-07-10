@@ -112,7 +112,7 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 		ctx.Respond(payload)
 
 	default:
-		fmt.Println("UNKNOWN MESSAGE TO BLOACKCHAIN CLIENT")
+		fmt.Print("\n UNKNOWN MESSAGE TO BLOACKCHAIN CLIENT: ", ctx.Message())
 	}
 }
 

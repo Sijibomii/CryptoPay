@@ -10,7 +10,6 @@ import (
 
 	"github.com/anthdm/hollywood/actor"
 	"github.com/gorilla/mux"
-	"github.com/rs/cors"
 	btc_processor "github.com/sijibomii/cryptopay/block_processor/bitcoin"
 	"github.com/sijibomii/cryptopay/blockchain_client/bitcoin"
 	coinclient "github.com/sijibomii/cryptopay/coin_client"
@@ -24,22 +23,29 @@ import (
 	"github.com/sijibomii/cryptopay/server/util"
 )
 
-func CORS(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Set CORS headers
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+// middleware has refused to run when been called from the browser and I can't figure out why so i'm creating a separate route for all options method
+func CORS() mux.MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		// Handle preflight requests
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
+			fmt.Print("\n REQUEST METHOD IS: ", r.Method)
 
-		// Call the next handler
-		next.ServeHTTP(w, r)
-	})
+			// Set CORS headers
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+			// Handle preflight requests
+			if r.Method == "OPTIONS" {
+				util.JsonBytesResponse(w, http.StatusOK, []byte(""))
+				return
+			}
+
+			// Call the next handler
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
 // posgress connection string should come in config
@@ -52,8 +58,9 @@ func Run(config config.Config) {
 	}
 
 	r := mux.NewRouter()
-	// r.Use(CORS)
-	r.Use(cors.Default().Handler)
+	// r.Use(mux.CORSMethodMiddleware(r))
+	r.Use(CORS())
+	// r.Use(cors.Default().Handler)
 
 	pg := *initPool(config.Postgres, 10)
 
@@ -111,9 +118,33 @@ func Run(config config.Config) {
 		controllers.LoginHandler(w, r, appState)
 	}).Methods("POST")
 
+	// options route
+	r.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Handle preflight requests
+		w.WriteHeader(http.StatusOK)
+	}).Methods("OPTIONS")
+
 	r.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
 		controllers.RegisterHandler(w, r, appState)
 	}).Methods("POST")
+
+	// options route
+	r.HandleFunc("/register", func(w http.ResponseWriter, r *http.Request) {
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Handle preflight requests
+		w.WriteHeader(http.StatusOK)
+	}).Methods("OPTIONS")
 
 	// activate
 
@@ -121,23 +152,71 @@ func Run(config config.Config) {
 		controllers.ResetPasswordHandler(w, r, appState)
 	}).Methods("POST")
 
+	// options route
+	r.HandleFunc("/reset_password", func(w http.ResponseWriter, r *http.Request) {
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Handle preflight requests
+		w.WriteHeader(http.StatusOK)
+	}).Methods("OPTIONS")
+
 	r.HandleFunc("/change_password", func(w http.ResponseWriter, r *http.Request) {
 		controllers.ChangePasswordHandler(w, r, appState)
 	}).Methods("POST")
 
+	// options route
+	r.HandleFunc("/change_password", func(w http.ResponseWriter, r *http.Request) {
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Handle preflight requests
+		w.WriteHeader(http.StatusOK)
+	}).Methods("OPTIONS")
+
 	// protected routes
 	secureRoutes := r.PathPrefix("/s").Subrouter()
 	// secureRoutes.Use(CORS)
-	secureRoutes.Use(cors.Default().Handler)
+	// secureRoutes.Use(cors.Default().Handler)
 	secureRoutes.Use(middleware.AuthMiddleware(appState))
 
 	secureRoutes.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
 		controllers.ProfileHandler(w, r, appState)
 	}).Methods("GET")
 
+	// options route
+	secureRoutes.HandleFunc("/profile", func(w http.ResponseWriter, r *http.Request) {
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Handle preflight requests
+		w.WriteHeader(http.StatusOK)
+	}).Methods("OPTIONS")
+
 	secureRoutes.HandleFunc("/client_tokens", func(w http.ResponseWriter, r *http.Request) {
 		controllers.GetAllClientTokensHandler(w, r, appState)
 	}).Methods("GET")
+
+	// options route
+	secureRoutes.HandleFunc("/client_tokens", func(w http.ResponseWriter, r *http.Request) {
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Handle preflight requests
+		w.WriteHeader(http.StatusOK)
+	}).Methods("OPTIONS")
 
 	secureRoutes.HandleFunc("/client_tokens", func(w http.ResponseWriter, r *http.Request) {
 		controllers.CreateClientTokensHandler(w, r, appState)
@@ -147,6 +226,18 @@ func Run(config config.Config) {
 		controllers.GetClientTokenByIdHandler(w, r, appState)
 	}).Methods("GET")
 
+	// options route
+	secureRoutes.HandleFunc("/client_tokens/:id", func(w http.ResponseWriter, r *http.Request) {
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Handle preflight requests
+		w.WriteHeader(http.StatusOK)
+	}).Methods("OPTIONS")
+
 	secureRoutes.HandleFunc("/stores", func(w http.ResponseWriter, r *http.Request) {
 		controllers.GetStoresList(w, r, appState)
 	}).Methods("GET")
@@ -154,6 +245,18 @@ func Run(config config.Config) {
 	secureRoutes.HandleFunc("/stores", func(w http.ResponseWriter, r *http.Request) {
 		controllers.CreateStores(w, r, appState)
 	}).Methods("POST")
+
+	// options route
+	secureRoutes.HandleFunc("/stores", func(w http.ResponseWriter, r *http.Request) {
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Handle preflight requests
+		w.WriteHeader(http.StatusOK)
+	}).Methods("OPTIONS")
 
 	// /stores/{id}
 	secureRoutes.HandleFunc("/stores/:id", func(w http.ResponseWriter, r *http.Request) {
@@ -168,11 +271,23 @@ func Run(config config.Config) {
 		controllers.DeleteStoreById(w, r, appState)
 	}).Methods("DELETE")
 
+	// options route
+	secureRoutes.HandleFunc("/stores/:id", func(w http.ResponseWriter, r *http.Request) {
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Handle preflight requests
+		w.WriteHeader(http.StatusOK)
+	}).Methods("OPTIONS")
+
 	// add separate route for addition of address
 
 	paymentRoutes := r.PathPrefix("/p").Subrouter()
-	paymentRoutes.Use(CORS)
-	paymentRoutes.Use(cors.Default().Handler)
+	// paymentRoutes.Use(CORS)
+	// paymentRoutes.Use(cors.Default().Handler)
 
 	paymentRoutes.Use(middleware.PaymentMiddleware(appState))
 
@@ -181,15 +296,37 @@ func Run(config config.Config) {
 		controllers.CreatePayment(w, r, appState)
 	}).Methods("POST")
 
+	paymentRoutes.HandleFunc("/payments", func(w http.ResponseWriter, r *http.Request) {
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Handle preflight requests
+		w.WriteHeader(http.StatusOK)
+	}).Methods("OPTIONS")
+
 	paymentRoutes.HandleFunc("/payments/:id/status", func(w http.ResponseWriter, r *http.Request) {
 		controllers.GetPaymentStatus(w, r, appState)
 	}).Methods("GET")
 
+	secureRoutes.HandleFunc("/payments/:id/status", func(w http.ResponseWriter, r *http.Request) {
+
+		// Set CORS headers
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		// Handle preflight requests
+		w.WriteHeader(http.StatusOK)
+	}).Methods("OPTIONS")
+
 	// /vouchers
-	handler := cors.Default().Handler(r)
+	// handler := cors.Default().Handler(r)
 	server := &http.Server{
 		Addr:    fmt.Sprintf("%s:%d", config.Server.Host, config.Server.Port),
-		Handler: handler,
+		Handler: r,
 	}
 	log.Printf("Server listening on %s:%d\n", config.Server.Host, config.Server.Port)
 	log.Fatal(server.ListenAndServe())

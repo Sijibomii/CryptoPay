@@ -8,7 +8,7 @@ var ApiClient = /** @class */ (function () {
     }
     ApiClient.prototype.createPayment = function (crypto) {
         return fetch("".concat(this.apiUrl, "/payments"), {
-            // mode: "cors",
+            mode: "cors",
             headers: {
                 Authorization: "Bearer ".concat(this.apiKey),
                 accept: "application/json",
@@ -29,7 +29,7 @@ var ApiClient = /** @class */ (function () {
     };
     ApiClient.prototype.getPaymentStatus = function (id, sessionToken) {
         return fetch("".concat(this.apiUrl, "/payments/").concat(id, "/status"), {
-            // mode: "cors",
+            mode: "cors",
             headers: {
                 Authorization: "Bearer ".concat(sessionToken),
                 accept: "application/json"
@@ -42,7 +42,7 @@ var ApiClient = /** @class */ (function () {
     };
     ApiClient.prototype.createVoucher = function (paymentId, sessionToken) {
         return fetch("".concat(this.apiUrl, "/vouchers"), {
-            // mode: "cors",
+            mode: "cors",
             headers: {
                 Authorization: "Bearer ".concat(sessionToken),
                 accept: "application/json",
