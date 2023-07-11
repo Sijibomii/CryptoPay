@@ -10,7 +10,7 @@ var ApiClient = /** @class */ (function () {
         this.identifier = options.config.identifier;
     }
     ApiClient.prototype.createPayment = function (crypto) {
-        return fetch("".concat(this.apiUrl, "/payments"), {
+        return fetch("".concat(this.apiUrl, "/p/payments"), {
             mode: "cors",
             headers: {
                 Authorization: "Bearer ".concat(this.apiKey),
@@ -31,7 +31,7 @@ var ApiClient = /** @class */ (function () {
         });
     };
     ApiClient.prototype.getPaymentStatus = function (id, sessionToken) {
-        return fetch("".concat(this.apiUrl, "/payments/").concat(id, "/status"), {
+        return fetch("".concat(this.apiUrl, "/p/payments/").concat(id, "/status"), {
             mode: "cors",
             headers: {
                 Authorization: "Bearer ".concat(sessionToken),
@@ -44,7 +44,7 @@ var ApiClient = /** @class */ (function () {
         });
     };
     ApiClient.prototype.createVoucher = function (paymentId, sessionToken) {
-        return fetch("".concat(this.apiUrl, "/vouchers"), {
+        return fetch("".concat(this.apiUrl, "/p/vouchers"), {
             mode: "cors",
             headers: {
                 Authorization: "Bearer ".concat(sessionToken),

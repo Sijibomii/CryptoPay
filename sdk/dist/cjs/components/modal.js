@@ -31,9 +31,9 @@ var Modal = /** @class */ (function (_super) {
     };
     Modal.prototype.open = function () {
         var _this = this;
-        setImmediate(function () {
+        setTimeout(function () {
             _this.element.querySelector("#modal-container").classList.add("active");
-        });
+        }, 0);
         this.element
             .querySelector(".btn-close")
             .addEventListener("click", this.close.bind(this), { once: true });

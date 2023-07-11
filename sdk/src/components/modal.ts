@@ -11,9 +11,9 @@ export class Modal extends Component {
     }
 
     open() {
-        setImmediate(() => {
-        this.element.querySelector("#modal-container")!.classList.add("active");
-        });
+        setTimeout(() => {
+            this.element.querySelector("#modal-container")!.classList.add("active");
+        }, 0);
         this.element
         .querySelector(".btn-close")!
         .addEventListener("click", this.close.bind(this), { once: true });

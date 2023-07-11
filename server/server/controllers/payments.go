@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/mux"
@@ -18,7 +19,7 @@ import (
 )
 
 type CreatePaymentParams struct {
-	Price      string `json:"price"`
+	Price      int    `json:"price"`
 	Crypto     string `json:"crypto"`
 	Fiat       string `json:"fiat"`
 	Identifier string `json:"identifier"`
@@ -77,7 +78,7 @@ func CreatePayment(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 		Store_id:   reqClient.Store_id,
 		Created_by: reqClient.ID,
 		Fiat:       createPaymentData.Fiat,
-		Price:      createPaymentData.Price,
+		Price:      strconv.Itoa(createPaymentData.Price),
 		Crypto:     createPaymentData.Crypto,
 	}
 

@@ -21,7 +21,7 @@ export class ApiClient {
     }
 
     createPayment(crypto: string) {
-        return fetch(`${this.apiUrl}/payments`, {
+        return fetch(`${this.apiUrl}/p/payments`, {
           mode: "cors",
           headers: {
             Authorization: `Bearer ${this.apiKey}`,
@@ -42,7 +42,7 @@ export class ApiClient {
     }
 
     getPaymentStatus(id: string, sessionToken: string) {
-        return fetch(`${this.apiUrl}/payments/${id}/status`, {
+        return fetch(`${this.apiUrl}/p/payments/${id}/status`, {
           mode: "cors",
           headers: {
             Authorization: `Bearer ${sessionToken}`,
@@ -56,7 +56,7 @@ export class ApiClient {
     }
 
     createVoucher(paymentId: string, sessionToken: string) {
-        return fetch(`${this.apiUrl}/vouchers`, {
+        return fetch(`${this.apiUrl}/p/vouchers`, {
           mode: "cors",
           headers: {
             Authorization: `Bearer ${sessionToken}`,
