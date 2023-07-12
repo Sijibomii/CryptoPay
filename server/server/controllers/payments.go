@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"strconv"
@@ -157,7 +158,13 @@ func GetPaymentStatus(w http.ResponseWriter, r *http.Request, appState *util.App
 	switch payment.Crypto {
 	case "btc":
 		//get the current payment status
+
+		// status is not been returned that's the issue
 		status, err := dao.FindBtcBlockChainStatusByNetwork(appState.Engine, appState.Postgres, payment.Btc_network)
+
+		if err != nil {
+			fmt.Printf("error: %s", err.Error())
+		}
 
 		remaining_conf := payment.Confirmations_required - status.Block_Height
 

@@ -135,7 +135,7 @@ func (poller *Poller) poll(e *actor.Engine, conn *actor.PID, block_number, retry
 	}
 	block, err := parseBlockString(str)
 	stringify := block.String()
-	fmt.Print("\n sending block string: ", stringify)
+	// fmt.Print("\n sending block string: ", stringify)
 	e.Send(poller.BlockProcessor, ProcessBlockMessage{
 		BlockString: stringify,
 	})

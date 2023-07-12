@@ -62,7 +62,7 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 	payments, err := models.FindAllPaymentsByAddresses(processor.Engine, processor.PostgresClient, processedBlockStream.Addresses, "btc")
 
 	if err != nil {
-		//fmt.Printf("error...")
+		fmt.Printf("\n error... %s \n", err.Error())
 		panic("error finding pending payments in processor")
 	}
 
@@ -114,7 +114,7 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 // transactions will be first processed in the mempool and will be marked as paid but will be eventually confirmed when the mempool becomes a block
 // a payout is created for a valid (i.e confirmed) payment. bc that's when we can guarantee that the money got to us
 func (processor *Processor) processBlock(block bitcoin.Block) {
-	fmt.Printf("\n Processing block: %v \n", *&block)
+	// fmt.Printf("\n Processing block: %v \n", *&block)
 
 	// get transactions
 	// looks like the rquest returned is too large to be returned by the hollywood actor. It get's the payload but the context deadline keeps expiring before

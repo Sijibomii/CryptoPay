@@ -54,15 +54,15 @@ func DecodeJWT(tokenString string, jwtPrivate *rsa.PrivateKey) (*JwtPayload, err
 
 	client_id := claims["client_id"].(string)
 	store_id := claims["store_id"].(string)
-	// expires_at := claims["expires_at"].(string)
+	expires_at := claims["expires_at"].(string)
 
 	client_uuid, err := uuid.Parse(client_id)
 
 	store_uuid, err := uuid.Parse(store_id)
 
-	// layout := "2006-01-02 15:04:05"
+	layout := "2006-01-02 15:04:05"
 
-	// _, err := time.Parse(layout, expires_at)
+	time, err := time.Parse(layout, expires_at)
 
 	// Map the claims to the JwtPayload struct
 	payload := &JwtPayload{
@@ -70,7 +70,7 @@ func DecodeJWT(tokenString string, jwtPrivate *rsa.PrivateKey) (*JwtPayload, err
 			ID:       client_uuid,
 			Store_id: store_uuid,
 		},
-		Expires_at: time.Unix(int64(claims["expires_at"].(float64)), 0),
+		Expires_at: time, //time.Unix(int64(claims["expires_at"].(float64)), 0),
 	}
 
 	return payload, nil

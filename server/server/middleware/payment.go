@@ -43,6 +43,7 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 
 			// Check if the URL path matches the regex pattern
 			if regex.MatchString(r.URL.Path) || r.URL.Path == "/p/vouchers" {
+
 				// session token is added here instead of api token
 				key := appState.PrivateKey
 
@@ -58,6 +59,7 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 				ctx := r.Context()
 				ctx = context.WithValue(ctx, "Payload", payload)
 				r = r.WithContext(ctx)
+				fmt.Printf("PAYMENT STATUS REQUEST 2!! \n")
 
 				// Call the next handler
 				next.ServeHTTP(w, r)
