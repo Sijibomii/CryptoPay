@@ -117,7 +117,19 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 	fmt.Printf("\n Processing block: %v \n", *&block)
 
 	// get transactions
-	transactions, err := bitcoin.GetAllTransactionsByBlockHeight(processor.Engine, processor.BtcClient, block.Height)
+	// looks like the rquest returned is too large to be returned by the hollywood actor. It get's the payload but the context deadline keeps expiring before
+	// it responds to the request
+	// transactions, err := bitcoin.GetAllTransactionsByBlockHeight(processor.Engine, processor.BtcClient, block.Height)
+
+	// code below is an anomaly (tempirary work around)
+
+	//create a new client
+
+	client := bitcoin.BlockchainClient{
+		BSUrl: "https://blockstream.info/testnet/api",
+	}
+
+	transactions, err := client.Get_all_transactions_by_block_height(block.Height)
 
 	if err != nil {
 		fmt.Printf("error... %s \n", err.Error())

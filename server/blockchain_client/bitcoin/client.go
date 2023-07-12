@@ -80,14 +80,12 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 
 		payload, err := client.get_all_transactions_by_block_height(l.Block_Height)
 
-		fmt.Print("\n payload equals: ", payload)
-
 		if err != nil {
 			fmt.Printf("error: %s", err.Error())
 			fmt.Println("ERRORRR!!!")
 			ctx.Respond(err.Error())
 		}
-
+		fmt.Print("\n payload equals: ", payload)
 		ctx.Respond(payload)
 
 	case BroadcastRawTransactionMessage:
@@ -257,7 +255,7 @@ func GetAllTransactionsByBlockHeight(e *actor.Engine, conn *actor.PID, block_hei
 
 	var resp = e.Request(conn, GetAllTransactionsByBlockHeightMessage{
 		Block_Height: block_height,
-	}, time.Millisecond*1200)
+	}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 

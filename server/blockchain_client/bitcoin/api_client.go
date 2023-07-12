@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"time"
 )
 
 type BlockchainClient struct {
@@ -455,7 +454,36 @@ func (client *BlockchainClient) get_all_transactions_by_block_height(block_heigh
 		//fmt.Printf("transaction request complete: ", trans)
 		result = append(result, *trans)
 
-		time.Sleep(20 * time.Microsecond)
+		// time.Sleep(20 * time.Microsecond)
+	}
+
+	//fmt.Printf(" \n transactions: ", result)
+
+	return result, nil
+}
+
+func (client *BlockchainClient) Get_all_transactions_by_block_height(block_height int) ([]Transaction, error) {
+
+	hash, err := client.get_Block_Hash_with_height(block_height)
+
+	if err != nil {
+		//fmt.Printf("error getting hash")
+	}
+
+	txids, err := client.get_Transactions_id_by_Block_hash(hash)
+
+	result := make([]Transaction, 0)
+
+	for _, txid := range txids {
+		trans, err := client.get_Transaction_By_Hash(txid)
+
+		if err != nil {
+			//fmt.Printf("error getting trans %s \n", txid)
+		}
+		//fmt.Printf("transaction request complete: ", trans)
+		result = append(result, *trans)
+
+		// time.Sleep(20 * time.Microsecond)
 	}
 
 	//fmt.Printf(" \n transactions: ", result)
