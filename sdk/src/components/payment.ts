@@ -1,5 +1,5 @@
 import { Component, ComponentInputs } from "./components";
-import QRCode from "qrcode";
+// import QRCode from "qrcode";
 
 export class Payment extends Component {
 
@@ -15,7 +15,7 @@ export class Payment extends Component {
         this.timer =  setTimeout(() => {}, 100);
         this.polling =  setTimeout(() => {}, 100);
     }
-
+ 
     override async onMounted() {
 
         this.timeLeft = "15:00";
@@ -25,22 +25,25 @@ export class Payment extends Component {
 
             this.copyButton.addEventListener("click", this.copyAddress.bind(this));
 
-            const qrcodeElement = this.element.querySelector(".qrcode");
-            const qrcodeOptions = {
-            text: `${this.dataset.payment.address}`,
-            width: 100,
-            height: 100,
-            colorDark: "#4a4a4a",
-            colorLight: "#ffffff"
-            };
+            // const qrcodeElement = this.element.querySelector(".qrcode");
 
-            QRCode.toCanvas(qrcodeElement, JSON.stringify(qrcodeOptions), (error : any) => {
-                if (error) {
-                  console.error("Failed to generate QR code:", error);
-                } else {
-                  console.log("QR code generated successfully");
-                }
-              });
+
+            // const qrcodeOptions = {
+            //     text: `${this.dataset.payment.address}`,
+            //     width: 100,
+            //     height: 100,
+            //     colorDark: "#4a4a4a",
+            //     colorLight: "#ffffff"
+            // };
+
+            // const ss =  JSON.stringify(qrcodeOptions)
+            // QRCode.toCanvas(qrcodeElement, JSON.stringify(qrcodeOptions), (error : any) => {
+            //     if (error) {
+            //       console.error("Failed to generate QR code:", error);
+            //     } else {
+            //       console.log("QR code generated successfully");
+            //     }
+            //   });
         
 
             this.startCountdown();

@@ -38,7 +38,7 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 
 	case GetBlockCountMessage:
-		fmt.Printf("revcieved block count message \n")
+		//fmt.Printf("revcieved block count message \n")
 
 		payload, err := client.get_block_count()
 
@@ -72,17 +72,22 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 		}
 
 		// stringify:
-		fmt.Print("\n TRANSACTION RAW MESSAGE : ", *payload)
-		fmt.Println("")
+		//fmt.Print("\n TRANSACTION RAW MESSAGE : ", *payload)
+		//fmt.Println("")
 		ctx.Respond(*payload)
 
 	case GetAllTransactionsByBlockHeightMessage:
 
 		payload, err := client.get_all_transactions_by_block_height(l.Block_Height)
 
+		fmt.Print("\n payload equals: ", payload)
+
 		if err != nil {
+			fmt.Printf("error: %s", err.Error())
+			fmt.Println("ERRORRR!!!")
 			ctx.Respond(err.Error())
 		}
+
 		ctx.Respond(payload)
 
 	case BroadcastRawTransactionMessage:
@@ -112,7 +117,7 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 		ctx.Respond(payload)
 
 	default:
-		fmt.Print("\n UNKNOWN MESSAGE TO BLOACKCHAIN CLIENT: ", ctx.Message())
+		//fmt.Print("\n UNKNOWN MESSAGE TO BLOACKCHAIN CLIENT: ", ctx.Message())
 	}
 }
 
@@ -231,18 +236,18 @@ func GetRawMempool(e *actor.Engine, conn *actor.PID) (*[]MempoolEntry, error) {
 
 	res, err := resp.Result()
 
-	fmt.Printf("\n res returned mempool \n")
+	//fmt.Printf("\n res returned mempool \n")
 
 	if err != nil {
-		return nil, errors.New("An error occured!")
+		return nil, errors.New("An error occured trying to get res!")
 	}
 
-	fmt.Printf("\n res returned mempool .....\n")
+	//fmt.Printf("\n res returned mempool .....\n")
 
 	mempool, ok := res.([]MempoolEntry)
 
 	if !ok {
-		return nil, errors.New("An error occured!")
+		return nil, errors.New("An error occured trying to conv to mempool!")
 	}
 
 	return &mempool, nil
@@ -252,18 +257,18 @@ func GetAllTransactionsByBlockHeight(e *actor.Engine, conn *actor.PID, block_hei
 
 	var resp = e.Request(conn, GetAllTransactionsByBlockHeightMessage{
 		Block_Height: block_height,
-	}, time.Millisecond*1000)
+	}, time.Millisecond*1200)
 
 	res, err := resp.Result()
 
 	if err != nil {
-		return nil, errors.New("An error occured!")
+		return nil, errors.New(err.Error())
 	}
 
 	trans, ok := res.([]Transaction)
 
 	if !ok {
-		return nil, errors.New("An error occured!")
+		return nil, errors.New("An error occured tying to conv to transaction")
 	}
 
 	return trans, nil

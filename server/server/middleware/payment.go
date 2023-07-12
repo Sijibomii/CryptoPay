@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"regexp"
 	"strings"
 
@@ -37,7 +36,7 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 				return
 			}
 
-			pattern := `^/payment/[^/]+/status$`
+			pattern := `^/p/payments/[^/]+/status$`
 
 			// Create a regex object from the pattern
 			regex := regexp.MustCompile(pattern)
@@ -45,7 +44,7 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 			// Check if the URL path matches the regex pattern
 			if regex.MatchString(r.URL.Path) || r.URL.Path == "/p/vouchers" {
 				// session token is added here instead of api token
-				key := os.Getenv("JWT_SECRET_KEY")
+				key := appState.PrivateKey
 
 				payload, err := util.DecodeJWT(token, key)
 
@@ -64,7 +63,7 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 				next.ServeHTTP(w, r)
 
 			} else if r.URL.Path == "/p/payments" {
-				fmt.Print("PAYMENTTTTTTT ############### \n")
+				//fmt.Print("PAYMENTTTTTTT ############### \n")
 				// create payment
 				clientToken, tokenErr := uuid.Parse(token)
 
@@ -105,7 +104,7 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 				// Call the next handler
 				next.ServeHTTP(w, r)
 			} else {
-				fmt.Print("NOT FOUNDDDD \n")
+				//fmt.Print("NOT FOUNDDDD \n")
 				http.NotFound(w, r)
 			}
 

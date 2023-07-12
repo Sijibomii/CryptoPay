@@ -26,10 +26,10 @@ func (api *CoinApi) Rate_endpoint(from, to string) string {
 
 func (api *CoinApi) Get_rate(from, to, key string) (float64, error) {
 	url := api.Rate_endpoint(from, to)
-	fmt.Printf("\n URL: %s \n", url)
+	//fmt.Printf("\n URL: %s \n", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		fmt.Printf("Error creating request: %s \n", err.Error())
+		//fmt.Printf("Error creating request: %s \n", err.Error())
 		return 0, errors.New("Error creating request: %s")
 	}
 	rateField := "rate"
@@ -37,7 +37,7 @@ func (api *CoinApi) Get_rate(from, to, key string) (float64, error) {
 	client := http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		fmt.Printf("Error making request: %s \n", err.Error())
+		//fmt.Printf("Error making request: %s \n", err.Error())
 		return 0, errors.New("Error creating request: %s")
 	}
 	defer resp.Body.Close()
@@ -45,7 +45,7 @@ func (api *CoinApi) Get_rate(from, to, key string) (float64, error) {
 	body, err := ioutil.ReadAll(resp.Body)
 	fmt.Print("\n BODY: ", body)
 	if err != nil {
-		fmt.Printf("Error reading response body: %s \n", err.Error())
+		//fmt.Printf("Error reading response body: %s \n", err.Error())
 		return 0, errors.New("Error reading response body: %s")
 	}
 
@@ -53,9 +53,9 @@ func (api *CoinApi) Get_rate(from, to, key string) (float64, error) {
 	var data map[string]interface{}
 	// err = json.Unmarshal(body, &data)
 
-	// fmt.Print("\n DATA: ", data)
+	// //fmt.Print("\n DATA: ", data)
 	// if err != nil {
-	// 	fmt.Printf("Error deserializing response body: %s", err.Error())
+	// 	//fmt.Printf("Error deserializing response body: %s", err.Error())
 	// 	return 0, errors.New("Error deserializing response body: %s")
 	// }
 
@@ -63,10 +63,10 @@ func (api *CoinApi) Get_rate(from, to, key string) (float64, error) {
 	_, ok := data[rateField].(float64)
 	if !ok {
 		// // Handle the error
-		// fmt.Printf("Rate field not found in response")
+		// //fmt.Printf("Rate field not found in response")
 		// return 0, errors.New("Rate field not found in response")
 	}
 
-	fmt.Print("RATEE RETURNED \n")
+	//fmt.Print("RATEE RETURNED \n")
 	return 0.000033, nil
 }

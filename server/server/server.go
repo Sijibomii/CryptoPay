@@ -28,7 +28,7 @@ func CORS() mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			fmt.Print("\n REQUEST METHOD IS: ", r.Method)
+			//fmt.Print("\n REQUEST METHOD IS: ", r.Method)
 
 			// Set CORS headers
 			w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -292,7 +292,6 @@ func Run(config config.Config) {
 	paymentRoutes.Use(middleware.PaymentMiddleware(appState))
 
 	paymentRoutes.HandleFunc("/payments", func(w http.ResponseWriter, r *http.Request) {
-		// util.EnableCors(&w)
 		controllers.CreatePayment(w, r, appState)
 	}).Methods("POST")
 
@@ -307,11 +306,11 @@ func Run(config config.Config) {
 		w.WriteHeader(http.StatusOK)
 	}).Methods("OPTIONS")
 
-	paymentRoutes.HandleFunc("/payments/:id/status", func(w http.ResponseWriter, r *http.Request) {
+	paymentRoutes.HandleFunc("/payments/{id}/status", func(w http.ResponseWriter, r *http.Request) {
 		controllers.GetPaymentStatus(w, r, appState)
 	}).Methods("GET")
 
-	secureRoutes.HandleFunc("/payments/:id/status", func(w http.ResponseWriter, r *http.Request) {
+	paymentRoutes.HandleFunc("/payments/{id}/status", func(w http.ResponseWriter, r *http.Request) {
 
 		// Set CORS headers
 		w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -404,7 +403,7 @@ func initPool(connection string, pool_size int) *utils.PgExecutor {
 	// Initialize the connection pool
 	pool, err := utils.InitPool(connection, pool_size)
 	if err != nil {
-		fmt.Println(connection)
+		//fmt.Println(connection)
 		panic(err)
 	}
 

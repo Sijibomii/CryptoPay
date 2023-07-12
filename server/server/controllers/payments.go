@@ -2,10 +2,8 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/google/uuid"
@@ -100,13 +98,12 @@ func CreatePayment(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 		Expires_at: payment.Expires_at,
 	}
 
-	key := os.Getenv("JWT_SECRET_KEY")
-	fmt.Printf("jwt secret key: %s", key)
+	//fmt.Printf("jwt secret key: %s", key)
 
 	token, err := jwtPayload.Encode(appState.PrivateKey)
 
 	if err != nil {
-		fmt.Print("\n error", err.Error())
+		//fmt.Print("\n error", err.Error())
 		util.ErrorResponseFunc(w, r, util.NewErrUnauthorized("payment error (jwt)"))
 		return
 	}

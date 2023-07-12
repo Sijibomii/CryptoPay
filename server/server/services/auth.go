@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sijibomii/cryptopay/core/models"
@@ -16,7 +14,7 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 	if email != "" {
 		var err error
 		user, err = dao.GetUserByEmail(appState.Engine, appState.Postgres, email)
-		fmt.Printf("email is %v \n", user)
+		//fmt.Printf("email is %v \n", user)
 		if err != nil && !util.IsErrNotFound(err) {
 			return "", errors.Wrap(err, "invalid username or password")
 		}
@@ -27,7 +25,7 @@ func Login(appState *util.AppState, email string, password string) (string, erro
 	}
 
 	if !util.ComparePassword(user.Password, password) {
-		fmt.Printf("Invalid password for user, userID: %s", user.ID)
+		//fmt.Printf("Invalid password for user, userID: %s", user.ID)
 		return "", errors.New("invalid username or password")
 	}
 
@@ -54,7 +52,7 @@ func ResetPassword(appState *util.AppState, email string) (*models.User, error) 
 	if email != "" {
 		var err error
 		user, err = dao.GetUserByEmail(appState.Engine, appState.Postgres, email)
-		fmt.Printf("email is %v \n", user)
+		//fmt.Printf("email is %v \n", user)
 		if err != nil && !util.IsErrNotFound(err) {
 			return user, errors.Wrap(err, "invalid username or password")
 		}

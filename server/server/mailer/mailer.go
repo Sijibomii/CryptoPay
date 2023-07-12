@@ -40,20 +40,20 @@ func sendActivationEmail(m *Mailer, user models.User) {
 
 	// Send the email
 	if err := dialer.DialAndSend(message); err != nil {
-		fmt.Printf("Mailer error: %s", err.Error())
+		//fmt.Printf("Mailer error: %s", err.Error())
 	}
 }
 
 func (m *Mailer) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 	case actor.Started:
-		fmt.Println("Mailer started")
+		//fmt.Println("Mailer started")
 
 	case SendActivationMailMessage:
 		sendActivationEmail(m, l.Payload)
 
 	default:
-		fmt.Println("UNKNOWN MESSAGE TO MAILER")
+		//fmt.Println("UNKNOWN MESSAGE TO MAILER")
 
 	}
 }

@@ -2,7 +2,6 @@ package util
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/anthdm/hollywood/actor"
@@ -18,9 +17,9 @@ func GetRate(e *actor.Engine, conn *actor.PID, from, to string) (float64, error)
 
 	res, err := resp.Result()
 
-	fmt.Print("rate received", res)
+	//fmt.Print("rate received", res)
 
-	fmt.Printf("\n")
+	//fmt.Printf("\n")
 
 	if err != nil {
 		return 0, errors.New("An error occured!")
@@ -30,7 +29,7 @@ func GetRate(e *actor.Engine, conn *actor.PID, from, to string) (float64, error)
 	var errorString string
 
 	if floatValue, ok := res.(float64); ok {
-		fmt.Print("converted to float")
+		//fmt.Print("converted to float")
 		rate = floatValue
 		return rate, nil
 	} else if stringValue, ok := res.(string); ok {

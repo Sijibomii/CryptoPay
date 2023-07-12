@@ -1,8 +1,6 @@
 package services
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sijibomii/cryptopay/core/models"
@@ -45,7 +43,7 @@ func CreateClientToken(appState *util.AppState, store_id uuid.UUID, name, domain
 		name, err = util.GenerateRandomString(20)
 
 		if err != nil {
-			fmt.Printf("unable to generate random str for client token name error: %s", err.Error())
+			//fmt.Printf("unable to generate random str for client token name error: %s", err.Error())
 			name = "RANDOM API KEY"
 		}
 	}

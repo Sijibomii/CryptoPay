@@ -28,7 +28,7 @@ export class ApiClient {
             accept: "application/json",
             "content-Type": "application/json"
           },
-          method: "POST",
+          method: "POST", 
           body: JSON.stringify({
             fiat: this.fiat,
             crypto: crypto,

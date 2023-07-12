@@ -50,13 +50,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Payment = void 0;
 var components_1 = require("./components");
-var qrcode_1 = __importDefault(require("qrcode"));
+// import QRCode from "qrcode";
 var Payment = /** @class */ (function (_super) {
     __extends(Payment, _super);
     function Payment(options) {
@@ -70,7 +67,7 @@ var Payment = /** @class */ (function (_super) {
     }
     Payment.prototype.onMounted = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var qrcodeElement, qrcodeOptions, error_1;
+            var error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -80,22 +77,22 @@ var Payment = /** @class */ (function (_super) {
                         _a.trys.push([1, 3, , 4]);
                         this.copyButton = this.element.querySelector(".copy-address");
                         this.copyButton.addEventListener("click", this.copyAddress.bind(this));
-                        qrcodeElement = this.element.querySelector(".qrcode");
-                        qrcodeOptions = {
-                            text: "".concat(this.dataset.payment.address),
-                            width: 100,
-                            height: 100,
-                            colorDark: "#4a4a4a",
-                            colorLight: "#ffffff"
-                        };
-                        qrcode_1.default.toCanvas(qrcodeElement, JSON.stringify(qrcodeOptions), function (error) {
-                            if (error) {
-                                console.error("Failed to generate QR code:", error);
-                            }
-                            else {
-                                console.log("QR code generated successfully");
-                            }
-                        });
+                        // const qrcodeElement = this.element.querySelector(".qrcode");
+                        // const qrcodeOptions = {
+                        //     text: `${this.dataset.payment.address}`,
+                        //     width: 100,
+                        //     height: 100,
+                        //     colorDark: "#4a4a4a",
+                        //     colorLight: "#ffffff"
+                        // };
+                        // const ss =  JSON.stringify(qrcodeOptions)
+                        // QRCode.toCanvas(qrcodeElement, JSON.stringify(qrcodeOptions), (error : any) => {
+                        //     if (error) {
+                        //       console.error("Failed to generate QR code:", error);
+                        //     } else {
+                        //       console.log("QR code generated successfully");
+                        //     }
+                        //   });
                         this.startCountdown();
                         return [4 /*yield*/, this.pollPaymentStatus()];
                     case 2:

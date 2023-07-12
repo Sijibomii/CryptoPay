@@ -1,8 +1,6 @@
 package coinclient
 
 import (
-	"fmt"
-
 	"github.com/anthdm/hollywood/actor"
 )
 
@@ -22,8 +20,8 @@ func (c *CoinClient) Receive(ctx *actor.Context) {
 		key := c.Key
 		payload, err := getRate(key, l.From, l.To)
 
-		fmt.Print("\n RATE: ", payload)
-		fmt.Print("\n")
+		//fmt.Print("\n RATE: ", payload)
+		//fmt.Print("\n")
 		if err != nil {
 			ctx.Respond(err.Error())
 		}
@@ -31,7 +29,7 @@ func (c *CoinClient) Receive(ctx *actor.Context) {
 		ctx.Respond(payload)
 
 	default:
-		fmt.Println("UNKNOWN MESSAGE TO COIN CLIENT")
+		//fmt.Println("UNKNOWN MESSAGE TO COIN CLIENT")
 	}
 }
 

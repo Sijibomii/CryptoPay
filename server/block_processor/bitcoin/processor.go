@@ -37,8 +37,12 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 	txids := make(map[string]string)
 	outputs := make(map[string]bitcoin.Vout)
 
+	// length := len(pooledTransactions)
+	//fmt.Print("\n TRANSACTION LENGTH:", length)
 	for _, transaction := range pooledTransactions {
+		// //fmt.Printf("TRANSACTION %s IS BEEN PROCCESSED \n", transaction.TxID)
 		for _, output := range transaction.Vout {
+			// //fmt.Printf("OUTPUT %s from TRANS %s IS BEEN PROCCESSED \n", output.ScriptPubKey, transaction.TxID)
 			if output.ScriptPubKeyAddress != "" {
 				outputAddresses := output.ScriptPubKeyAddress
 				addresses = append(addresses, outputAddresses)
@@ -58,7 +62,7 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 	payments, err := models.FindAllPaymentsByAddresses(processor.Engine, processor.PostgresClient, processedBlockStream.Addresses, "btc")
 
 	if err != nil {
-		fmt.Printf("error...")
+		//fmt.Printf("error...")
 		panic("error finding pending payments in processor")
 	}
 
@@ -99,7 +103,7 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 			}
 
 		default:
-			fmt.Printf("PAYMENT STATUS OF %s NOT RECOGNIZED \n", payment.Status)
+			//fmt.Printf("PAYMENT STATUS OF %s NOT RECOGNIZED \n", payment.Status)
 		}
 
 		models.UpdatePayment(processor.Engine, processor.PostgresClient, paymentPayload.ID, paymentPayload)
@@ -116,7 +120,7 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 	transactions, err := bitcoin.GetAllTransactionsByBlockHeight(processor.Engine, processor.BtcClient, block.Height)
 
 	if err != nil {
-		fmt.Printf("error...")
+		fmt.Printf("error... %s \n", err.Error())
 		panic("error finding all transactions by block height")
 	}
 
@@ -126,8 +130,8 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 
 	for _, transaction := range transactions {
 		for _, output := range transaction.Vout {
-			fmt.Print("\n output: ", output)
-			fmt.Print("\n address: ", output.ScriptPubKeyAddress)
+			//fmt.Print("\n output: ", output)
+			//fmt.Print("\n address: ", output.ScriptPubKeyAddress)
 			if output.ScriptPubKeyAddress != "" {
 				outputAddresses := output.ScriptPubKeyAddress
 
@@ -139,7 +143,7 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 		}
 	}
 
-	fmt.Print("\n find all payments by addresses: ", addresses)
+	//fmt.Print("\n find all payments by addresses: ", addresses)
 
 	payments, err := models.FindAllPaymentsByAddresses(processor.Engine, processor.PostgresClient, addresses, "btc")
 
@@ -214,13 +218,13 @@ func (processor *Processor) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 
 	case actor.Started:
-		fmt.Println("processor actor started")
+		//fmt.Println("processor actor started")
 
 	case ProcessBlockMessage:
-		fmt.Print("process block message received! \n")
+		//fmt.Print("process block message received! \n")
 
-		fmt.Print("block string recived ", l.BlockString)
-		fmt.Println("")
+		//fmt.Print("block string recived ", l.BlockString)
+		//fmt.Println("")
 		block, err := parseBlockString(l.BlockString)
 
 		if err != nil {
@@ -229,10 +233,10 @@ func (processor *Processor) Receive(ctx *actor.Context) {
 		processor.processBlock(block)
 
 	case ProcessMempoolTransactionsMessage:
-		fmt.Print("process mempool transactions message received! \n")
+		//fmt.Print("process mempool transactions message received! \n")
 		processor.processMempoolTransactions(l.Transactions)
 
 	default:
-		fmt.Println("UNKNOWN MESSAGE TO PROCESSOR CLIENT")
+		//fmt.Println("UNKNOWN MESSAGE TO PROCESSOR CLIENT")
 	}
 }
