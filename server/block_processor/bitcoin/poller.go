@@ -144,7 +144,7 @@ func (poller *Poller) poll(e *actor.Engine, conn *actor.PID, block_number, retry
 	e.SendRepeat(conn, Poll{
 		Block_number: block_number + 1,
 		Retry_count:  retry_count,
-	}, time.Millisecond*2000)
+	}, time.Millisecond*10000)
 
 	return true, nil
 

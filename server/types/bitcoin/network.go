@@ -17,7 +17,7 @@ func (n Network) String() string {
 	case Mainnet:
 		return "mainnet"
 	case Test:
-		return "test"
+		return "testnet"
 	default:
 		return ""
 	}
@@ -34,7 +34,7 @@ func (n *Network) UnmarshalText(data []byte) error {
 	switch str {
 	case "mainnet":
 		*n = Mainnet
-	case "test":
+	case "testnet":
 		*n = Test
 	default:
 		return fmt.Errorf("invalid value for bitcoin network")

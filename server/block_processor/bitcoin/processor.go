@@ -213,6 +213,9 @@ func (processor *Processor) processBlock(block bitcoin.Block) {
 			Transaction: *transaction,
 		})
 	}
+
+	// update blockchain status
+	models.UpdateBtcBlockChainStatusByNetwork(processor.Engine, processor.PostgresClient, "testnet", block.Height)
 }
 
 // helper func

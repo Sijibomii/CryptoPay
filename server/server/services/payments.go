@@ -22,7 +22,7 @@ func CreatePayment(appState *util.AppState, store models.Store, payload models.P
 	payload.Confirmations_required = store.Btc_confirmations_required
 	payload.Index = 1
 
-	payload.Btc_network = "TEST"
+	payload.Btc_network = "testnet"
 
 	payload.Status = "pending"
 

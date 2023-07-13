@@ -192,6 +192,11 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 		ctx.Respond(payload)
 
+	case models.UpdateBtcBlockChainStatusByNetworkMessage:
+		payload := updateBtcBlockChainStatusByNetwork(d.DB, l.Network, l.Block_height)
+
+		ctx.Respond(payload)
+
 	// payout
 	case models.InsertPayoutMessage:
 		payload := insertPayout(d.DB, l.Payload)

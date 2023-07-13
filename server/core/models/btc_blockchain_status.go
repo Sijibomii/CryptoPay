@@ -49,6 +49,11 @@ type FindBtcBlockChainStatusByNetworkMessage struct {
 	Network string
 }
 
+type UpdateBtcBlockChainStatusByNetworkMessage struct {
+	Network      string
+	Block_height int
+}
+
 func InsertBtcBlockChainStatus(e *actor.Engine, conn *actor.PID, d BtcBlockChainStatusPayload) (BtcBlockChainStatus, error) {
 	d.Set_created_at()
 	d.Set_id_token()
@@ -71,6 +76,25 @@ func InsertBtcBlockChainStatus(e *actor.Engine, conn *actor.PID, d BtcBlockChain
 func FindBtcBlockChainStatusByNetwork(e *actor.Engine, conn *actor.PID, network string) (BtcBlockChainStatus, error) {
 	var resp = e.Request(conn, FindBtcBlockChainStatusByNetworkMessage{
 		Network: network,
+	}, time.Millisecond*100)
+	res, err := resp.Result()
+
+	if err != nil {
+		return BtcBlockChainStatus{}, errors.New("An error occured!")
+	}
+	myStruct, ok := res.(BtcBlockChainStatus)
+
+	if !ok {
+		return BtcBlockChainStatus{}, errors.New("An error occured!")
+	}
+
+	return myStruct, nil
+}
+
+func UpdateBtcBlockChainStatusByNetwork(e *actor.Engine, conn *actor.PID, network string, block_height int) (BtcBlockChainStatus, error) {
+	var resp = e.Request(conn, UpdateBtcBlockChainStatusByNetworkMessage{
+		Network:      network,
+		Block_height: block_height,
 	}, time.Millisecond*100)
 	res, err := resp.Result()
 
