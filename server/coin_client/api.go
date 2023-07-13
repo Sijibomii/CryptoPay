@@ -68,5 +68,6 @@ func (api *CoinApi) Get_rate(from, to, key string) (float64, error) {
 	}
 
 	fmt.Print("RATEE RETURNED \n")
+
 	return 0.000033, nil
 }

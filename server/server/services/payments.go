@@ -64,12 +64,12 @@ func CreatePayment(appState *util.AppState, store models.Store, payload models.P
 		return &models.Payment{}, errors.Wrap(err, "internal error")
 	}
 	fee, err := bitcoin.GetFeeEstimates(appState.Engine, appState.BtcClient)
-
-	charge := (rate * float64(price)) + fee.OneHourFee
+	// in sat: CONVERT FEE TO BTC FROM SAT
+	charge := (rate * float64(price)) + (fee.OneHourFee / 100000000)
 	fmt.Print("\n charge: ", charge)
 	fmt.Print("\n")
 	payload.Charge = strconv.FormatFloat(charge, 'f', -1, 64)
-	payload.Fee = fee.OneHourFee
+	payload.Fee = fee.OneHourFee / 100000000
 	fmt.Print("\n fee: ", fee)
 	fmt.Print("\n")
 	payment, err := dao.CreatePayment(appState.Engine, appState.Postgres, payload)

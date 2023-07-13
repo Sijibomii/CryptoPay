@@ -68,20 +68,21 @@ func Run(config config.Config) {
 
 	e := actor.NewEngine()
 
-	pid := e.Spawn(newDbClient(pg), "dbClient")
+	// there's a wierd bug with hollywood "out or range..." that's why the restart is set to 20
+	pid := e.Spawn(newDbClient(pg), "dbClient", actor.WithMaxRestarts(20))
 
-	mailerPid := e.Spawn(newMailerClient(&config.Mailer), "mailer")
+	mailerPid := e.Spawn(newMailerClient(&config.Mailer), "mailer", actor.WithMaxRestarts(20))
 
 	// currencyClient
 	value := os.Getenv("COIN_API_KEY")
 
-	coinClientPid := e.Spawn(newCoinClient(value), "coinClient")
+	coinClientPid := e.Spawn(newCoinClient(value), "coinClient", actor.WithMaxRestarts(20))
 
-	btcChainClient := e.Spawn(newBtcChainClient(), "btcChainClient")
+	btcChainClient := e.Spawn(newBtcChainClient(), "btcChainClient", actor.WithMaxRestarts(20))
 
-	processorClient := e.Spawn(newProcessorClient("testnet", pid, e, btcChainClient), "processorClient")
+	processorClient := e.Spawn(newProcessorClient("testnet", pid, e, btcChainClient), "processorClient", actor.WithMaxRestarts(20))
 
-	pollerClient := e.Spawn(newPollerClient("testnet", pid, btcChainClient, processorClient), "pollerClient")
+	pollerClient := e.Spawn(newPollerClient("testnet", pid, btcChainClient, processorClient), "pollerClient", actor.WithMaxRestarts(20))
 
 	// send message
 	e.Send(pollerClient, btc_processor.StartPollingMessage{

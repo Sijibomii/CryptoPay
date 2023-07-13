@@ -38,7 +38,7 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 	outputs := make(map[string]bitcoin.Vout)
 
 	length := len(pooledTransactions)
-	fmt.Print("\n TRANSACTION LENGTH:", length)
+	fmt.Println("\n TRANSACTION LENGTH: ", length)
 	for _, transaction := range pooledTransactions {
 		fmt.Printf("TRANSACTION %s IS BEEN PROCCESSED \n", transaction.TxID)
 		for _, output := range transaction.Vout {

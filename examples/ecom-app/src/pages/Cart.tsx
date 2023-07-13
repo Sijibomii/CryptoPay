@@ -6,7 +6,7 @@ const Cart = () => {
     function handleCheckOut(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>){
         e.preventDefault()
         const cryptoPay = new CryptoPay({
-            price: 2,
+            price: 0.1,
             fiat: "USD",
             identifier: "sijibomiolajubu@gmail.com",
             apiUrl: "http://localhost:7000",

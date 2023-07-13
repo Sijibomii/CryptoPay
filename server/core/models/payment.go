@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/anthdm/hollywood/actor"
@@ -162,6 +163,7 @@ type FindAllPaymentByAddressesMessage struct {
 }
 
 func FindAllPaymentsByAddresses(e *actor.Engine, conn *actor.PID, address []string, crypto string) ([]Payment, error) {
+	fmt.Printf("\n FINDING PAYMENTS BY ADDRESSES \n")
 	var resp = e.Request(conn, FindAllPaymentByAddressesMessage{
 		Address: address,
 		Crypto:  crypto,
