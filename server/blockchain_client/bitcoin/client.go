@@ -38,7 +38,7 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 
 	case GetBlockCountMessage:
-		//fmt.Printf("revcieved block count message \n")
+		fmt.Printf("revcieved block count message \n")
 
 		payload, err := client.get_block_count()
 
@@ -72,8 +72,8 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 		}
 
 		// stringify:
-		//fmt.Print("\n TRANSACTION RAW MESSAGE : ", *payload)
-		//fmt.Println("")
+		fmt.Print("\n TRANSACTION RAW MESSAGE : ", *payload)
+		fmt.Println("")
 		ctx.Respond(*payload)
 
 	case GetAllTransactionsByBlockHeightMessage:
@@ -115,7 +115,7 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 		ctx.Respond(payload)
 
 	default:
-		//fmt.Print("\n UNKNOWN MESSAGE TO BLOACKCHAIN CLIENT: ", ctx.Message())
+		fmt.Print("\n UNKNOWN MESSAGE TO BLOACKCHAIN CLIENT: ", ctx.Message())
 	}
 }
 
@@ -234,13 +234,13 @@ func GetRawMempool(e *actor.Engine, conn *actor.PID) (*[]MempoolEntry, error) {
 
 	res, err := resp.Result()
 
-	//fmt.Printf("\n res returned mempool \n")
+	fmt.Printf("\n res returned mempool \n")
 
 	if err != nil {
 		return nil, errors.New("An error occured trying to get res!")
 	}
 
-	//fmt.Printf("\n res returned mempool .....\n")
+	fmt.Printf("\n res returned mempool .....\n")
 
 	mempool, ok := res.([]MempoolEntry)
 

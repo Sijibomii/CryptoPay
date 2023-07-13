@@ -28,7 +28,7 @@ func CORS() mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			//fmt.Print("\n REQUEST METHOD IS: ", r.Method)
+			fmt.Print("\n REQUEST METHOD IS: ", r.Method)
 
 			// Set CORS headers
 			w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -403,7 +403,7 @@ func initPool(connection string, pool_size int) *utils.PgExecutor {
 	// Initialize the connection pool
 	pool, err := utils.InitPool(connection, pool_size)
 	if err != nil {
-		//fmt.Println(connection)
+		fmt.Println(connection)
 		panic(err)
 	}
 

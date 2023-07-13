@@ -34,12 +34,12 @@ func (client *BlockchainClient) Block_count_endpoint() string {
 }
 
 func (client *BlockchainClient) get_block_count() (int, error) {
-	//fmt.Printf("block count message \n")
+	fmt.Printf("block count message \n")
 	// client.Block_count_endpoint()
 	response, err := http.Get("https://blockstream.info/testnet/api/blocks/tip/height")
 	//
 	if err != nil {
-		//fmt.Printf("block count message \n #############  %s", err.Error())
+		fmt.Printf("block count message \n #############  %s", err.Error())
 		return 0, err
 	}
 	defer response.Body.Close()
@@ -50,7 +50,7 @@ func (client *BlockchainClient) get_block_count() (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	//fmt.Println(string(body))
+	fmt.Println(string(body))
 	// Parse response to integer
 	value, err := strconv.Atoi(string(body))
 	if err != nil {
@@ -83,7 +83,7 @@ func (b Block) String() string {
 func (client *BlockchainClient) Get_Block_endpoint(block_hash string) string {
 	baseURL, _ := url.Parse(client.BSUrl)
 	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/block/%s", block_hash)})
-	//fmt.Printf(u.String())
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -116,14 +116,14 @@ func (client *BlockchainClient) get_Block(block_hash string) (*Block, error) {
 
 func (client *BlockchainClient) Get_Block_Hash_with_height_endpoint(block_height int) string {
 	baseURL, _ := url.Parse(client.BSUrl)
-	//fmt.Printf(baseURL.String())
+	fmt.Printf(baseURL.String())
 	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/block-height/%s", strconv.Itoa(block_height))})
-	//fmt.Printf(u.String())
+	fmt.Printf(u.String())
 	return u.String()
 }
 
 func (client *BlockchainClient) get_Block_Hash_with_height(block_height int) (string, error) {
-	//fmt.Printf("Getting block with height \n")
+	fmt.Printf("Getting block with height \n")
 
 	response, err := http.Get(client.Get_Block_Hash_with_height_endpoint(block_height))
 	if err != nil {
@@ -139,7 +139,7 @@ func (client *BlockchainClient) get_Block_Hash_with_height(block_height int) (st
 
 	value := string(body)
 
-	//fmt.Printf("value: %s \n", value)
+	fmt.Printf("value: %s \n", value)
 
 	return value, nil
 }
@@ -147,7 +147,7 @@ func (client *BlockchainClient) get_Block_Hash_with_height(block_height int) (st
 func (client *BlockchainClient) Get_Transactions_by_Block_hash_endpoint(block_hash string) string {
 	baseURL, _ := url.Parse(client.BSUrl)
 	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/block/%s/txids", block_hash)})
-	//fmt.Printf(u.String())
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -177,7 +177,7 @@ func (client *BlockchainClient) get_Transactions_id_by_Block_hash(block_hash str
 func (client *BlockchainClient) Get_Transaction_by_hash_endpoint(tx_hash string) string {
 	baseURL, _ := url.Parse(client.BSUrl)
 	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/tx/%s", tx_hash)})
-	//fmt.Printf(u.String())
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -240,7 +240,7 @@ func (client *BlockchainClient) get_Transaction_By_Hash(tx_hash string) (*Transa
 
 	body, err := ioutil.ReadAll(resp.Body)
 
-	//fmt.Printf("\n transaction request body: %s \n", string(body))
+	fmt.Printf("\n transaction request body: %s \n", string(body))
 
 	if err != nil {
 		return nil, err
@@ -262,7 +262,7 @@ func (client *BlockchainClient) get_Transaction_By_Hash(tx_hash string) (*Transa
 func (client *BlockchainClient) Get_Hash_For_Last_Block_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
 	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/blocks/tip/hash")})
-	//fmt.Printf(u.String())
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -291,7 +291,7 @@ func (client *BlockchainClient) get_Hash_For_Last_Block() (string, error) {
 func (client *BlockchainClient) BroadcastTransaction_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
 	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/tx")})
-	//fmt.Printf(u.String())
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -321,7 +321,7 @@ func (client *BlockchainClient) broadcastTransaction(rawTx string) (string, erro
 	// should return hash
 
 	// Print the response body
-	//fmt.Println(string(body))
+	fmt.Println(string(body))
 
 	return string(body), nil
 }
@@ -337,7 +337,7 @@ type FeeEstimates struct {
 func (client *BlockchainClient) GetFeeEstimates_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
 	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/fee-estimates")})
-	//fmt.Printf(u.String())
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -346,9 +346,9 @@ func (client *BlockchainClient) getFeeEstimates() (FeeEstimates, error) {
 
 	f := FeeEstimates{}
 
-	//fmt.Printf("\n fee url: %s \n", url)
+	fmt.Printf("\n fee url: %s \n", url)
 	resp, err := http.Get(url)
-	//fmt.Print("\n resp: ", resp)
+	fmt.Print("\n resp: ", resp)
 	if err != nil {
 		return f, err
 	}
@@ -356,7 +356,7 @@ func (client *BlockchainClient) getFeeEstimates() (FeeEstimates, error) {
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
-	//fmt.Print("\n body: ", body)
+	fmt.Print("\n body: ", body)
 	if err != nil {
 		return f, err
 	}
@@ -368,7 +368,7 @@ func (client *BlockchainClient) getFeeEstimates() (FeeEstimates, error) {
 	var feeEstimates FeeEstimates
 
 	err = json.Unmarshal(body, &feeEstimates)
-	//fmt.Print("\n feeEstimates: ", feeEstimates)
+	fmt.Print("\n feeEstimates: ", feeEstimates)
 	if err != nil {
 		return f, err
 	}
@@ -386,7 +386,7 @@ type MempoolEntry struct {
 func (client *BlockchainClient) GetRawMempool_endpoint() string {
 	baseURL, _ := url.Parse(client.BSUrl)
 	u := baseURL.ResolveReference(&url.URL{Path: fmt.Sprintf("/testnet/api/mempool/recent")})
-	//fmt.Printf(u.String())
+	fmt.Printf(u.String())
 	return u.String()
 }
 
@@ -421,13 +421,13 @@ func (client *BlockchainClient) get_Block_with_height(block_height int) (*Block,
 	hash, err := client.get_Block_Hash_with_height(block_height)
 
 	if err != nil {
-		//fmt.Printf("error getting hash")
+		fmt.Printf("error getting hash")
 	}
 
 	block, err := client.get_Block(hash)
 
 	if err != nil {
-		//fmt.Printf("error getting block %s", err.Error())
+		fmt.Printf("error getting block %s", err.Error())
 	}
 
 	return block, nil
@@ -438,7 +438,7 @@ func (client *BlockchainClient) get_all_transactions_by_block_height(block_heigh
 	hash, err := client.get_Block_Hash_with_height(block_height)
 
 	if err != nil {
-		//fmt.Printf("error getting hash")
+		fmt.Printf("error getting hash")
 	}
 
 	txids, err := client.get_Transactions_id_by_Block_hash(hash)
@@ -449,15 +449,15 @@ func (client *BlockchainClient) get_all_transactions_by_block_height(block_heigh
 		trans, err := client.get_Transaction_By_Hash(txid)
 
 		if err != nil {
-			//fmt.Printf("error getting trans %s \n", txid)
+			fmt.Printf("error getting trans %s \n", txid)
 		}
-		//fmt.Printf("transaction request complete: ", trans)
+		fmt.Printf("transaction request complete: ", trans)
 		result = append(result, *trans)
 
 		// time.Sleep(20 * time.Microsecond)
 	}
 
-	//fmt.Printf(" \n transactions: ", result)
+	fmt.Printf(" \n transactions: ", result)
 
 	return result, nil
 }
@@ -467,7 +467,7 @@ func (client *BlockchainClient) Get_all_transactions_by_block_height(block_heigh
 	hash, err := client.get_Block_Hash_with_height(block_height)
 
 	if err != nil {
-		//fmt.Printf("error getting hash")
+		fmt.Printf("error getting hash")
 	}
 
 	txids, err := client.get_Transactions_id_by_Block_hash(hash)
@@ -478,15 +478,15 @@ func (client *BlockchainClient) Get_all_transactions_by_block_height(block_heigh
 		trans, err := client.get_Transaction_By_Hash(txid)
 
 		if err != nil {
-			//fmt.Printf("error getting trans %s \n", txid)
+			fmt.Printf("error getting trans %s \n", txid)
 		}
-		//fmt.Printf("transaction request complete: ", trans)
+		fmt.Printf("transaction request complete: ", trans)
 		result = append(result, *trans)
 
 		// time.Sleep(20 * time.Microsecond)
 	}
 
-	//fmt.Printf(" \n transactions: ", result)
+	fmt.Printf(" \n transactions: ", result)
 
 	return result, nil
 }

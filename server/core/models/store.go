@@ -3,6 +3,7 @@ package models
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -137,7 +138,7 @@ func (s *Store) Can_accept(crypto currency.Crypto) bool {
 		// }
 		return true
 	case currency.Eth:
-		//fmt.Println("Ethereum (ETH)")
+		fmt.Println("Ethereum (ETH)")
 	default:
 		return false
 	}

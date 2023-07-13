@@ -65,7 +65,7 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 				next.ServeHTTP(w, r)
 
 			} else if r.URL.Path == "/p/payments" {
-				//fmt.Print("PAYMENTTTTTTT ############### \n")
+				fmt.Print("PAYMENTTTTTTT ############### \n")
 				// create payment
 				clientToken, tokenErr := uuid.Parse(token)
 
@@ -106,7 +106,7 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 				// Call the next handler
 				next.ServeHTTP(w, r)
 			} else {
-				//fmt.Print("NOT FOUNDDDD \n")
+				fmt.Print("NOT FOUNDDDD \n")
 				http.NotFound(w, r)
 			}
 

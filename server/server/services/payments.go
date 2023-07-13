@@ -1,8 +1,11 @@
 package services
 
 import (
+	"fmt"
 	"strconv"
 
+	"github.com/btcsuite/btcd/chaincfg"
+	"github.com/btcsuite/btcutil"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/sijibomii/cryptopay/blockchain_client/bitcoin"
@@ -42,27 +45,33 @@ func CreatePayment(appState *util.AppState, store models.Store, payload models.P
 	masterKey, _ := bip32.NewMasterKey(seed)
 
 	childKey, _ := util.NewChildKeyFromString(masterKey, path)
+	params := &chaincfg.TestNet3Params
+	address, err := btcutil.NewAddressPubKey(childKey.PublicKey().Key, params)
 
-	payload.Address = childKey.PublicKey().String()
-
+	if err != nil {
+		fmt.Printf("error: %s", err.Error())
+		fmt.Println("add:", address)
+		panic("")
+	}
+	payload.Address = address.EncodeAddress()
 	rate, err := util.GetRate(appState.Engine, appState.CoinClient, payload.Fiat, payload.Crypto)
 
 	price, err := strconv.ParseFloat(payload.Price, 64)
 
 	if err != nil {
 		// Handle the error if the string cannot be parsed
-		//fmt.Println("Error converting string to float64:", err)
+		fmt.Println("Error converting string to float64:", err)
 		return &models.Payment{}, errors.Wrap(err, "internal error")
 	}
 	fee, err := bitcoin.GetFeeEstimates(appState.Engine, appState.BtcClient)
 
 	charge := (rate * float64(price)) + fee.OneHourFee
-	//fmt.Print("\n charge: ", charge)
-	//fmt.Print("\n")
+	fmt.Print("\n charge: ", charge)
+	fmt.Print("\n")
 	payload.Charge = strconv.FormatFloat(charge, 'f', -1, 64)
 	payload.Fee = fee.OneHourFee
-	//fmt.Print("\n fee: ", fee)
-	//fmt.Print("\n")
+	fmt.Print("\n fee: ", fee)
+	fmt.Print("\n")
 	payment, err := dao.CreatePayment(appState.Engine, appState.Postgres, payload)
 
 	return payment, nil

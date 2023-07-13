@@ -17,7 +17,7 @@ type ErrorResponse struct {
 }
 
 func ErrorResponseFunc(w http.ResponseWriter, r *http.Request, err error) {
-	//fmt.Printf("ERROR: %s\n", err.Error())
+	fmt.Printf("ERROR: %s\n", err.Error())
 
 	errorResponse := ErrorResponse{Error: err.Error()}
 
@@ -30,7 +30,7 @@ func ErrorResponseFunc(w http.ResponseWriter, r *http.Request, err error) {
 		errorResponse.Error = "internal server error"
 		errorResponse.ErrorCode = http.StatusInternalServerError
 	}
-	//fmt.Printf("API ERROR: %s\n", err.Error())
+	fmt.Printf("API ERROR: %s\n", err.Error())
 	SetResponseHeader(w, "Content-Type", "application/json")
 	data, err := json.Marshal(errorResponse)
 	if err != nil {

@@ -1,6 +1,7 @@
 package bitcoin
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/anthdm/hollywood/actor"
@@ -42,20 +43,20 @@ type PBPollMessage struct {
 }
 
 func (pb *PBPoller) poll(e *actor.Engine, conn *actor.PID, previous []bitcoin.MempoolEntry, retry_size int) {
-	//fmt.Print("\n POLLING FROM PRENDING BLOCK POLLER ######### \n")
+	fmt.Print("\n POLLING FROM PRENDING BLOCK POLLER ######### \n")
 
 	var resp = e.Request(pb.BtcClient, bitcoin.GetRawMempoolMessage{}, time.Millisecond*2000)
 
 	res, err := resp.Result()
 	if err != nil {
-		//fmt.Printf("error...")
+		fmt.Printf("error...")
 		panic(err.Error())
 	}
 
 	mempool, ok := res.([]bitcoin.MempoolEntry)
 
 	if !ok {
-		//fmt.Printf("error...")
+		fmt.Printf("error...")
 		panic("error parsing resp from poll in pb")
 	}
 
@@ -72,22 +73,22 @@ func (pb *PBPoller) poll(e *actor.Engine, conn *actor.PID, previous []bitcoin.Me
 		res, err := resp.Result()
 
 		if err != nil {
-			//fmt.Printf("error...")
+			fmt.Printf("error...")
 			panic("error getting resp from poll for loop")
 		}
 
 		trans, ok := res.(bitcoin.Transaction)
 
 		if !ok || trans.TxID == "0" {
-			//fmt.Println("raw trans: ", res)
-			//fmt.Printf("error in pb poll for loop ...")
+			fmt.Println("raw trans: ", res)
+			fmt.Printf("error in pb poll for loop ...")
 			continue
 		}
 
 		transResult = append(transResult, trans)
 
-		//fmt.Print("\n RAW TRANSACTION APPENDED FROM PB POLLER: ", trans)
-		//fmt.Println("")
+		fmt.Print("\n RAW TRANSACTION APPENDED FROM PB POLLER: ", trans)
+		fmt.Println("")
 	}
 
 	e.Send(pb.BlockProcessor, ProcessMempoolTransactionsMessage{
@@ -125,16 +126,16 @@ func (poller *PBPoller) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 
 	case actor.Started:
-		//fmt.Println("pending poller actor started")
+		fmt.Println("pending poller actor started")
 
 	case StartPBPollingMessage:
-		//fmt.Println("START POLLING FROM PENDING BLOCK POLLER")
+		fmt.Println("START POLLING FROM PENDING BLOCK POLLER")
 		poller.startPolling(ctx.Engine(), ctx.PID())
 
 	case PBPollMessage:
 		poller.poll(ctx.Engine(), ctx.PID(), l.Previous, l.Retry_count)
 
 	default:
-		//fmt.Println("UNKNOWN MESSAGE TO PBPoller CLIENT")
+		fmt.Println("UNKNOWN MESSAGE TO PBPoller CLIENT")
 	}
 }

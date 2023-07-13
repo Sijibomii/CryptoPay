@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/hex"
+	"fmt"
 
 	"github.com/btcsuite/btcd/btcec"
 	"github.com/btcsuite/btcutil/base58"
@@ -75,7 +76,7 @@ func (s *Script) script_sig(signature *btcec.Signature, publicKey *bip32.Key) {
 func (s *Script) from_hex(hexStr string) {
 	bytes, err := hex.DecodeString(hexStr)
 	if err != nil {
-		//fmt.Printf("unable to decode hex correctly")
+		fmt.Printf("unable to decode hex correctly")
 		panic("unable to decode hex correctly")
 	}
 	s.Data = bytes

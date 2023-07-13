@@ -77,9 +77,9 @@ func main() {
 	var crypto Crypto
 	err := crypto.Scan([]byte("btc"))
 	if err != nil {
-		//fmt.Println("Error:", err)
+		fmt.Println("Error:", err)
 		return
 	}
 
-	//fmt.Println("Crypto:", crypto)
+	fmt.Println("Crypto:", crypto)
 }

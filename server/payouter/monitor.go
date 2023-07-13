@@ -1,6 +1,7 @@
 package payouter
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/anthdm/hollywood/actor"
@@ -27,17 +28,17 @@ type MonitorMessage struct{}
 
 // actor.started message
 func started(e *actor.Engine, conn *actor.PID) {
-	//fmt.Printf("repeated message will be sent to monitor..")
+	fmt.Printf("repeated message will be sent to monitor..")
 	e.SendRepeat(conn, MonitorMessage{}, time.Millisecond*10000)
 }
 
 func (m *Monitor) doMonitor(e *actor.Engine, conn *actor.PID) {
 	status, err := models.FindBtcBlockChainStatusByNetwork(e, m.PostgresClient, m.Network)
 	if err != nil {
-		//fmt.Printf("monitor error %s", err.Error())
+		fmt.Printf("monitor error %s", err.Error())
 	}
 	if status.Block_Height == m.PreviousBlock {
-		//fmt.Printf("ok from monitor")
+		fmt.Printf("ok from monitor")
 	} else {
 
 		// why not just call the func?
@@ -48,7 +49,7 @@ func (m *Monitor) doMonitor(e *actor.Engine, conn *actor.PID) {
 
 		_, err := resp.Result()
 		if err != nil {
-			//fmt.Printf("monitor error %s", err.Error())
+			fmt.Printf("monitor error %s", err.Error())
 			panic("monitor error")
 		}
 	}
@@ -65,7 +66,7 @@ func (m *Monitor) processBlock(e *actor.Engine, block_number int, network string
 	// find all confirmed payouts
 	payouts, err := models.FindAllConfirmedPayout(e, m.PostgresClient, block_number, network)
 	if err != nil {
-		//fmt.Printf("monitor error %s", err.Error())
+		fmt.Printf("monitor error %s", err.Error())
 	}
 
 	// send processPayout for all payouts to the payrouter
@@ -91,6 +92,6 @@ func (monitor *Monitor) Receive(ctx *actor.Context) {
 
 		ctx.Respond(payload)
 	default:
-		//fmt.Println("UNKNOWN MESSAGE TO Monitor CLIENT")
+		fmt.Println("UNKNOWN MESSAGE TO Monitor CLIENT")
 	}
 }
