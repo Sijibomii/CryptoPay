@@ -23,14 +23,13 @@ var Success = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     Success.prototype.onMounted = function () {
-        var _this = this;
         this.modal.element.querySelector(".btn-close").classList.remove("disabled");
-        var dataset = this.dataset;
-        this.apiClient
-            .createVoucher(dataset.payment.id, dataset.sessionToken)
-            .then(function (data) {
-            _this.onSuccess(data.voucher);
-        });
+        // const dataset = this.dataset;
+        // this.apiClient
+        // .createVoucher(dataset.payment.id, dataset.sessionToken)
+        // .then(data => {
+        //     this.onSuccess(data.voucher);
+        // });
     };
     Success.prototype.render = function () {
         var currency = this.dataset.currency;

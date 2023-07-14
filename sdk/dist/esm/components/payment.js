@@ -50,6 +50,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import { Component } from "./components";
+// import QRCode from "qrcode";
 var Payment = /** @class */ (function (_super) {
     __extends(Payment, _super);
     function Payment(options) {
