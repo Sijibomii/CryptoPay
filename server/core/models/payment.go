@@ -166,7 +166,7 @@ func FindAllPaymentsByAddresses(e *actor.Engine, conn *actor.PID, address []stri
 	var resp = e.Request(conn, FindAllPaymentByAddressesMessage{
 		Address: address,
 		Crypto:  crypto,
-	}, time.Millisecond*100)
+	}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 	var cts []Payment

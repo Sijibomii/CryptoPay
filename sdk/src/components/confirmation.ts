@@ -36,6 +36,8 @@ export class Confirmation extends Component {
         this.dataset.remaining_confirmations = parseInt(
         resp.remaining_confirmations
         );
+        
+        console.log("response from payment status is: ", resp)
 
         if (resp.status == "insufficient_amount") {
             throw new Error(

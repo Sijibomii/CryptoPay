@@ -74,7 +74,8 @@ func (pb *PBPoller) poll(e *actor.Engine, conn *actor.PID, previous []bitcoin.Me
 
 		if err != nil {
 			fmt.Printf("error... getting transaction %s reason: %s \n ", transaction.TxID, err.Error())
-			panic("error getting resp from poll for loop")
+			continue
+			// panic("error getting resp from poll for loop")
 		}
 
 		trans, ok := res.(bitcoin.Transaction)

@@ -69,29 +69,29 @@ func Run(config config.Config) {
 	e := actor.NewEngine()
 
 	// there's a wierd bug with hollywood "out or range..." that's why the restart is set to 20
-	pid := e.Spawn(newDbClient(pg), "dbClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
+	pid := e.Spawn(newDbClient(pg), "dbClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*1024))
 
-	mailerPid := e.Spawn(newMailerClient(&config.Mailer), "mailer", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
+	mailerPid := e.Spawn(newMailerClient(&config.Mailer), "mailer", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*1024))
 
 	// currencyClient
 	value := os.Getenv("COIN_API_KEY")
 
-	coinClientPid := e.Spawn(newCoinClient(value), "coinClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
+	coinClientPid := e.Spawn(newCoinClient(value), "coinClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*1024))
 
-	btcChainClient := e.Spawn(newBtcChainClient(), "btcChainClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
+	btcChainClient := e.Spawn(newBtcChainClient(), "btcChainClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*1024))
 
-	processorClient := e.Spawn(newProcessorClient("testnet", pid, e, btcChainClient), "processorClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
+	processorClient := e.Spawn(newProcessorClient("testnet", pid, e, btcChainClient), "processorClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*1024))
 
-	pollerClient := e.Spawn(newPollerClient("testnet", pid, btcChainClient, processorClient), "pollerClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
+	pollerClient := e.Spawn(newPollerClient("testnet", pid, btcChainClient, processorClient), "pollerClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*1024))
 
 	// send message
 	e.Send(pollerClient, btc_processor.StartPollingMessage{
 		Ignore_previous_blocks: true,
 	})
 
-	pbBtcChainClient := e.Spawn(newBtcChainClient(), "pbBtcChainClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
+	pbBtcChainClient := e.Spawn(newBtcChainClient(), "pbBtcChainClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*1024))
 
-	pbProcessorClient := e.Spawn(newProcessorClient("testnet", pid, e, pbBtcChainClient), "pbProcessorClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
+	pbProcessorClient := e.Spawn(newProcessorClient("testnet", pid, e, pbBtcChainClient), "pbProcessorClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*1024))
 
 	pendingPollerClient := e.Spawn(newPendingPollerClient("testnet", pid, pbBtcChainClient, pbProcessorClient), "pendingPollerClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
 	e.Send(pendingPollerClient, btc_processor.StartPBPollingMessage{})

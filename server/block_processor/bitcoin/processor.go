@@ -62,7 +62,7 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 	payments, err := models.FindAllPaymentsByAddresses(processor.Engine, processor.PostgresClient, processedBlockStream.Addresses, "btc")
 
 	if err != nil {
-		//fmt.Printf("\n error... %s \n", err.Error())
+		fmt.Printf("\n error... %s \n", err.Error())
 		panic("error finding pending payments in processor")
 	}
 
@@ -76,7 +76,7 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 
 		var paymentPayload models.PaymentPayload
 
-		paymentPayload.FromPayment(payment)
+		paymentPayload = paymentPayload.FromPayment(payment)
 		paymentPayload.Transaction_hash = transaction.TxID
 
 		vout := processedBlockStream.Outputs[payment.Address]
@@ -106,8 +106,8 @@ func (processor *Processor) processMempoolTransactions(pooledTransactions []bitc
 			//fmt.Printf("PAYMENT STATUS OF %s NOT RECOGNIZED \n", payment.Status)
 		}
 
-		models.UpdatePayment(processor.Engine, processor.PostgresClient, paymentPayload.ID, paymentPayload)
-
+		newpayment, _ := models.UpdatePayment(processor.Engine, processor.PostgresClient, paymentPayload.ID, paymentPayload)
+		fmt.Print("\n PAYMENT UPDATED: ", newpayment)
 	}
 }
 
