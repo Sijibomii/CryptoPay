@@ -1,7 +1,6 @@
 package payouter
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -40,26 +39,26 @@ func (p *Payouter) preparePayout(e *actor.Engine, dbConn *actor.PID, payout mode
 	store, err := dao.GetStoreById(e, dbConn, payout.Store_id)
 
 	if err != nil {
-		fmt.Printf("unable to get store by id in prepare payout")
+		//fmt.Printf("unable to get store by id in prepare payout")
 		panic("unable to get store by id in prepare payout")
 	}
 
 	payment, err := dao.GetPaymentById(e, dbConn, payout.Payment_id)
 
 	if err != nil {
-		fmt.Printf("unable to get payment by id in prepare payout")
+		//fmt.Printf("unable to get payment by id in prepare payout")
 		panic("unable to get payment by id in prepare payout")
 	}
 
 	fee, err := bitcoin.GetFeeEstimates(e, p.BtcClient)
 
 	if err != nil {
-		fmt.Printf("unable to get fee by id in prepare payout")
+		//fmt.Printf("unable to get fee by id in prepare payout")
 		panic("unable to get fee by id in prepare payout")
 	}
 
 	if fee.OneHourFee == 0 {
-		fmt.Printf("invalid gas fee")
+		//fmt.Printf("invalid gas fee")
 		panic("invalid gas fee")
 	}
 
@@ -96,12 +95,12 @@ func (p *Payouter) payout(e *actor.Engine, dbConn *actor.PID, payout models.Payo
 	resp, err := p.preparePayout(e, dbConn, payout)
 
 	if err != nil {
-		fmt.Printf("unable to prepare payout")
+		//fmt.Printf("unable to prepare payout")
 		panic("unable to prepare payout")
 	}
 
 	if resp.Store.Btc_payout_user_addresses == "" {
-		fmt.Printf("no payout address in payouter")
+		//fmt.Printf("no payout address in payouter")
 		panic("no payout address in payouter")
 	}
 
@@ -118,7 +117,7 @@ func (p *Payouter) payout(e *actor.Engine, dbConn *actor.PID, payout models.Payo
 				utxo_idx = idx
 			}
 		} else {
-			fmt.Printf("unexpected script type in payouter %s", output.ScriptPubKeyType)
+			//fmt.Printf("unexpected script type in payouter %s", output.ScriptPubKeyType)
 			panic("unexpected script type in payouter")
 		}
 	}
@@ -130,7 +129,7 @@ func (p *Payouter) payout(e *actor.Engine, dbConn *actor.PID, payout models.Payo
 	tx_fee_per_byte := float64(resp.Fee) / 1000
 
 	if float64(value) <= tx_fee_per_byte*192 {
-		fmt.Printf("Insufficient funds to pay out.")
+		//fmt.Printf("Insufficient funds to pay out.")
 		panic("Insufficient funds to pay out.")
 	}
 	var inputs []bitcoin.TransactionInput
@@ -153,7 +152,7 @@ func (p *Payouter) payout(e *actor.Engine, dbConn *actor.PID, payout models.Payo
 	hash, err := bitcoin.BroadcastRawTransaction(e, p.BtcClient, string(raw_transaction))
 
 	if err != nil {
-		fmt.Printf("unable to broadcast transaction in payouter")
+		//fmt.Printf("unable to broadcast transaction in payouter")
 		panic("unable to broadcast transaction in payouter")
 	}
 
@@ -172,7 +171,7 @@ func (client *Payouter) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 
 	case actor.Started:
-		fmt.Println("payrouter started")
+		//fmt.Println("payrouter started")
 
 	case ProcessPayoutMessage:
 		client.SendPayoutMessage(ctx.Engine(), client.BtcClient, l.Payout)
@@ -180,7 +179,7 @@ func (client *Payouter) Receive(ctx *actor.Context) {
 	case PayoutMessage:
 
 	default:
-		fmt.Println("UNKNOWN MESSAGE TO Payrouter")
+		//fmt.Println("UNKNOWN MESSAGE TO Payrouter")
 	}
 }
 
@@ -194,7 +193,7 @@ func (p *Payouter) DoPayout(e *actor.Engine, conn *actor.PID, payout models.Payo
 	hash, err := p.payout(e, conn, payout)
 
 	if err != nil {
-		fmt.Printf("unable to get payout")
+		//fmt.Printf("unable to get payout")
 		panic("unable to get payout")
 	}
 
@@ -214,5 +213,5 @@ func (p *Payouter) DoPayout(e *actor.Engine, conn *actor.PID, payout models.Payo
 	if err != nil {
 		panic("insufficient funds")
 	}
-	fmt.Printf("payload updated")
+	//fmt.Printf("payload updated")
 }

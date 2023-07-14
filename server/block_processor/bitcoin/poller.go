@@ -35,7 +35,7 @@ type StartPollingMessage struct {
 }
 
 func (poller *Poller) startPolling(e *actor.Engine, conn *actor.PID, ignore_prev_blocks bool) (bool, error) {
-	fmt.Print("START POLLING MESSAGE \n")
+	//fmt.Print("START POLLING MESSAGE \n")
 	// send bootstrap message.
 
 	current_block, err := poller.bootstrapPoller(e, conn, ignore_prev_blocks)
@@ -45,22 +45,22 @@ func (poller *Poller) startPolling(e *actor.Engine, conn *actor.PID, ignore_prev
 
 	// _, err := resp.Result()
 	if err != nil {
-		fmt.Printf("error...123 %s", err.Error())
+		//fmt.Printf("error...123 %s", err.Error())
 		panic("error getting resp from boostrap")
 	}
 
 	// currentblock, ok := res.(int)
 
-	fmt.Print("CURRENT BLOCK  ", current_block, "\n")
+	//fmt.Print("CURRENT BLOCK  ", current_block, "\n")
 
 	// if !ok {
-	// 	fmt.Printf("error...")
+	// 	//fmt.Printf("error...")
 	// 	panic("error parsing resp from bootstrap")
 	// }
 
 	// get current block from response and send poll message
 
-	fmt.Print("POLL MESSAGE SENDING... \n")
+	//fmt.Print("POLL MESSAGE SENDING... \n")
 
 	e.Send(conn, Poll{
 		Block_number: current_block,
@@ -75,19 +75,19 @@ type BootstrapPollerMessage struct {
 }
 
 func (poller *Poller) bootstrapPoller(e *actor.Engine, conn *actor.PID, ig_prev_blocks bool) (int, error) {
-	fmt.Printf("BLOCK COUNT MESSAGE SENT \n")
+	//fmt.Printf("BLOCK COUNT MESSAGE SENT \n")
 	var resp = e.Request(poller.BtcClient, bitcoin.GetBlockCountMessage{}, time.Millisecond*1000)
 
 	res, err := resp.Result()
 	if err != nil {
-		fmt.Printf("error... \n")
+		//fmt.Printf("error... \n")
 		panic("error getting block count")
 	}
 
 	blockCount, ok := res.(int)
 
 	if !ok {
-		fmt.Printf("error...")
+		//fmt.Printf("error...")
 		panic("error getting block count")
 	}
 
@@ -104,7 +104,7 @@ func (poller *Poller) bootstrapPoller(e *actor.Engine, conn *actor.PID, ig_prev_
 	}
 
 	if err != nil {
-		fmt.Printf("error...")
+		//fmt.Printf("error...")
 		panic("error finding or inserting bloack status")
 	}
 
@@ -129,17 +129,17 @@ func (poller *Poller) poll(e *actor.Engine, conn *actor.PID, block_number, retry
 		return false, errors.New("An error occured!")
 	}
 	str, ok := res.(string)
-	fmt.Print("\n recieved string from req: ", str)
+	//fmt.Print("\n recieved string from req: ", str)
 	if !ok {
 		return false, errors.New("An error occured!")
 	}
 	block, err := parseBlockString(str)
 	stringify := block.String()
-	// fmt.Print("\n sending block string: ", stringify)
+	// //fmt.Print("\n sending block string: ", stringify)
 	e.Send(poller.BlockProcessor, ProcessBlockMessage{
 		BlockString: stringify,
 	})
-	fmt.Print("hereee sending poll2")
+	//fmt.Print("hereee sending poll2")
 
 	e.SendRepeat(conn, Poll{
 		Block_number: block_number + 1,
@@ -156,7 +156,7 @@ func parseBlockString(str string) (bitcoin.Block, error) {
 	regex := regexp.MustCompile(`Block: ID=(.*), Height=(\d+), Version=(\d+), Timestamp=(\d+), TxCount=(\d+), Size=(\d+), Weight=(\d+), MerkleRoot=(.*), PreviousBlock=(.*), MedianTime=(\d+), Nonce=(\d+), Bits=(\d+), Difficulty=(\d+)`)
 	match := regex.FindStringSubmatch(str)
 	if match == nil {
-		fmt.Printf("\n miss match ###################### \n")
+		//fmt.Printf("\n miss match ###################### \n")
 		return bitcoin.Block{}, fmt.Errorf("invalid block string format")
 	}
 
@@ -191,10 +191,10 @@ func (poller *Poller) Receive(ctx *actor.Context) {
 		// ctx.Respond(payload)
 
 	case Poll:
-		fmt.Print("polling message recieved")
+		//fmt.Print("polling message recieved")
 		poller.poll(ctx.Engine(), ctx.PID(), l.Block_number, l.Retry_count)
 
 	default:
-		fmt.Println("UNKNOWN MESSAGE TO POLLER CLIENT")
+		//fmt.Println("UNKNOWN MESSAGE TO POLLER CLIENT")
 	}
 }

@@ -18,10 +18,10 @@ import (
 )
 
 type CreatePaymentParams struct {
-	Price      int    `json:"price"`
-	Crypto     string `json:"crypto"`
-	Fiat       string `json:"fiat"`
-	Identifier string `json:"identifier"`
+	Price      float64 `json:"price"`
+	Crypto     string  `json:"crypto"`
+	Fiat       string  `json:"fiat"`
+	Identifier string  `json:"identifier"`
 }
 
 type storeParams struct {
@@ -51,10 +51,11 @@ func CreatePayment(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 	err = json.Unmarshal(requestBody, &createPaymentData)
 
 	if err != nil {
+		fmt.Printf("errror : %s \n", err.Error())
 		util.ErrorResponseFunc(w, r, err)
 		return
 	}
-
+	fmt.Printf("GETS HEREEE \n")
 	store, err := services.FindStoreById(appState, clientTokenContext.Store_id)
 
 	var crypto currency.Crypto
@@ -77,7 +78,7 @@ func CreatePayment(w http.ResponseWriter, r *http.Request, appState *util.AppSta
 		Store_id:   reqClient.Store_id,
 		Created_by: reqClient.ID,
 		Fiat:       createPaymentData.Fiat,
-		Price:      strconv.Itoa(createPaymentData.Price),
+		Price:      strconv.FormatFloat(createPaymentData.Price, 'f', -1, 64),
 		Crypto:     createPaymentData.Crypto,
 	}
 
@@ -161,7 +162,7 @@ func GetPaymentStatus(w http.ResponseWriter, r *http.Request, appState *util.App
 		status, err := dao.FindBtcBlockChainStatusByNetwork(appState.Engine, appState.Postgres, payment.Btc_network)
 
 		if err != nil {
-			fmt.Printf("error: %s", err.Error())
+			//fmt.Printf("error: %s", err.Error())
 		}
 
 		remaining_conf := payment.Confirmations_required - status.Block_Height

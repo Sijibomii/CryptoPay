@@ -49,8 +49,8 @@ func CreatePayment(appState *util.AppState, store models.Store, payload models.P
 	address, err := btcutil.NewAddressPubKey(childKey.PublicKey().Key, params)
 
 	if err != nil {
-		fmt.Printf("error: %s", err.Error())
-		fmt.Println("add:", address)
+		//fmt.Printf("error: %s", err.Error())
+		//fmt.Println("add:", address)
 		panic("")
 	}
 	payload.Address = address.EncodeAddress()
@@ -60,7 +60,7 @@ func CreatePayment(appState *util.AppState, store models.Store, payload models.P
 
 	if err != nil {
 		// Handle the error if the string cannot be parsed
-		fmt.Println("Error converting string to float64:", err)
+		//fmt.Println("Error converting string to float64:", err)
 		return &models.Payment{}, errors.Wrap(err, "internal error")
 	}
 	fee, err := bitcoin.GetFeeEstimates(appState.Engine, appState.BtcClient)
@@ -70,8 +70,8 @@ func CreatePayment(appState *util.AppState, store models.Store, payload models.P
 	fmt.Print("\n")
 	payload.Charge = strconv.FormatFloat(charge, 'f', -1, 64)
 	payload.Fee = fee.OneHourFee / 100000000
-	fmt.Print("\n fee: ", fee)
-	fmt.Print("\n")
+	//fmt.Print("\n fee: ", fee)
+	//fmt.Print("\n")
 	payment, err := dao.CreatePayment(appState.Engine, appState.Postgres, payload)
 
 	return payment, nil

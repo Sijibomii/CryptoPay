@@ -1,8 +1,6 @@
 package db
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"github.com/sijibomii/cryptopay/core/models"
@@ -13,7 +11,7 @@ func insertClientToken(conn *gorm.DB, payload models.ClientToken) models.ClientT
 	if err := result.Error; err != nil {
 		panic(err)
 	}
-	fmt.Printf("TOKEEEN \n")
+	//fmt.Printf("TOKEEEN \n")
 	return payload
 }
 

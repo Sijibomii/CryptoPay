@@ -1,8 +1,6 @@
 package db
 
 import (
-	"fmt"
-
 	"github.com/anthdm/hollywood/actor"
 	"github.com/sijibomii/cryptopay/core/models"
 	"github.com/sijibomii/cryptopay/core/utils"
@@ -15,7 +13,7 @@ type DBClient struct {
 func (d *DBClient) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 	case actor.Started:
-		fmt.Println("User db actor started")
+		//fmt.Println("User db actor started")
 
 	case models.InsertUserMessage:
 		payload, err := insertUser(d.DB, l.Payload)
@@ -34,7 +32,7 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 	case models.FindUserByEmailMessage:
 		payload, err := findUserByEmail(d.DB, l.Email)
-		fmt.Printf("Output of actor %v \n", payload)
+		//fmt.Printf("Output of actor %v \n", payload)
 
 		if err != nil {
 			ctx.Respond(nil)
@@ -124,7 +122,7 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 		ctx.Respond(payload)
 
 	case models.FindClientTokenByTokenAndDomainMessage:
-		fmt.Print("FIND TOKEN BY DOMAIN \n")
+		//fmt.Print("FIND TOKEN BY DOMAIN \n")
 		payload := findClientTokenByTokenAndDomain(d.DB, l.Token, l.Domain)
 
 		ctx.Respond(payload)
@@ -171,7 +169,7 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 
 		defer func() {
 			if r := recover(); r != nil {
-				fmt.Printf("Session insertion failed")
+				//fmt.Printf("Session insertion failed")
 				ctx.Respond(nil)
 			}
 		}()
@@ -214,6 +212,6 @@ func (d *DBClient) Receive(ctx *actor.Context) {
 	case models.UpdatePayoutWithPaymentMessage:
 
 	default:
-		fmt.Println("UNKNOWN MESSAGE TO USER DB")
+		//fmt.Println("UNKNOWN MESSAGE TO USER DB")
 	}
 }

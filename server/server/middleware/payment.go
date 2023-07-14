@@ -59,7 +59,7 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 				ctx := r.Context()
 				ctx = context.WithValue(ctx, "Payload", payload)
 				r = r.WithContext(ctx)
-				fmt.Printf("PAYMENT STATUS REQUEST 2!! \n")
+				//fmt.Printf("PAYMENT STATUS REQUEST 2!! \n")
 
 				// Call the next handler
 				next.ServeHTTP(w, r)
@@ -85,9 +85,8 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 				// 	http.Error(w, "invalid origin header", http.StatusUnauthorized)
 				// 	return
 				// }
-				fmt.Print("\n ORIGIN HEADERRR", originHeader)
-				fmt.Print("\n ORIGIN HEADERRR PARTSSSS", originHeaderParts)
-				fmt.Print("\n")
+
+				//fmt.Print("\n")
 				// domain := strings.TrimSuffix(originHeaderParts[1], "/")
 
 				// // domain is the store it will be used i.e www.amazon.com
@@ -103,10 +102,12 @@ func PaymentMiddleware(appState *util.AppState) mux.MiddlewareFunc {
 				ctx = context.WithValue(ctx, "Ctoken", client_token)
 				r = r.WithContext(ctx)
 
+				fmt.Print("\n ORIGIN HEADERRR", originHeader)
+				fmt.Print("\n ORIGIN HEADERRR PARTSSSS", originHeaderParts)
 				// Call the next handler
 				next.ServeHTTP(w, r)
 			} else {
-				fmt.Print("NOT FOUNDDDD \n")
+				//fmt.Print("NOT FOUNDDDD \n")
 				http.NotFound(w, r)
 			}
 

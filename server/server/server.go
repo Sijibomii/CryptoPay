@@ -28,7 +28,7 @@ func CORS() mux.MiddlewareFunc {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-			fmt.Print("\n REQUEST METHOD IS: ", r.Method)
+			//fmt.Print("\n REQUEST METHOD IS: ", r.Method)
 
 			// Set CORS headers
 			w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -69,31 +69,31 @@ func Run(config config.Config) {
 	e := actor.NewEngine()
 
 	// there's a wierd bug with hollywood "out or range..." that's why the restart is set to 20
-	pid := e.Spawn(newDbClient(pg), "dbClient", actor.WithMaxRestarts(20))
+	pid := e.Spawn(newDbClient(pg), "dbClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
 
-	mailerPid := e.Spawn(newMailerClient(&config.Mailer), "mailer", actor.WithMaxRestarts(20))
+	mailerPid := e.Spawn(newMailerClient(&config.Mailer), "mailer", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
 
 	// currencyClient
 	value := os.Getenv("COIN_API_KEY")
 
-	coinClientPid := e.Spawn(newCoinClient(value), "coinClient", actor.WithMaxRestarts(20))
+	coinClientPid := e.Spawn(newCoinClient(value), "coinClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
 
-	btcChainClient := e.Spawn(newBtcChainClient(), "btcChainClient", actor.WithMaxRestarts(20))
+	btcChainClient := e.Spawn(newBtcChainClient(), "btcChainClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
 
-	processorClient := e.Spawn(newProcessorClient("testnet", pid, e, btcChainClient), "processorClient", actor.WithMaxRestarts(20))
+	processorClient := e.Spawn(newProcessorClient("testnet", pid, e, btcChainClient), "processorClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
 
-	pollerClient := e.Spawn(newPollerClient("testnet", pid, btcChainClient, processorClient), "pollerClient", actor.WithMaxRestarts(20))
+	pollerClient := e.Spawn(newPollerClient("testnet", pid, btcChainClient, processorClient), "pollerClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
 
 	// send message
 	e.Send(pollerClient, btc_processor.StartPollingMessage{
 		Ignore_previous_blocks: true,
 	})
 
-	pbBtcChainClient := e.Spawn(newBtcChainClient(), "pbBtcChainClient")
+	pbBtcChainClient := e.Spawn(newBtcChainClient(), "pbBtcChainClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
 
-	pbProcessorClient := e.Spawn(newProcessorClient("testnet", pid, e, pbBtcChainClient), "pbProcessorClient")
+	pbProcessorClient := e.Spawn(newProcessorClient("testnet", pid, e, pbBtcChainClient), "pbProcessorClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
 
-	pendingPollerClient := e.Spawn(newPendingPollerClient("testnet", pid, pbBtcChainClient, pbProcessorClient), "pendingPollerClient")
+	pendingPollerClient := e.Spawn(newPendingPollerClient("testnet", pid, pbBtcChainClient, pbProcessorClient), "pendingPollerClient", actor.WithMaxRestarts(20), actor.WithInboxSize(1024*32))
 	e.Send(pendingPollerClient, btc_processor.StartPBPollingMessage{})
 
 	appState := &util.AppState{
@@ -404,7 +404,7 @@ func initPool(connection string, pool_size int) *utils.PgExecutor {
 	// Initialize the connection pool
 	pool, err := utils.InitPool(connection, pool_size)
 	if err != nil {
-		fmt.Println(connection)
+		//fmt.Println(connection)
 		panic(err)
 	}
 

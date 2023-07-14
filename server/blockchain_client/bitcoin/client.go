@@ -2,7 +2,6 @@ package bitcoin
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/anthdm/hollywood/actor"
@@ -38,7 +37,7 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 	switch l := ctx.Message().(type) {
 
 	case GetBlockCountMessage:
-		fmt.Printf("revcieved block count message \n")
+		//fmt.Printf("revcieved block count message \n")
 
 		payload, err := client.get_block_count()
 
@@ -72,8 +71,8 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 		}
 
 		// stringify:
-		fmt.Print("\n TRANSACTION RAW MESSAGE : ", *payload)
-		fmt.Println("")
+		//fmt.Print("\n TRANSACTION RAW MESSAGE : ", *payload)
+		//fmt.Println("")
 		ctx.Respond(*payload)
 
 	case GetAllTransactionsByBlockHeightMessage:
@@ -81,11 +80,11 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 		payload, err := client.get_all_transactions_by_block_height(l.Block_Height)
 
 		if err != nil {
-			fmt.Printf("error: %s", err.Error())
-			fmt.Println("ERRORRR!!!")
+			//fmt.Printf("error: %s", err.Error())
+			//fmt.Println("ERRORRR!!!")
 			ctx.Respond(err.Error())
 		}
-		fmt.Print("\n payload equals: ", payload)
+		//fmt.Print("\n payload equals: ", payload)
 		ctx.Respond(payload)
 
 	case BroadcastRawTransactionMessage:
@@ -115,7 +114,7 @@ func (client *BlockchainClient) Receive(ctx *actor.Context) {
 		ctx.Respond(payload)
 
 	default:
-		fmt.Print("\n UNKNOWN MESSAGE TO BLOACKCHAIN CLIENT: ", ctx.Message())
+		//fmt.Print("\n UNKNOWN MESSAGE TO BLOACKCHAIN CLIENT: ", ctx.Message())
 	}
 }
 
@@ -234,13 +233,13 @@ func GetRawMempool(e *actor.Engine, conn *actor.PID) (*[]MempoolEntry, error) {
 
 	res, err := resp.Result()
 
-	fmt.Printf("\n res returned mempool \n")
+	//fmt.Printf("\n res returned mempool \n")
 
 	if err != nil {
 		return nil, errors.New("An error occured trying to get res!")
 	}
 
-	fmt.Printf("\n res returned mempool .....\n")
+	//fmt.Printf("\n res returned mempool .....\n")
 
 	mempool, ok := res.([]MempoolEntry)
 

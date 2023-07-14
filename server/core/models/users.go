@@ -153,7 +153,7 @@ func UpdateUser(e *actor.Engine, conn *actor.PID, id uuid.UUID, d UserPayload) (
 
 	res, err := resp.Result()
 
-	// fmt.Printf(" User struct: %+v\n", myStruct)
+	// //fmt.Printf(" User struct: %+v\n", myStruct)
 
 	if err != nil {
 		return User{}, errors.New("An error occured!")
