@@ -83,7 +83,7 @@ const Cart = () => {
                                     <Link className="text-sm text-white ml-2" to='/checkout'>Remove</Link>
                                 </div>
                             </td>
-                        </tr>
+                        </tr> 
                     </tbody>
                 </table>
 
